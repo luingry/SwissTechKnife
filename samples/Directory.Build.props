@@ -1,0 +1,17 @@
+<Project>
+  <!--
+    Sample modules live here only to exercise the host end to end. Real modules live in their own
+    repositories and reference SwissTechKnife.Sdk.dll the same way (compile-only, Private=false).
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)..\Directory.Build.props" />
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\SwissTechKnife.Sdk\SwissTechKnife.Sdk.csproj" Private="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="module.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

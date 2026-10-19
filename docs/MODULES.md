@@ -1,0 +1,90 @@
+# Writing a module
+
+Modules live in their own repositories. A module is a .NET Framework 4.8 WPF class library that implements `SwissTechKnife.Sdk.IModule`, packaged as a zip with a `module.json`, and listed in the host catalog.
+
+## 1. Project
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SmoothMice.Module</AssemblyName>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Compile-only: the host provides the one shared copy at runtime. -->
+    <Reference Include="SwissTechKnife.Sdk" HintPath="lib\SwissTechKnife.Sdk.dll" Private="false" />
+    <None Include="module.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
+```
+
+Copy `SwissTechKnife.Sdk.dll` from a host build (or `dotnet pack src/SwissTechKnife.Sdk` and reference the package). SDK 1.x only grows additively.
+
+## 2. Entry point
+
+```csharp
+public sealed class SmoothMiceModule : IBackgroundModule
+{
+    private IModuleContext _context;
+    public void Initialize(IModuleContext context) => _context = context; // cheap, never block
+    public void Start() { /* install hooks */ }                         // activation: startup only
+    public void Stop() { /* remove hooks */ }
+    public FrameworkElement CreateView() => new SettingsView(_context);  // created on first open, kept alive
+    public void Dispose() { }
+}
+```
+
+`IModuleContext` gives: `DataDirectory` (settings that survive updates), `InstallDirectory` (read-only), `Dispatcher`, `Log`, `Notify(...)` (host toast) and `ShowModulePage()`.
+Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timers while hidden.
+
+## 3. module.json
+
+```json
+{
+  "id": "smooth-mice",
+  "version": "3.0.0",
+  "entryAssembly": "SmoothMice.Module.dll",
+  "entryType": "SmoothMice.Module.SmoothMiceModule",
+  "sdkVersion": 1,
+  "activation": "startup",
+  "loadMode": "memory"
+}
+```
+
+| Field | Values |
+|---|---|
+| `activation` | `onDemand` (default): created when the page is first opened. `startup`: created with the host; `IBackgroundModule.Start` is called. |
+| `loadMode` | `memory` (default): assemblies are read into memory, files are never locked, uninstall/update apply at once. `file`: `Assembly.LoadFrom`, for code that needs `Assembly.Location` or native side-by-side DLLs (WebView2). File changes then apply after a restart. |
+
+## 4. Package and catalog
+
+Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. Publish it (e.g. GitHub release asset) and add/update the entry in the host's `catalog/catalog.json`:
+
+```json
+{
+  "id": "smooth-mice", "name": "SmoothMice", "tagline": "…", "description": "…",
+  "category": "Entrada", "author": "luingry", "version": "3.0.0",
+  "icon": "<24×24 stroke path>", "accent": "#F2A65A",
+  "package": "https://github.com/luingry/SmoothMice/releases/download/v3.0.0/smooth-mice-3.0.0.zip",
+  "sha256": "<lowercase hex>", "size": 123456
+}
+```
+
+An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
+
+## 5. Rules
+
+- Use only design-system keys (`docs/DESIGN_SYSTEM.md`); no native-looking controls, no hard-coded colors.
+- The module shares the host process: never block the UI thread, never call `Environment.Exit`, catch your own background exceptions, release hooks/handles in `Stop`/`Dispose`.
+- Do not bundle another copy of the SDK or of WPF/.NET assemblies.
+- Single-instance, tray icon, auto-start and updates belong to the host: remove them from the app when converting it.
+
+## Conversion notes
+
+| App | Notes |
+|---|---|
+| SmoothMice | `activation: startup` + `IBackgroundModule` for the `WH_MOUSE_LL` hook and scroll worker. Its settings move to `DataDirectory`. The host's single-instance guard replaces the app's. Its own WPF theme is replaced by the SDK theme. |
+| Winput LAN | WebView2 needs `loadMode: file` (native loader next to the assembly). The firewall rule and the elevated logon task need an elevation story in the host installer; plan this before converting. |
+| AQ Tracker | Catalog entry is a placeholder until its description and package exist. |

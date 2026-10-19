@@ -1,0 +1,237 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="clr-namespace:SwissTechKnife.Sdk">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Tokens.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <!--
+        Buttons. One template, layered: background → checked → hover → pressed → content.
+        State changes fade the layers (opacity is GPU-cheap) and press scales the root slightly.
+    -->
+
+
+
+    <ControlTemplate x:Key="Template.Button" TargetType="ButtonBase">
+        <Grid x:Name="Root" Background="Transparent" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True">
+            <Grid.RenderTransform>
+                <ScaleTransform x:Name="Scale" />
+            </Grid.RenderTransform>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualStateGroup.Transitions>
+                        <VisualTransition GeneratedDuration="0:0:0.16" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                        <VisualTransition To="Pressed" GeneratedDuration="0:0:0.06" />
+                    </VisualStateGroup.Transitions>
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="MouseOver">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="HoverLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="HoverLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                            <DoubleAnimation Storyboard.TargetName="PressLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0" />
+                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.38" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+                <VisualStateGroup x:Name="CheckStates">
+                    <VisualStateGroup.Transitions>
+                        <VisualTransition GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                    </VisualStateGroup.Transitions>
+                    <VisualState x:Name="Unchecked" />
+                    <VisualState x:Name="Indeterminate" />
+                    <VisualState x:Name="Checked">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="CheckedLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+
+            <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" />
+            <Border x:Name="CheckedLayer" Background="{StaticResource Brush.Accent.Soft}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" Opacity="0" />
+            <Border x:Name="HoverLayer" Background="{TemplateBinding ui:Ui.HoverBackground}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" Opacity="0" />
+            <Border x:Name="PressLayer" Background="{TemplateBinding ui:Ui.PressedBackground}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" Opacity="0" />
+            <StackPanel Orientation="Horizontal"
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <TextBlock x:Name="Glyph"
+                           Text="{TemplateBinding ui:Ui.Icon}"
+                           FontFamily="{StaticResource Font.Icon}"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           TextOptions.TextRenderingMode="Grayscale"
+                           Margin="0,0,8,0" />
+                <ContentPresenter x:Name="Presenter" RecognizesAccessKey="True" VerticalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="ui:Ui.Icon" Value="{x:Null}">
+                <Setter TargetName="Glyph" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="Content" Value="{x:Null}">
+                <Setter TargetName="Glyph" Property="Margin" Value="0" />
+                <Setter TargetName="Glyph" Property="FontSize" Value="{Binding FontSize, RelativeSource={RelativeSource TemplatedParent}}" />
+                <Setter TargetName="Presenter" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="Button.Base" TargetType="ButtonBase">
+        <Setter Property="Background" Value="{StaticResource Brush.Surface4}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Text}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="MinHeight" Value="{StaticResource Size.Control}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual.Ring}" />
+        <Setter Property="ui:Ui.CornerRadius" Value="{StaticResource Radius.Md}" />
+        <Setter Property="ui:Ui.HoverBackground" Value="{StaticResource Brush.Overlay.Hover}" />
+        <Setter Property="ui:Ui.PressedBackground" Value="{StaticResource Brush.Overlay.Pressed}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template" Value="{StaticResource Template.Button}" />
+    </Style>
+
+    <!-- Primary: the one main action of a surface. -->
+    <Style x:Key="Button.Primary" TargetType="ButtonBase" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.OnAccent}" />
+        <Setter Property="ui:Ui.HoverBackground" Value="{StaticResource Brush.Overlay.Lighten}" />
+        <Setter Property="ui:Ui.PressedBackground" Value="{StaticResource Brush.Overlay.Darken}" />
+    </Style>
+
+    <!-- Secondary: alternative actions next to a primary one. -->
+    <Style x:Key="Button.Secondary" TargetType="ButtonBase" BasedOn="{StaticResource Button.Base}" />
+
+    <!-- Ghost: low-emphasis and toolbar actions. -->
+    <Style x:Key="Button.Ghost" TargetType="ButtonBase" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="{StaticResource Brush.Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}" />
+        <Setter Property="Padding" Value="12,0" />
+    </Style>
+
+    <!-- Danger: destructive actions (uninstall, delete). -->
+    <Style x:Key="Button.Danger" TargetType="ButtonBase" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="{StaticResource Brush.Danger.Soft}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Danger}" />
+        <Setter Property="ui:Ui.HoverBackground" Value="{StaticResource Brush.Danger.Soft}" />
+    </Style>
+
+    <!-- Icon: square icon-only button (set ui:Ui.Icon and a ToolTip). -->
+    <Style x:Key="Button.Icon" TargetType="ButtonBase" BasedOn="{StaticResource Button.Ghost}">
+        <Setter Property="Width" Value="{StaticResource Size.Control}" />
+        <Setter Property="Height" Value="{StaticResource Size.Control}" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Icon}" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+
+    <Style x:Key="Button.Icon.Sm" TargetType="ButtonBase" BasedOn="{StaticResource Button.Icon}">
+        <Setter Property="Width" Value="{StaticResource Size.Control.Sm}" />
+        <Setter Property="Height" Value="{StaticResource Size.Control.Sm}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Icon.Sm}" />
+        <Setter Property="ui:Ui.CornerRadius" Value="{StaticResource Radius.Sm}" />
+    </Style>
+
+    <!-- Toggle: on/off tool button. Checked tints with the accent. -->
+    <Style x:Key="Button.Toggle" TargetType="ToggleButton" BasedOn="{StaticResource Button.Ghost}">
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Brush.Accent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource Button.Secondary}" />
+    <Style TargetType="RepeatButton" BasedOn="{StaticResource Button.Secondary}" />
+    <Style TargetType="ToggleButton" BasedOn="{StaticResource Button.Toggle}" />
+
+    <!-- Segmented control item: put RadioButtons sharing a GroupName inside a Border.Segmented. -->
+    <Style x:Key="Segmented.Container" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Brush.Surface3}" />
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Md}" />
+        <Setter Property="Padding" Value="3" />
+    </Style>
+
+    <Style x:Key="Segmented.Item" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Text}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Body}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual.Ring}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid x:Name="Root" Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.16" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="HoverLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="HoverLayer" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.38" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CheckStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.22" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Unchecked" />
+                                <VisualState x:Name="Indeterminate" />
+                                <VisualState x:Name="Checked">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Pill" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="PillScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="PillScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="HoverLayer" Background="{StaticResource Brush.Overlay.Hover}" CornerRadius="8" Opacity="0" />
+                        <Border x:Name="Pill" Background="{StaticResource Brush.Surface5}" CornerRadius="8" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="PillScale" ScaleX="0.92" ScaleY="0.92" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

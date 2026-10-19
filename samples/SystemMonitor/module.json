@@ -1,0 +1,7 @@
+{
+  "id": "system-monitor",
+  "version": "1.0.0",
+  "entryAssembly": "SwissTechKnife.Samples.SystemMonitor.dll",
+  "entryType": "SwissTechKnife.Samples.SystemMonitor.SystemMonitorModule",
+  "sdkVersion": 1
+}

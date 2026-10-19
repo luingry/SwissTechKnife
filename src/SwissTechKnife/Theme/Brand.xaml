@@ -1,0 +1,87 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+    <!--
+        SwissTechKnife brand mark. Single source of truth for the logo:
+        the app renders it as vector, and scripts/render-brand.ps1 rasterizes the same
+        drawings into the .ico, PNGs and installer art.
+
+        Concept: a Swiss cross built from five modular tiles (one tool, many modules).
+        The orange core is the host; the right arm is a folding blade with a nail nick.
+        Grid: 256 x 256.
+    -->
+
+    <LinearGradientBrush x:Key="Brand.CoreBrush" StartPoint="0,0" EndPoint="1,1" po:Freeze="True">
+        <GradientStop Color="#F59A5C" Offset="0" />
+        <GradientStop Color="#E0652C" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brand.TileBrush" Color="#EDE7DE" po:Freeze="True" />
+    <LinearGradientBrush x:Key="Brand.BladeBrush" StartPoint="0,0" EndPoint="1,1" po:Freeze="True">
+        <GradientStop Color="#FAF7F2" Offset="0" />
+        <GradientStop Color="#C9C1B6" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="Brand.BadgeBrush" StartPoint="0,0" EndPoint="0,1" po:Freeze="True">
+        <GradientStop Color="#2B2825" Offset="0" />
+        <GradientStop Color="#161514" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Mark shapes on the 256 grid (frozen so both drawings below can share them). -->
+    <DrawingCollection x:Key="Brand.MarkShapes" po:Freeze="True">
+        <!-- Top, left, bottom tiles -->
+        <GeometryDrawing Brush="{StaticResource Brand.TileBrush}">
+            <GeometryDrawing.Geometry>
+                <GeometryGroup>
+                    <RectangleGeometry Rect="102,42,52,52" RadiusX="12" RadiusY="12" />
+                    <RectangleGeometry Rect="42,102,52,52" RadiusX="12" RadiusY="12" />
+                    <RectangleGeometry Rect="102,162,52,52" RadiusX="12" RadiusY="12" />
+                </GeometryGroup>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <!-- Core -->
+        <GeometryDrawing Brush="{StaticResource Brand.CoreBrush}">
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="102,102,52,52" RadiusX="12" RadiusY="12" />
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <!-- Blade with nail nick -->
+        <GeometryDrawing Brush="{StaticResource Brand.BladeBrush}">
+            <GeometryDrawing.Geometry>
+                <GeometryGroup FillRule="EvenOdd">
+                    <PathGeometry Figures="M174,102 L232,102 C229,127 215,154 192,154 L174,154 Q162,154 162,142 L162,114 Q162,102 174,102 Z" />
+                    <RectangleGeometry Rect="174,111,26,7" RadiusX="3.5" RadiusY="3.5" />
+                </GeometryGroup>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+    </DrawingCollection>
+
+    <!-- Mark only (transparent background), for use on dark surfaces. -->
+    <DrawingGroup x:Key="Brand.MarkDrawing" po:Freeze="True">
+        <GeometryDrawing Brush="Transparent" Geometry="M0,0 H256 V256 H0 Z" />
+        <DrawingGroup Children="{StaticResource Brand.MarkShapes}">
+            <DrawingGroup.Transform>
+                <TranslateTransform X="-6" />
+            </DrawingGroup.Transform>
+        </DrawingGroup>
+    </DrawingGroup>
+
+    <!-- App icon: mark on a dark squircle badge. -->
+    <DrawingGroup x:Key="Brand.LogoDrawing" po:Freeze="True">
+        <GeometryDrawing Brush="{StaticResource Brand.BadgeBrush}">
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0,0,256,256" RadiusX="62" RadiusY="62" />
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <DrawingGroup Children="{StaticResource Brand.MarkShapes}">
+            <DrawingGroup.Transform>
+                <TransformGroup>
+                    <TranslateTransform X="-6" />
+                    <ScaleTransform CenterX="128" CenterY="128" ScaleX="0.96" ScaleY="0.96" />
+                </TransformGroup>
+            </DrawingGroup.Transform>
+        </DrawingGroup>
+    </DrawingGroup>
+
+    <DrawingImage x:Key="Brand.Mark" Drawing="{StaticResource Brand.MarkDrawing}" po:Freeze="True" />
+    <DrawingImage x:Key="Brand.Logo" Drawing="{StaticResource Brand.LogoDrawing}" po:Freeze="True" />
+</ResourceDictionary>
+

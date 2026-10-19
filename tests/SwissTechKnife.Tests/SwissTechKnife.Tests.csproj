@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Dependency-free console test runner: `dotnet run` exits non-zero on any failure. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>SwissTechKnife.Tests</AssemblyName>
+    <RootNamespace>SwissTechKnife.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <ProjectReference Include="..\..\src\SwissTechKnife.Core\SwissTechKnife.Core.csproj" />
+  </ItemGroup>
+</Project>

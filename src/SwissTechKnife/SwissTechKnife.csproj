@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SwissTechKnife</AssemblyName>
+    <RootNamespace>SwissTechKnife</RootNamespace>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <ApplicationIcon>..\..\assets\brand\swisstechknife.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SwissTechKnife.Sdk\SwissTechKnife.Sdk.csproj" />
+    <ProjectReference Include="..\SwissTechKnife.Core\SwissTechKnife.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Embedded so the window icon never depends on the install folder layout. -->
+    <Resource Include="..\..\assets\brand\swisstechknife.ico" Link="Assets\swisstechknife.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Bundled catalog + packages (written by scripts/pack-modules.ps1). -->
+    <None Include="..\..\artifacts\feed\**\*" Link="feed\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\artifacts\feed')" />
+  </ItemGroup>
+</Project>

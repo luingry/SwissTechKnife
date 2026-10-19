@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Public module contract. Module repositories reference this assembly (compile-only, never shipped
+    inside a module package): the host provides the one instance every module binds to.
+    The assembly version stays fixed at the SDK contract version so modules built against any 1.x
+    keep loading; only additive changes are allowed within a major version.
+  -->
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SwissTechKnife.Sdk</AssemblyName>
+    <RootNamespace>SwissTechKnife.Sdk</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageId>SwissTechKnife.Sdk</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Description>Contract for SwissTechKnife modules.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>
+

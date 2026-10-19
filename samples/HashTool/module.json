@@ -1,0 +1,7 @@
+{
+  "id": "hash-tool",
+  "version": "1.0.0",
+  "entryAssembly": "SwissTechKnife.Samples.HashTool.dll",
+  "entryType": "SwissTechKnife.Samples.HashTool.HashToolModule",
+  "sdkVersion": 1
+}

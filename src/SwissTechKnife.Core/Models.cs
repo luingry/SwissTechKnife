@@ -1,0 +1,176 @@
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
+namespace SwissTechKnife.Core
+{
+    /// <summary>Remote list of modules (catalog.json).</summary>
+    [DataContract]
+    public sealed class Catalog
+    {
+        [DataMember(Name = "schema", Order = 0)]
+        public int Schema { get; set; } = 1;
+
+        [DataMember(Name = "modules", Order = 1)]
+        public List<CatalogEntry> Modules { get; set; } = new List<CatalogEntry>();
+    }
+
+    /// <summary>One module as advertised by the catalog.</summary>
+    [DataContract]
+    public sealed class CatalogEntry
+    {
+        [DataMember(Name = "id", Order = 0)]
+        public string Id { get; set; }
+
+        [DataMember(Name = "name", Order = 1)]
+        public string Name { get; set; }
+
+        /// <summary>One line shown on the card.</summary>
+        [DataMember(Name = "tagline", Order = 2)]
+        public string Tagline { get; set; }
+
+        /// <summary>Longer explanation shown in the details dialog.</summary>
+        [DataMember(Name = "description", Order = 3)]
+        public string Description { get; set; }
+
+        [DataMember(Name = "category", Order = 4)]
+        public string Category { get; set; }
+
+        [DataMember(Name = "author", Order = 5)]
+        public string Author { get; set; }
+
+        [DataMember(Name = "version", Order = 6)]
+        public string Version { get; set; }
+
+        [DataMember(Name = "minHostVersion", Order = 7, EmitDefaultValue = false)]
+        public string MinHostVersion { get; set; }
+
+        /// <summary>Stroke icon as SVG path data on a 24×24 grid.</summary>
+        [DataMember(Name = "icon", Order = 8)]
+        public string Icon { get; set; }
+
+        /// <summary>Module color (#RRGGBB) used for its icon tile.</summary>
+        [DataMember(Name = "accent", Order = 9)]
+        public string Accent { get; set; }
+
+        /// <summary>Package URL (absolute, or relative to the catalog). Empty = announced, not yet available.</summary>
+        [DataMember(Name = "package", Order = 10, EmitDefaultValue = false)]
+        public string Package { get; set; }
+
+        [DataMember(Name = "sha256", Order = 11, EmitDefaultValue = false)]
+        public string Sha256 { get; set; }
+
+        [DataMember(Name = "size", Order = 12, EmitDefaultValue = false)]
+        public long Size { get; set; }
+
+        [DataMember(Name = "homepage", Order = 13, EmitDefaultValue = false)]
+        public string Homepage { get; set; }
+
+        public bool IsAvailable => !string.IsNullOrWhiteSpace(Package) && !string.IsNullOrWhiteSpace(Sha256);
+
+        public CatalogEntry Clone() => (CatalogEntry)MemberwiseClone();
+    }
+
+    /// <summary>module.json at the root of every package.</summary>
+    [DataContract]
+    public sealed class ModuleManifest
+    {
+        [DataMember(Name = "id", Order = 0)]
+        public string Id { get; set; }
+
+        [DataMember(Name = "version", Order = 1)]
+        public string Version { get; set; }
+
+        /// <summary>File name of the assembly that contains the entry type.</summary>
+        [DataMember(Name = "entryAssembly", Order = 2)]
+        public string EntryAssembly { get; set; }
+
+        /// <summary>Full name of the class implementing IModule.</summary>
+        [DataMember(Name = "entryType", Order = 3)]
+        public string EntryType { get; set; }
+
+        [DataMember(Name = "sdkVersion", Order = 4)]
+        public int SdkVersion { get; set; } = 1;
+
+        /// <summary>"onDemand" (default: loaded when first opened) or "startup" (loaded with the host).</summary>
+        [DataMember(Name = "activation", Order = 5, EmitDefaultValue = false)]
+        public string Activation { get; set; }
+
+        /// <summary>
+        /// "memory" (default): assemblies are read into memory, so files are never locked and uninstall/update
+        /// apply immediately. "file": Assembly.LoadFrom, for code that needs Assembly.Location or native
+        /// side-by-side DLLs (e.g. WebView2); file changes then apply on the next start.
+        /// </summary>
+        [DataMember(Name = "loadMode", Order = 6, EmitDefaultValue = false)]
+        public string LoadMode { get; set; }
+
+        public bool StartsWithHost => string.Equals(Activation, "startup", System.StringComparison.OrdinalIgnoreCase);
+
+        public bool LoadsFromFile => string.Equals(LoadMode, "file", System.StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>A module present on disk.</summary>
+    [DataContract]
+    public sealed class InstalledModule
+    {
+        [DataMember(Name = "id", Order = 0)]
+        public string Id { get; set; }
+
+        [DataMember(Name = "version", Order = 1)]
+        public string Version { get; set; }
+
+        [DataMember(Name = "enabled", Order = 2)]
+        public bool Enabled { get; set; } = true;
+
+        [DataMember(Name = "installedUtc", Order = 3)]
+        public string InstalledUtc { get; set; }
+
+        /// <summary>Folder name under modules/&lt;id&gt;/ holding this version.</summary>
+        [DataMember(Name = "folder", Order = 4)]
+        public string Folder { get; set; }
+
+        [DataMember(Name = "manifest", Order = 5)]
+        public ModuleManifest Manifest { get; set; }
+
+        /// <summary>Catalog entry snapshot at install time, so the module still shows offline or after it leaves the catalog.</summary>
+        [DataMember(Name = "entry", Order = 6)]
+        public CatalogEntry Entry { get; set; }
+    }
+
+    [DataContract]
+    public sealed class HostState
+    {
+        [DataMember(Name = "schema", Order = 0)]
+        public int Schema { get; set; } = 1;
+
+        [DataMember(Name = "modules", Order = 1)]
+        public List<InstalledModule> Modules { get; set; } = new List<InstalledModule>();
+
+        /// <summary>Folders that could not be deleted (locked); retried at the next start.</summary>
+        [DataMember(Name = "pendingDeletes", Order = 2)]
+        public List<string> PendingDeletes { get; set; } = new List<string>();
+    }
+
+    [DataContract]
+    public sealed class HostSettings
+    {
+        /// <summary>Catalog location: http(s) URL, absolute path, or a path relative to the app folder.</summary>
+        [DataMember(Name = "catalog", Order = 0, EmitDefaultValue = false)]
+        public string Catalog { get; set; }
+
+        [DataMember(Name = "window", Order = 1, EmitDefaultValue = false)]
+        public WindowPlacement Window { get; set; }
+
+        [DataMember(Name = "lastPage", Order = 2, EmitDefaultValue = false)]
+        public string LastPage { get; set; }
+    }
+
+    [DataContract]
+    public sealed class WindowPlacement
+    {
+        [DataMember(Name = "left", Order = 0)] public double Left { get; set; }
+        [DataMember(Name = "top", Order = 1)] public double Top { get; set; }
+        [DataMember(Name = "width", Order = 2)] public double Width { get; set; }
+        [DataMember(Name = "height", Order = 3)] public double Height { get; set; }
+        [DataMember(Name = "maximized", Order = 4)] public bool Maximized { get; set; }
+    }
+}

@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Entry point of the design system. The host merges this once into Application.Resources, so every
+        module page inherits it automatically. For designer previews in a module repo, merge
+        pack://application:,,,/SwissTechKnife.Sdk;component/Theme/Theme.xaml in a design-time dictionary.
+    -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Tokens.xaml" />
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Typography.xaml" />
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Buttons.xaml" />
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Inputs.xaml" />
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Scrolling.xaml" />
+        <ResourceDictionary Source="/SwissTechKnife.Sdk;component/Theme/Overlays.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
