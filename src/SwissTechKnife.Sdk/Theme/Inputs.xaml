@@ -184,6 +184,16 @@
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0:0:0.14" />
+                                    <VisualTransition To="Pressed" GeneratedDuration="0:0:0.1">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="KnobScale" Storyboard.TargetProperty="ScaleX" To="1.15" Duration="0:0:0.1" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
+                                    <VisualTransition From="Pressed" GeneratedDuration="0:0:0.14">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="KnobScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
                                 </VisualStateGroup.Transitions>
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver">
@@ -204,7 +214,18 @@
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="CheckStates">
                                 <VisualStateGroup.Transitions>
-                                    <VisualTransition GeneratedDuration="0:0:0.22" GeneratedEasingFunction="{StaticResource Ease.Emphasized}" />
+                                    <VisualTransition GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                                    <!-- Transforms are not interpolated by generated transitions (they jump at the end): animate the knob explicitly. -->
+                                    <VisualTransition From="Unchecked" To="Checked" GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="KnobMove" Storyboard.TargetProperty="X" To="16" Duration="0:0:0.2" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
+                                    <VisualTransition From="Checked" To="Unchecked" GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="KnobMove" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.2" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
                                 </VisualStateGroup.Transitions>
                                 <VisualState x:Name="Unchecked" />
                                 <VisualState x:Name="Indeterminate" />
@@ -275,6 +296,18 @@
                             <VisualStateGroup x:Name="CheckStates">
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0:0:0.18" GeneratedEasingFunction="{StaticResource Ease.Out}" />
+                                    <VisualTransition From="Unchecked" To="Checked" GeneratedDuration="0:0:0.18" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="DotScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource Ease.Out}" />
+                                            <DoubleAnimation Storyboard.TargetName="DotScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
+                                    <VisualTransition From="Checked" To="Unchecked" GeneratedDuration="0:0:0.18" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="DotScale" Storyboard.TargetProperty="ScaleX" To="0" Duration="0:0:0.14" />
+                                            <DoubleAnimation Storyboard.TargetName="DotScale" Storyboard.TargetProperty="ScaleY" To="0" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </VisualTransition>
                                 </VisualStateGroup.Transitions>
                                 <VisualState x:Name="Unchecked" />
                                 <VisualState x:Name="Indeterminate" />

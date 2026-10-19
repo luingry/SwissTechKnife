@@ -20,7 +20,19 @@
                 <VisualStateGroup x:Name="CommonStates">
                     <VisualStateGroup.Transitions>
                         <VisualTransition GeneratedDuration="0:0:0.16" GeneratedEasingFunction="{StaticResource Ease.Out}" />
-                        <VisualTransition To="Pressed" GeneratedDuration="0:0:0.06" />
+                        <VisualTransition To="Pressed" GeneratedDuration="0:0:0.06">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0:0:0.08" EasingFunction="{StaticResource Ease.Out}" />
+                                <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0:0:0.08" EasingFunction="{StaticResource Ease.Out}" />
+                            </Storyboard>
+                        </VisualTransition>
+                        <!-- Scale transforms are not interpolated by generated transitions: release explicitly. -->
+                        <VisualTransition From="Pressed" GeneratedDuration="0:0:0.16" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource Ease.Out}" />
+                                <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.18" EasingFunction="{StaticResource Ease.Out}" />
+                            </Storyboard>
+                        </VisualTransition>
                     </VisualStateGroup.Transitions>
                     <VisualState x:Name="Normal" />
                     <VisualState x:Name="MouseOver">

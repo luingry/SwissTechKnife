@@ -9,7 +9,7 @@ namespace SwissTechKnife.Infrastructure
     /// </summary>
     internal static class AfterAnimation
     {
-        /// <summary>Slightly longer than the switch transition (220 ms).</summary>
+        /// <summary>Slightly longer than the switch transition (200 ms).</summary>
         private static readonly TimeSpan Delay = TimeSpan.FromMilliseconds(260);
 
         public static void Run(Action action)

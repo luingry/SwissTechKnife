@@ -37,3 +37,9 @@
 
 - Cause: the switch's bound setter ran disk writes (state/settings), list refreshes (all cards regenerated) and module start/stop on the UI thread during the 220 ms knob animation.
 - Solution: switches flip their visual state at once and run the real work via `AfterAnimation.Run` (260 ms later); list views refresh only when their membership actually changes.
+## 2026-10-19 — Switch knob jumped at the end of the toggle (stutter, part 2)
+
+- Symptom: after deferring the switch side effects, toggling still looked like a stutter. A per-frame trace (`STK_FRAMEDIAG=1`) showed the knob `TranslateTransform.X` stayed at 0 for ~200 ms and then jumped to 16, while the track color faded smoothly.
+- Cause: VisualStateManager *generated* transitions (`GeneratedDuration`) do not interpolate properties of Freezable targets such as `TranslateTransform`/`ScaleTransform`; they only apply the new state at the end. Same for button/card press scale and the radio dot.
+- Solution: explicit `VisualTransition From/To` storyboards animate the transforms (switch knob slide and press stretch, radio dot, button and card press). Animations also run at the display refresh rate (`FrameRate.MatchDisplay`, 74–75 Hz here) instead of WPF's fixed 60 fps.
+- Prevention: any transform in a VSM state needs an explicit transition storyboard; verify motion with `STK_FRAMEDIAG=1` (it logs the knob position per frame and frame gaps).

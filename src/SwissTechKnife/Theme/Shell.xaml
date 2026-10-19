@@ -234,7 +234,18 @@
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualStateGroup.Transitions>
                                     <VisualTransition GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}" />
-                                    <VisualTransition To="Pressed" GeneratedDuration="0:0:0.08" />
+                                    <VisualTransition To="Pressed" GeneratedDuration="0:0:0.08">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.992" Duration="0:0:0.08" />
+                                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.992" Duration="0:0:0.08" />
+                                        </Storyboard>
+                                    </VisualTransition>
+                                    <VisualTransition From="Pressed" GeneratedDuration="0:0:0.2" GeneratedEasingFunction="{StaticResource Ease.Out}">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2" EasingFunction="{StaticResource Ease.Out}" />
+                                            <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.2" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </VisualTransition>
                                 </VisualStateGroup.Transitions>
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver">

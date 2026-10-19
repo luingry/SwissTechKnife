@@ -58,6 +58,8 @@ namespace SwissTechKnife
 
             base.OnStartup(e);
 
+            FrameRate.MatchDisplay();
+            FrameDiagnostics.StartIfEnabled();
             if (e.Args.Contains("--diag-resources"))
             {
                 DumpResources(Resources, "app");
