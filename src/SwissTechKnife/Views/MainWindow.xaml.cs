@@ -81,10 +81,20 @@ namespace SwissTechKnife.Views
                 case nameof(ShellViewModel.CurrentPage):
                     AnimatePageIn();
                     break;
-                case nameof(ShellViewModel.IsSettingsTab):
+                case nameof(ShellViewModel.DialogTab):
                     if (_shell.IsDialogOpen)
                     {
                         Dialog.AnimateTab();
+                    }
+                    break;
+                case nameof(ShellViewModel.IsUpdateConfirmOpen):
+                    if (_shell.IsUpdateConfirmOpen)
+                    {
+                        Dialog.OpenConfirm(_shell.PendingUpdate);
+                    }
+                    else
+                    {
+                        Dialog.CloseConfirm();
                     }
                     break;
                 case nameof(ShellViewModel.IsDialogOpen):
@@ -113,7 +123,7 @@ namespace SwissTechKnife.Views
         {
             if (e.Key == Key.Escape && _shell.IsDialogOpen)
             {
-                _shell.SelectedModule = null;
+                _shell.CloseTopOverlay();
                 e.Handled = true;
             }
         }

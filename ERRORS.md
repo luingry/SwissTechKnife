@@ -26,3 +26,14 @@
 
 - Cause: `Radius.Pill` was 999. WPF does not clamp corner radii to half the element size; it scales oversized radii proportionally, which turns a short pill into an ellipse.
 - Solution: chips have a fixed height (22) and `Radius.Pill` is half of it (11). Keep any pill radius ≤ half its height.
+
+## 2026-10-19 — Accents corrupted in catalog.json ("animaÃ§Ã£o")
+
+- Cause: editing the catalog through Windows PowerShell 5.1 JSON/text round-trips re-decoded UTF-8 text as ANSI in some steps.
+- Solution: repaired with a Latin-1 → UTF-8 re-decode; edit and format JSON with Node (`JSON.parse`/`JSON.stringify(…, null, 2)`) or the app's own serializer, never with PS 5.1 `ConvertTo-Json`.
+- Check: count `Ã`/`Â`/U+FFFD in the file (read as UTF-8) before committing.
+
+## 2026-10-19 — Switch knob stuttered when toggled
+
+- Cause: the switch's bound setter ran disk writes (state/settings), list refreshes (all cards regenerated) and module start/stop on the UI thread during the 220 ms knob animation.
+- Solution: switches flip their visual state at once and run the real work via `AfterAnimation.Run` (260 ms later); list views refresh only when their membership actually changes.

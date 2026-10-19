@@ -73,9 +73,28 @@ namespace SwissTechKnife.Core
         [DataMember(Name = "iconBackground", Order = 15, EmitDefaultValue = false)]
         public string IconBackground { get; set; }
 
+        /// <summary>Release notes, one entry per version (any order; the UI sorts newest first).</summary>
+        [DataMember(Name = "releaseNotes", Order = 16, EmitDefaultValue = false)]
+        public List<ReleaseNote> ReleaseNotes { get; set; }
+
         public bool IsAvailable => !string.IsNullOrWhiteSpace(Package) && !string.IsNullOrWhiteSpace(Sha256);
 
         public CatalogEntry Clone() => (CatalogEntry)MemberwiseClone();
+    }
+
+    [DataContract]
+    public sealed class ReleaseNote
+    {
+        [DataMember(Name = "version", Order = 0)]
+        public string Version { get; set; }
+
+        /// <summary>Release date, yyyy-MM-dd.</summary>
+        [DataMember(Name = "date", Order = 1, EmitDefaultValue = false)]
+        public string Date { get; set; }
+
+        /// <summary>User-facing changes, one sentence each (pt-BR).</summary>
+        [DataMember(Name = "notes", Order = 2)]
+        public List<string> Notes { get; set; } = new List<string>();
     }
 
     /// <summary>module.json at the root of every package.</summary>

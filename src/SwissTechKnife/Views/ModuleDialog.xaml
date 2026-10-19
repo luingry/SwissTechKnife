@@ -4,6 +4,35 @@
              xmlns:ui="clr-namespace:SwissTechKnife.Sdk;assembly=SwissTechKnife.Sdk"
              Visibility="Collapsed"
              KeyboardNavigation.TabNavigation="Cycle">
+    <UserControl.Resources>
+        <!-- One version: "v1.1.0  19 out 2026  [Atual]" + bullet list. -->
+        <DataTemplate x:Key="ReleaseNoteTemplate">
+            <StackPanel Margin="0,0,0,18">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.BodyStrong}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding DateText}" Style="{StaticResource Text.Caption}" Margin="10,1,0,0" VerticalAlignment="Center" />
+                    <Border Style="{StaticResource Chip}" Background="{StaticResource Brush.Accent.Soft}" Margin="10,0,0,0"
+                            Visibility="{Binding IsCurrent, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Atual" Foreground="{StaticResource Brush.Accent}" VerticalAlignment="Center" />
+                    </Border>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Notes}" Margin="0,8,0,0" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Width="4" Height="4" Fill="{StaticResource Brush.Text.Tertiary}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2,8,0,0" />
+                                <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource Text.Paragraph}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
         <Border x:Name="Scrim" Background="{StaticResource Brush.Scrim}" Opacity="0" CornerRadius="{StaticResource Radius.Lg}" MouseLeftButtonDown="OnScrimClick" />
 
@@ -43,14 +72,18 @@
                             VerticalAlignment="Top" Margin="0,-10,-10,0" Click="OnCloseClick" />
                 </Grid>
 
-                <!-- Tabs: "Configurações" appears only for enabled modules that offer settings -->
+                <!-- Tabs: "Notas da versão" when notes exist; "Configurações" for enabled modules with settings -->
                 <StackPanel Grid.Row="1" Margin="0,22,0,0">
                     <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left" Margin="0,0,0,20"
-                            Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}">
+                            Visibility="{Binding ShowTabs, Converter={StaticResource BoolToVisibility}}">
                         <ui:SegmentedPanel>
                             <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Descrição"
                                          IsChecked="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Notas da versão"
+                                         Visibility="{Binding HasReleaseNotes, Converter={StaticResource BoolToVisibility}}"
+                                         IsChecked="{Binding DataContext.IsNotesTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
                             <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" AutomationProperties.Name="Configurações"
+                                         Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}"
                                          IsChecked="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE713;" Style="{StaticResource Text.Icon}" FontSize="12" Margin="0,0,7,0" />
@@ -88,6 +121,12 @@
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
+
+                        <!-- Notas da versão -->
+                        <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto"
+                                      Visibility="{Binding DataContext.IsNotesTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl ItemsSource="{Binding ReleaseNotes}" ItemTemplate="{StaticResource ReleaseNoteTemplate}" Focusable="False" Margin="0,0,0,-18" />
+                        </ScrollViewer>
 
                         <!-- Configurações -->
                         <Grid Visibility="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
@@ -167,7 +206,7 @@
                                 Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowOpenPrimary, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" Margin="8,0,0,0"
-                                Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
+                                Command="{Binding DataContext.RequestUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowUpdate, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE896;" Content="Instalar" Margin="8,0,0,0"
                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
@@ -183,5 +222,50 @@
                 </Grid>
             </Grid>
         </Border>
+        <!-- Update confirmation: over the details card -->
+        <Grid x:Name="ConfirmLayer" Visibility="Collapsed">
+            <Border x:Name="ConfirmScrim" Background="{StaticResource Brush.Scrim}" Opacity="0" CornerRadius="{StaticResource Radius.Lg}" MouseLeftButtonDown="OnConfirmScrimClick" />
+            <Border x:Name="ConfirmCard" Width="460" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24"
+                    Background="{StaticResource Brush.Surface3}" CornerRadius="{StaticResource Radius.Xl}"
+                    Effect="{StaticResource Elevation.Overlay}" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="ConfirmScale" ScaleX="0.96" ScaleY="0.96" />
+                        <TranslateTransform x:Name="ConfirmMove" Y="10" />
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <StackPanel Margin="26,24,26,22">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ContentControl Style="{StaticResource IconTile}" Width="40" Height="40" Padding="9" ui:Ui.CornerRadius="11" />
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource Text.Subtitle}">
+                                <Run Text="Atualizar" /> <Run Text="{Binding Name, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,2,0,0">
+                                <Run Text="{Binding VersionText, Mode=OneWay}" /> <Run Text="→" /> <Run Text="{Binding LatestVersion, Mode=OneWay, StringFormat=v{0}}" Foreground="{StaticResource Brush.Success}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="O que muda" Style="{StaticResource Text.Overline}" Margin="0,22,0,10" />
+                    <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding UpdateNotes}" ItemTemplate="{StaticResource ReleaseNoteTemplate}" Focusable="False" Margin="0,0,0,-18" />
+                    </ScrollViewer>
+                    <TextBlock Text="Esta versão não tem notas publicadas." Style="{StaticResource Text.Paragraph}"
+                               Visibility="{Binding HasUpdateNotes, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                        <Button x:Name="ConfirmCancel" Style="{StaticResource Button.Secondary}" Content="Cancelar"
+                                Command="{Binding DataContext.CancelUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" Margin="8,0,0,0"
+                                Command="{Binding DataContext.ConfirmUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

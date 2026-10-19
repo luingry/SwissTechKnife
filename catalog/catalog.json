@@ -14,7 +14,17 @@
       "homepage": "https://github.com/luingry/SmoothMice",
       "package": "https://github.com/luingry/smoothmice/releases/download/module-v3.0.0/smooth-mice-3.0.0.zip",
       "sha256": "680db6cd67a867200c61ce2cb6755247e7c9815e10ca841b8e08fe0bfa2bd0b2",
-      "size": 512175
+      "size": 512175,
+      "releaseNotes": [
+        {
+          "version": "3.0.0",
+          "date": "2026-10-19",
+          "notes": [
+            "Primeira versão como módulo do SwissTechKnife: inicia junto com ele e roda em um processo próprio, para que nada no SwissTechKnife atrase a rolagem.",
+            "A página do módulo mostra se o SmoothMice está ativo e abre a janela dele."
+          ]
+        }
+      ]
     },
     {
       "id": "winput-lan",
@@ -43,7 +53,24 @@
       "version": "1.1.0",
       "icon": "M3,12 L7,12 L10,5 L14,19 L17,12 L21,12",
       "accent": "#5FB3D0",
-      "package": "system-monitor-1.1.0.zip"
+      "package": "system-monitor-1.1.0.zip",
+      "releaseNotes": [
+        {
+          "version": "1.1.0",
+          "date": "2026-10-19",
+          "notes": [
+            "Nova aba Configurações: intervalo de atualização (1, 2 ou 5 segundos) e opção de esconder o gráfico do processador.",
+            "As configurações são aplicadas na hora e mantidas entre atualizações."
+          ]
+        },
+        {
+          "version": "1.0.0",
+          "date": "2026-10-19",
+          "notes": [
+            "Primeira versão: uso do processador, memória em uso e tempo ligado, lidos só enquanto a página está aberta."
+          ]
+        }
+      ]
     },
     {
       "id": "hash-tool",
@@ -53,7 +80,16 @@
       "version": "1.0.0",
       "icon": "M9,4 L7,20 M17,4 L15,20 M4,9 L20,9 M3,15 L19,15",
       "accent": "#A98BF0",
-      "package": "hash-tool-1.0.0.zip"
+      "package": "hash-tool-1.0.0.zip",
+      "releaseNotes": [
+        {
+          "version": "1.0.0",
+          "date": "2026-10-19",
+          "notes": [
+            "Primeira versão: MD5, SHA-1, SHA-256 e SHA-512 de textos e arquivos, com cópia em um clique."
+          ]
+        }
+      ]
     }
   ]
 }

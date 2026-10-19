@@ -76,6 +76,52 @@ namespace SwissTechKnife.Views
             CardMove.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(show ? 0 : 6, duration) { EasingFunction = ease });
         }
 
+        /// <summary>Update confirmation popup over the details card.</summary>
+        public void OpenConfirm(ModuleItem item)
+        {
+            ConfirmCard.DataContext = item;
+            ConfirmLayer.Visibility = Visibility.Visible;
+            AnimateConfirm(show: true, onDone: null);
+            Dispatcher.BeginInvoke(new Action(() => ConfirmCancel.Focus()), System.Windows.Threading.DispatcherPriority.Input);
+        }
+
+        public void CloseConfirm()
+        {
+            int generation = ++_confirmGeneration;
+            AnimateConfirm(show: false, onDone: () =>
+            {
+                if (generation == _confirmGeneration)
+                {
+                    ConfirmLayer.Visibility = Visibility.Collapsed;
+                    ConfirmCard.DataContext = null;
+                }
+            });
+        }
+
+        private int _confirmGeneration;
+
+        private void AnimateConfirm(bool show, Action onDone)
+        {
+            if (show)
+            {
+                _confirmGeneration++;
+            }
+            var ease = (IEasingFunction)FindResource(show ? "Ease.Emphasized" : "Ease.Out");
+            Duration duration = show ? (Duration)FindResource("Motion.Slow") : (Duration)FindResource("Motion.Normal");
+            var fade = new DoubleAnimation(show ? 1 : 0, duration) { EasingFunction = ease };
+            if (onDone != null)
+            {
+                fade.Completed += (s, e) => onDone();
+            }
+            ConfirmScrim.BeginAnimation(OpacityProperty, new DoubleAnimation(show ? 1 : 0, duration));
+            ConfirmCard.BeginAnimation(OpacityProperty, fade);
+            ConfirmScale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(show ? 1 : 0.97, duration) { EasingFunction = ease });
+            ConfirmScale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(show ? 1 : 0.97, duration) { EasingFunction = ease });
+            ConfirmMove.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(show ? 0 : 6, duration) { EasingFunction = ease });
+        }
+
+        private void OnConfirmScrimClick(object sender, MouseButtonEventArgs e) => Shell?.CancelUpdateCommand.Execute(null);
+
         private void OnScrimClick(object sender, MouseButtonEventArgs e) => Dismiss();
 
         private void OnCloseClick(object sender, RoutedEventArgs e) => Dismiss();

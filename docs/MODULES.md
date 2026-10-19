@@ -78,7 +78,7 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 }
 ```
 
-`iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
+`releaseNotes` is a list of `{ "version", "date": "yyyy-MM-dd", "notes": ["…"] }` (pt-BR, one sentence per change): the details dialog shows them in **Notas da versão** (up to the current version, marked **Atual**), and the update confirmation shows the versions being installed. `iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
 
 ## 5. Rules
 

@@ -29,6 +29,7 @@ namespace SwissTechKnife.ViewModels
         private readonly Action<bool> _applyTray;
         private readonly Action<string, NotificationKind> _notify;
         private bool _isChecking;
+        private bool? _pendingStartup;
 
         public SettingsViewModel(SettingsStore settings, string exePath, Action<bool> applyTray, Func<System.Threading.Tasks.Task> checkNow, Action<string, NotificationKind> notify)
         {
@@ -79,14 +80,25 @@ namespace SwissTechKnife.ViewModels
         /// <summary>Reads the Run value each time, so changes made outside the app show correctly.</summary>
         public bool StartWithWindows
         {
-            get => StartupRegistration.IsEnabled(_exePath);
+            get => _pendingStartup ?? StartupRegistration.IsEnabled(_exePath);
             set
             {
-                if (value != StartWithWindows && !StartupRegistration.TrySet(_exePath, value))
+                if (value == StartWithWindows)
                 {
-                    _notify("Não foi possível alterar a inicialização com o Windows.", NotificationKind.Error);
+                    return;
                 }
+                _pendingStartup = value;
                 OnPropertyChanged();
+                AfterAnimation.Run(() =>
+                {
+                    bool target = _pendingStartup ?? value;
+                    _pendingStartup = null;
+                    if (target != StartupRegistration.IsEnabled(_exePath) && !StartupRegistration.TrySet(_exePath, target))
+                    {
+                        _notify("Não foi possível alterar a inicialização com o Windows.", NotificationKind.Error);
+                    }
+                    OnPropertyChanged(nameof(StartWithWindows));
+                });
             }
         }
 
@@ -98,9 +110,13 @@ namespace SwissTechKnife.ViewModels
                 if (value != _settings.Current.HideToTrayOnClose)
                 {
                     _settings.Current.HideToTrayOnClose = value;
-                    _settings.Save();
-                    _applyTray(value);
                     OnPropertyChanged();
+                    // Creating the tray icon loads WinForms: do it after the switch animation.
+                    AfterAnimation.Run(() =>
+                    {
+                        _settings.Save();
+                        _applyTray(_settings.Current.HideToTrayOnClose);
+                    });
                 }
             }
         }

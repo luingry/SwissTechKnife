@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Media;
 using SwissTechKnife.Core;
 using SwissTechKnife.Infrastructure;
@@ -34,6 +35,7 @@ namespace SwissTechKnife.ViewModels
         private string _pageError;
         private bool _confirmingUninstall;
         private ImageSource _iconImage;
+        private bool? _pendingActive;
 
         public ModuleItem(string id)
         {
@@ -120,19 +122,33 @@ namespace SwissTechKnife.ViewModels
         /// <summary>Two-way target for the enable switch on the card and in the dialog.</summary>
         public bool IsActive
         {
-            get => IsEnabled;
+            get => _pendingActive ?? IsEnabled;
             set
             {
-                if (value != IsEnabled)
+                if (value == IsActive)
                 {
-                    ToggleHandler?.Invoke(this, value);
+                    return;
                 }
-                // Re-sync the switch if the change was refused or failed.
+                // The switch (and its label) flips now; the real enable/disable runs once the knob animation ends.
+                _pendingActive = value;
                 OnPropertyChanged(nameof(IsActive));
+                OnPropertyChanged(nameof(ActiveText));
+                Infrastructure.AfterAnimation.Run(() =>
+                {
+                    bool target = _pendingActive ?? IsEnabled;
+                    _pendingActive = null;
+                    if (target != IsEnabled)
+                    {
+                        ToggleHandler?.Invoke(this, target);
+                    }
+                    // Re-sync if the change was refused or failed.
+                    OnPropertyChanged(nameof(IsActive));
+                    OnPropertyChanged(nameof(ActiveText));
+                });
             }
         }
 
-        public string ActiveText => IsEnabled ? "Ativado" : "Desativado";
+        public string ActiveText => IsActive ? "Ativado" : "Desativado";
 
         public ModuleStatus Status =>
             _installed != null ? (_installed.Enabled ? ModuleStatus.Enabled : ModuleStatus.Disabled)
@@ -148,6 +164,48 @@ namespace SwissTechKnife.ViewModels
 
         /// <summary>Enabled module that declares a settings view.</summary>
         public bool HasSettings => IsEnabled && _installed.Manifest?.HasSettings == true;
+
+        /// <summary>Notes for every version up to the current one, newest first; the current is flagged.</summary>
+        public IReadOnlyList<ReleaseNoteView> ReleaseNotes
+        {
+            get
+            {
+                Version current = Core.VersionText.ParseOrZero(Version);
+                return Notes()
+                    .Where(n => Core.VersionText.ParseOrZero(n.Version) <= current)
+                    .Select(n => new ReleaseNoteView(n, Core.VersionText.ParseOrZero(n.Version) == current))
+                    .ToList();
+            }
+        }
+
+        public bool HasReleaseNotes => ReleaseNotes.Count > 0;
+
+        /// <summary>What an update brings: versions after the installed one, up to the catalog version.</summary>
+        public IReadOnlyList<ReleaseNoteView> UpdateNotes
+        {
+            get
+            {
+                if (!HasUpdate)
+                {
+                    return new ReleaseNoteView[0];
+                }
+                Version installed = Core.VersionText.ParseOrZero(_installed.Version);
+                Version target = Core.VersionText.ParseOrZero(_catalogEntry.Version);
+                return Notes()
+                    .Where(n => Core.VersionText.ParseOrZero(n.Version) > installed && Core.VersionText.ParseOrZero(n.Version) <= target)
+                    .Select(n => new ReleaseNoteView(n, false))
+                    .ToList();
+            }
+        }
+
+        public bool HasUpdateNotes => UpdateNotes.Count > 0;
+
+        public bool ShowTabs => HasSettings || HasReleaseNotes;
+
+        private IEnumerable<ReleaseNote> Notes() =>
+            ((_catalogEntry ?? _installed?.Entry)?.ReleaseNotes ?? new List<ReleaseNote>())
+                .Where(n => n != null && Core.VersionText.TryParse(n.Version, out _))
+                .OrderByDescending(n => Core.VersionText.ParseOrZero(n.Version));
 
         public string UpdateText => HasUpdate ? "v" + _catalogEntry.Version + " disponível" : null;
 
@@ -302,5 +360,29 @@ namespace SwissTechKnife.ViewModels
             }
             return (bytes / (1024.0 * 1024.0)).ToString("0.0", CultureInfo.CurrentCulture) + " MB";
         }
+    }
+
+    /// <summary>One version in the "Notas da versão" tab or the update confirmation.</summary>
+    public sealed class ReleaseNoteView
+    {
+        private static readonly CultureInfo PtBr = CultureInfo.GetCultureInfo("pt-BR");
+
+        public ReleaseNoteView(ReleaseNote note, bool isCurrent)
+        {
+            VersionText = "v" + note.Version;
+            IsCurrent = isCurrent;
+            Notes = (note.Notes ?? new List<string>()).Where(n => !string.IsNullOrWhiteSpace(n)).ToList();
+            DateText = DateTime.TryParseExact(note.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                ? date.ToString("d MMM yyyy", PtBr)
+                : null;
+        }
+
+        public string VersionText { get; }
+
+        public string DateText { get; }
+
+        public bool IsCurrent { get; }
+
+        public IReadOnlyList<string> Notes { get; }
     }
 }

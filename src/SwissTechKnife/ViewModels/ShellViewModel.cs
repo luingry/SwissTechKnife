@@ -21,6 +21,13 @@ namespace SwissTechKnife.ViewModels
         Installed,
     }
 
+    public enum DialogTab
+    {
+        Description,
+        Notes,
+        Settings,
+    }
+
     public enum CatalogState
     {
         Loading,
@@ -47,12 +54,15 @@ namespace SwissTechKnife.ViewModels
         private ModuleItem _selectedModule;
         private CatalogState _catalogState = CatalogState.Loading;
         private string _catalogMessage;
-        private bool _isSettingsTab;
+        private DialogTab _dialogTab;
+        private ModuleItem _pendingUpdate;
         private FrameworkElement _settingsPage;
         private string _settingsError;
         private readonly SettingsStore _settings;
         private readonly DispatcherTimer _updateTimer;
         private bool _isSettingsActive;
+        private string _storeSignature;
+        private string _sidebarSignature;
 
         public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion, SettingsStore settings, string exePath, Action<bool> applyTray)
         {
@@ -92,6 +102,17 @@ namespace SwissTechKnife.ViewModels
             RestartCommand = new RelayCommand(_ => _restart());
             DismissToastCommand = new RelayCommand(p => DismissToast(p as Toast));
             RetryPageCommand = new RelayCommand(_ => RetryPage(), _ => _currentModule != null);
+            RequestUpdateCommand = new RelayCommand(p => PendingUpdate = (ModuleItem)p, p => p is ModuleItem m && m.HasUpdate && !m.IsBusy);
+            CancelUpdateCommand = new RelayCommand(_ => PendingUpdate = null);
+            ConfirmUpdateCommand = new AsyncCommand(async _ =>
+            {
+                ModuleItem item = PendingUpdate;
+                PendingUpdate = null;
+                if (item != null)
+                {
+                    await InstallAsync(item);
+                }
+            }, _ => PendingUpdate != null, ex => ReportError(ex));
         }
 
         public string HostVersion { get; }
@@ -118,6 +139,9 @@ namespace SwissTechKnife.ViewModels
         public ICommand RestartCommand { get; }
         public ICommand DismissToastCommand { get; }
         public ICommand RetryPageCommand { get; }
+        public ICommand RequestUpdateCommand { get; }
+        public ICommand CancelUpdateCommand { get; }
+        public ICommand ConfirmUpdateCommand { get; }
 
         public string SearchText
         {
@@ -247,6 +271,7 @@ namespace SwissTechKnife.ViewModels
                 }
                 if (Set(ref _selectedModule, value))
                 {
+                    PendingUpdate = null;
                     ShowDescriptionTab();
                     OnPropertyChanged(nameof(IsDialogOpen));
                 }
@@ -255,31 +280,83 @@ namespace SwissTechKnife.ViewModels
 
         public bool IsDialogOpen => _selectedModule != null;
 
-        /// <summary>Dialog tab: "Descrição" (default) or "Configurações" (modules with settings).</summary>
+        /// <summary>Dialog tab: Descrição (default), Notas da versão, Configurações (modules with settings).</summary>
+        public DialogTab DialogTab
+        {
+            get => _dialogTab;
+            private set
+            {
+                if (Set(ref _dialogTab, value))
+                {
+                    OnPropertyChanged(nameof(IsDescriptionTab));
+                    OnPropertyChanged(nameof(IsNotesTab));
+                    OnPropertyChanged(nameof(IsSettingsTab));
+                }
+            }
+        }
+
         public bool IsDescriptionTab
         {
-            get => !_isSettingsTab;
+            get => _dialogTab == DialogTab.Description;
             set
             {
                 if (value)
                 {
-                    ShowDescriptionTab();
+                    DialogTab = DialogTab.Description;
+                }
+            }
+        }
+
+        public bool IsNotesTab
+        {
+            get => _dialogTab == DialogTab.Notes;
+            set
+            {
+                if (value && _selectedModule?.HasReleaseNotes == true)
+                {
+                    DialogTab = DialogTab.Notes;
                 }
             }
         }
 
         public bool IsSettingsTab
         {
-            get => _isSettingsTab;
+            get => _dialogTab == DialogTab.Settings;
             set
             {
-                if (value && !_isSettingsTab && _selectedModule?.HasSettings == true)
+                if (value && _dialogTab != DialogTab.Settings && _selectedModule?.HasSettings == true)
                 {
                     LoadSettingsPage(_selectedModule);
-                    _isSettingsTab = true;
-                    OnPropertyChanged(nameof(IsSettingsTab));
-                    OnPropertyChanged(nameof(IsDescriptionTab));
+                    DialogTab = DialogTab.Settings;
                 }
+            }
+        }
+
+        /// <summary>Module whose update is waiting for confirmation (popup over the details dialog).</summary>
+        public ModuleItem PendingUpdate
+        {
+            get => _pendingUpdate;
+            private set
+            {
+                if (Set(ref _pendingUpdate, value))
+                {
+                    OnPropertyChanged(nameof(IsUpdateConfirmOpen));
+                }
+            }
+        }
+
+        public bool IsUpdateConfirmOpen => _pendingUpdate != null;
+
+        /// <summary>Closes the topmost overlay (Esc): the update confirmation first, then the dialog.</summary>
+        public void CloseTopOverlay()
+        {
+            if (IsUpdateConfirmOpen)
+            {
+                PendingUpdate = null;
+            }
+            else
+            {
+                SelectedModule = null;
             }
         }
 
@@ -490,15 +567,7 @@ namespace SwissTechKnife.ViewModels
             NotifyPageShown();
         }
 
-        private void ShowDescriptionTab()
-        {
-            if (_isSettingsTab)
-            {
-                _isSettingsTab = false;
-                OnPropertyChanged(nameof(IsSettingsTab));
-                OnPropertyChanged(nameof(IsDescriptionTab));
-            }
-        }
+        private void ShowDescriptionTab() => DialogTab = DialogTab.Description;
 
         /// <summary>Activates the module if needed and asks it for its settings view.</summary>
         private void LoadSettingsPage(ModuleItem item)
@@ -652,14 +721,26 @@ namespace SwissTechKnife.ViewModels
 
         private void RefreshLists()
         {
-            _storeView.Refresh();
-            _sidebarView.Refresh();
+            // Refresh a view only when its membership changed: a refresh regenerates every card,
+            // which is visible (entry animations) and costly when, say, a switch just toggled.
+            RefreshIfChanged(_storeView, StoreFilter, ref _storeSignature);
+            RefreshIfChanged(_sidebarView, o => ((ModuleItem)o).IsEnabled, ref _sidebarSignature);
             OnPropertyChanged(nameof(AvailableCount));
             OnPropertyChanged(nameof(InstalledCount));
             OnPropertyChanged(nameof(UpdateCount));
             OnPropertyChanged(nameof(HasUpdates));
             OnPropertyChanged(nameof(HasSidebarModules));
             RefreshEmptyState();
+        }
+
+        private void RefreshIfChanged(ListCollectionView view, Predicate<object> filter, ref string signature)
+        {
+            string current = string.Join("|", _manager.Items.Where(i => filter(i)).Select(i => i.Id));
+            if (current != signature)
+            {
+                signature = current;
+                view.Refresh();
+            }
         }
 
         private void RefreshEmptyState()
