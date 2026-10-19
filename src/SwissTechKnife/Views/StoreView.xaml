@@ -84,7 +84,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left">
-                <StackPanel Orientation="Horizontal">
+                <ui:SegmentedPanel>
                     <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsAvailableTab}" AutomationProperties.Name="Disponíveis">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Disponíveis" />
@@ -97,7 +97,7 @@
                             <TextBlock Text="{Binding InstalledCount}" Margin="8,0,0,0" Foreground="{StaticResource Brush.Text.Tertiary}" />
                         </StackPanel>
                     </RadioButton>
-                </StackPanel>
+                </ui:SegmentedPanel>
             </Border>
 
             <!-- Catalog notice (offline / failed) -->

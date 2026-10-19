@@ -11,10 +11,10 @@
                     <Grid>
                         <TextBlock Text="Origem" Style="{StaticResource Text.Overline}" VerticalAlignment="Center" />
                         <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Right">
-                            <StackPanel Orientation="Horizontal">
+                            <ui:SegmentedPanel>
                                 <RadioButton x:Name="TextTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="Texto" IsChecked="True" Checked="OnModeChanged" />
                                 <RadioButton x:Name="FileTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="Arquivo" Checked="OnModeChanged" />
-                            </StackPanel>
+                            </ui:SegmentedPanel>
                         </Border>
                     </Grid>
 

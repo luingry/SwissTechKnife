@@ -44,7 +44,7 @@ Hierarchy comes from size + weight + tone. Pages have one Display title.
 | | `Button.Danger` | Destructive actions; require a second click to confirm |
 | | `Button.Icon` / `Button.Icon.Sm` | Icon-only; always set a `ToolTip` |
 | Toggle | `Button.Toggle` (implicit `ToggleButton`) | On/off tool |
-| Segmented | `Segmented.Container` + `Segmented.Item` (RadioButtons) | 2–4 mutually exclusive views |
+| Segmented | `Segmented.Container` > `ui:SegmentedPanel` > `Segmented.Item` (RadioButtons) | 2–4 mutually exclusive views; the panel slides one shared indicator to the checked item |
 | Switch | `Switch` (CheckBox) | Settings that apply immediately |
 | CheckBox / RadioButton | implicit | Forms |
 | TextBox | implicit · `TextBox.Search` | `ui:Ui.Placeholder`, `ui:Ui.Icon` |

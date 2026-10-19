@@ -48,8 +48,6 @@
 
             <!-- Sidebar -->
             <DockPanel Grid.Column="0" Margin="12,6,12,14">
-                <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Text.Caption}" Margin="12,8,0,0"
-                           Text="Módulos rodam no mesmo processo." TextWrapping="Wrap" TextTrimming="None" Foreground="{StaticResource Brush.Text.Disabled}" />
 
                 <StackPanel DockPanel.Dock="Top">
                     <Button Style="{StaticResource Nav.Button}" Command="{Binding ShowStoreCommand}" Tag="{Binding IsStoreActive}" AutomationProperties.Name="Módulos">

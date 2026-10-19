@@ -47,7 +47,7 @@
                 <StackPanel Grid.Row="1" Margin="0,22,0,0">
                     <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left" Margin="0,0,0,20"
                             Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}">
-                        <StackPanel Orientation="Horizontal">
+                        <ui:SegmentedPanel>
                             <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Descrição"
                                          IsChecked="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
                             <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" AutomationProperties.Name="Configurações"
@@ -57,7 +57,7 @@
                                     <TextBlock Text="Configurações" />
                                 </StackPanel>
                             </RadioButton>
-                        </StackPanel>
+                        </ui:SegmentedPanel>
                     </Border>
 
                     <Grid x:Name="TabBody">

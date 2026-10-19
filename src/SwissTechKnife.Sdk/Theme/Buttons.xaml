@@ -160,7 +160,15 @@
     <Style TargetType="RepeatButton" BasedOn="{StaticResource Button.Secondary}" />
     <Style TargetType="ToggleButton" BasedOn="{StaticResource Button.Toggle}" />
 
-    <!-- Segmented control item: put RadioButtons sharing a GroupName inside a Border.Segmented. -->
+    <!--
+        Segmented control: Border Segmented.Container > ui:SegmentedPanel > RadioButtons (Segmented.Item, shared GroupName).
+        The panel draws the active indicator and slides it between items.
+    -->
+    <Style TargetType="ui:SegmentedPanel">
+        <Setter Property="IndicatorBrush" Value="{StaticResource Brush.Surface5}" />
+        <Setter Property="IndicatorRadius" Value="8" />
+    </Style>
+
     <Style x:Key="Segmented.Container" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource Brush.Surface3}" />
         <Setter Property="CornerRadius" Value="{StaticResource Radius.Md}" />
@@ -208,21 +216,10 @@
                                 </VisualStateGroup.Transitions>
                                 <VisualState x:Name="Unchecked" />
                                 <VisualState x:Name="Indeterminate" />
-                                <VisualState x:Name="Checked">
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Pill" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="PillScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="PillScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0" />
-                                    </Storyboard>
-                                </VisualState>
+                                <VisualState x:Name="Checked" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="HoverLayer" Background="{StaticResource Brush.Overlay.Hover}" CornerRadius="8" Opacity="0" />
-                        <Border x:Name="Pill" Background="{StaticResource Brush.Surface5}" CornerRadius="8" Opacity="0" RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="PillScale" ScaleX="0.92" ScaleY="0.92" />
-                            </Border.RenderTransform>
-                        </Border>
                         <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
                     </Grid>
                     <ControlTemplate.Triggers>
