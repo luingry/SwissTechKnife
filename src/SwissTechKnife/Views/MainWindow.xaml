@@ -117,7 +117,7 @@
                             <ContentControl Style="{StaticResource IconTile}" Width="36" Height="36" Padding="8" ui:Ui.CornerRadius="10" />
                             <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name}" Style="{StaticResource Text.Subtitle}" />
-                                <TextBlock Text="{Binding Byline}" Style="{StaticResource Text.Caption}" Margin="0,1,0,0" />
+                                <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" Margin="0,1,0,0" />
                             </StackPanel>
                             <Button Grid.Column="2" Style="{StaticResource Button.Ghost}" ui:Ui.Icon="&#xE946;" Content="Detalhes"
                                     Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />

@@ -70,7 +70,7 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 ```json
 {
   "id": "smooth-mice", "name": "SmoothMice", "tagline": "…", "description": "…",
-  "category": "Entrada", "author": "luingry", "version": "3.0.0",
+  "version": "3.0.0",
   "icon": "<24×24 stroke path>", "accent": "#F2A65A",
   "package": "https://github.com/luingry/SmoothMice/releases/download/v3.0.0/smooth-mice-3.0.0.zip",
   "sha256": "<lowercase hex>", "size": 123456

@@ -25,7 +25,7 @@
                         <ContentControl Style="{StaticResource IconTile}" />
                         <StackPanel Grid.Column="1" Margin="14,0,8,0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Name}" Style="{StaticResource Text.Subtitle}" />
-                            <TextBlock Text="{Binding Byline}" Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
+                            <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
                         </StackPanel>
                         <ContentControl Grid.Column="2" Style="{StaticResource StatusChip}" VerticalAlignment="Top" />
                     </Grid>

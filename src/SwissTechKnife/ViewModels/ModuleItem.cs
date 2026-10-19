@@ -71,25 +71,7 @@ namespace SwissTechKnife.ViewModels
 
         public string Description => string.IsNullOrWhiteSpace(Info.Description) ? Info.Tagline : Info.Description;
 
-        public string Category => string.IsNullOrWhiteSpace(Info.Category) ? "Geral" : Info.Category;
-
-        public string Author => Info.Author;
-
         public string Homepage => Info.Homepage;
-
-        /// <summary>"Categoria · Autor · v1.0.0" under the name.</summary>
-        public string Byline
-        {
-            get
-            {
-                string text = Category;
-                if (!string.IsNullOrWhiteSpace(Author))
-                {
-                    text += "  ·  " + Author;
-                }
-                return string.IsNullOrWhiteSpace(Version) ? text : text + "  ·  v" + Version;
-            }
-        }
 
         public string Version => IsInstalled ? _installed.Version : Info.Version;
 
@@ -228,8 +210,7 @@ namespace SwissTechKnife.ViewModels
             var culture = CultureInfo.CurrentCulture.CompareInfo;
             const CompareOptions options = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace;
             return culture.IndexOf(Name ?? string.Empty, query, options) >= 0
-                || culture.IndexOf(Tagline ?? string.Empty, query, options) >= 0
-                || culture.IndexOf(Category ?? string.Empty, query, options) >= 0;
+                || culture.IndexOf(Tagline ?? string.Empty, query, options) >= 0;
         }
 
         public void Refresh() => OnAllPropertiesChanged();
