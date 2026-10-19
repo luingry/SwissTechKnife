@@ -217,7 +217,7 @@
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}" />
                         </Trigger>
-                        <!-- Inactive item on hover: the label dims 20%; no background, so it never reads as selected. -->
+                        <!-- Inactive item on hover: the label dims 40%; no background, so it never reads as selected. -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
@@ -226,7 +226,7 @@
                             <MultiTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Label" Storyboard.TargetProperty="Opacity" To="0.8" Duration="{StaticResource Motion.Fast}" />
+                                        <DoubleAnimation Storyboard.TargetName="Label" Storyboard.TargetProperty="Opacity" To="0.6" Duration="{StaticResource Motion.Fast}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </MultiTrigger.EnterActions>
