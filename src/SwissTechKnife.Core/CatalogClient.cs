@@ -109,7 +109,7 @@ namespace SwissTechKnife.Core
             return result;
         }
 
-        internal static async Task<byte[]> ReadAllAsync(Uri uri, CancellationToken cancellationToken)
+        public static async Task<byte[]> ReadAllAsync(Uri uri, CancellationToken cancellationToken)
         {
             if (uri.IsFile)
             {

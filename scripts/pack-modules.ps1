@@ -56,6 +56,10 @@ foreach ($entry in $catalog.modules) {
         $entry | Add-Member -Force NoteProperty size $p.Size
     }
 }
+# Module icons ship with the feed (catalog "iconImage" paths are relative to catalog.json).
+$icons = Join-Path $root 'catalog/icons'
+if (Test-Path $icons) { Copy-Item $icons (Join-Path $feed 'icons') -Recurse -Force }
+
 $json = $catalog | ConvertTo-Json -Depth 8
 [IO.File]::WriteAllText((Join-Path $feed 'catalog.json'), $json, (New-Object Text.UTF8Encoding $false))
 Write-Host "Feed written to $feed" -ForegroundColor Green

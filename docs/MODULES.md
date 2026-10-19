@@ -72,12 +72,13 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
   "id": "smooth-mice", "name": "SmoothMice", "tagline": "…", "description": "…",
   "version": "3.0.0",
   "icon": "<24×24 stroke path>", "accent": "#F2A65A",
+  "iconImage": "icons/smooth-mice.png", "iconBackground": "#ECE6DD",
   "package": "https://github.com/luingry/SmoothMice/releases/download/v3.0.0/smooth-mice-3.0.0.zip",
   "sha256": "<lowercase hex>", "size": 123456
 }
 ```
 
-An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
+`iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
 
 ## 5. Rules
 

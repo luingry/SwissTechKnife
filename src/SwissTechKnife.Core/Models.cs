@@ -65,6 +65,14 @@ namespace SwissTechKnife.Core
         [DataMember(Name = "homepage", Order = 13, EmitDefaultValue = false)]
         public string Homepage { get; set; }
 
+        /// <summary>Optional raster icon (PNG URL, absolute or relative to the catalog). Wins over <see cref="Icon"/>.</summary>
+        [DataMember(Name = "iconImage", Order = 14, EmitDefaultValue = false)]
+        public string IconImage { get; set; }
+
+        /// <summary>Optional tile color (#RRGGBB) behind <see cref="IconImage"/>; defaults to the accent tint.</summary>
+        [DataMember(Name = "iconBackground", Order = 15, EmitDefaultValue = false)]
+        public string IconBackground { get; set; }
+
         public bool IsAvailable => !string.IsNullOrWhiteSpace(Package) && !string.IsNullOrWhiteSpace(Sha256);
 
         public CatalogEntry Clone() => (CatalogEntry)MemberwiseClone();

@@ -33,6 +33,7 @@ namespace SwissTechKnife.ViewModels
         private string _restartReason;
         private string _pageError;
         private bool _confirmingUninstall;
+        private ImageSource _iconImage;
 
         public ModuleItem(string id)
         {
@@ -86,6 +87,28 @@ namespace SwissTechKnife.ViewModels
         public Brush AccentBrush => Brushes(Info.Accent).Strong;
 
         public Brush AccentSoftBrush => Brushes(Info.Accent).Soft;
+
+        /// <summary>Raster icon location from the catalog (null = vector icon only).</summary>
+        public string IconImageUrl => Info.IconImage;
+
+        /// <summary>The module's own icon, once loaded; replaces the vector icon.</summary>
+        public ImageSource IconImage
+        {
+            get => _iconImage;
+            set
+            {
+                if (Set(ref _iconImage, value))
+                {
+                    OnPropertyChanged(nameof(HasIconImage));
+                    OnPropertyChanged(nameof(TileBrush));
+                }
+            }
+        }
+
+        public bool HasIconImage => _iconImage != null;
+
+        /// <summary>Icon tile color: catalog iconBackground for raster icons, else the accent tint.</summary>
+        public Brush TileBrush => HasIconImage && !string.IsNullOrWhiteSpace(Info.IconBackground) ? Brushes(Info.IconBackground).Strong : AccentSoftBrush;
 
         public bool IsInstalled => _installed != null;
 

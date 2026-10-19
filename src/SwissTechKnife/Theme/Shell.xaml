@@ -147,14 +147,25 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContentControl">
-                    <Border Background="{Binding AccentSoftBrush}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" Padding="{TemplateBinding Padding}">
-                        <Viewbox Stretch="Uniform">
-                            <Canvas Width="24" Height="24">
-                                <Path Data="{Binding IconGeometry}" Stroke="{Binding AccentBrush}" StrokeThickness="1.8"
-                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
-                            </Canvas>
-                        </Viewbox>
+                    <Border Background="{Binding TileBrush}" CornerRadius="{TemplateBinding ui:Ui.CornerRadius}" Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Viewbox x:Name="Vector" Stretch="Uniform">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="{Binding IconGeometry}" Stroke="{Binding AccentBrush}" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                </Canvas>
+                            </Viewbox>
+                            <!-- The module's own icon replaces the vector icon once loaded. -->
+                            <Image x:Name="Raster" Source="{Binding IconImage}" Stretch="Uniform" Visibility="Collapsed"
+                                   RenderOptions.BitmapScalingMode="HighQuality" Margin="-3" />
+                        </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding HasIconImage}" Value="True">
+                            <Setter TargetName="Vector" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Raster" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

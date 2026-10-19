@@ -21,6 +21,7 @@ namespace SwissTechKnife.Modules
         private readonly CatalogClient _catalog;
         private readonly PackageInstaller _installer;
         private readonly ModuleRuntime _runtime;
+        private readonly IconCache _icons;
 
         public ModuleManager(HostPaths paths, StateStore state, CatalogClient catalog, PackageInstaller installer, ModuleRuntime runtime)
         {
@@ -29,6 +30,7 @@ namespace SwissTechKnife.Modules
             _catalog = catalog;
             _installer = installer;
             _runtime = runtime;
+            _icons = new IconCache(paths);
         }
 
         public ObservableCollection<ModuleItem> Items { get; } = new ObservableCollection<ModuleItem>();
@@ -86,6 +88,34 @@ namespace SwissTechKnife.Modules
             }
             Sort();
             RaiseChanged();
+            _ = LoadIconsAsync(result.Source);
+        }
+
+        /// <summary>Loads module icon images in the background; tiles keep the vector icon until they arrive.</summary>
+        private async Task LoadIconsAsync(Uri catalogUri)
+        {
+            foreach (ModuleItem item in Items.ToList())
+            {
+                string url = item.IconImageUrl;
+                if (string.IsNullOrWhiteSpace(url) || item.IconImage != null)
+                {
+                    continue;
+                }
+                Uri uri;
+                try
+                {
+                    uri = new Uri(catalogUri, url);
+                }
+                catch (UriFormatException)
+                {
+                    continue;
+                }
+                System.Windows.Media.ImageSource image = await _icons.GetAsync(uri, CancellationToken.None);
+                if (image != null)
+                {
+                    item.IconImage = image;
+                }
+            }
         }
 
         /// <summary>Installs, or updates to the catalog version.</summary>
