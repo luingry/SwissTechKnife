@@ -11,6 +11,9 @@ Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 
 $root = Split-Path -Parent $PSScriptRoot
 $feed = Join-Path $root 'artifacts/feed'
+# Start clean so retired package versions never ship (also the copies in the app output folders).
+if (Test-Path $feed) { Remove-Item -Recurse -Force $feed }
+Get-ChildItem (Join-Path $root 'src/SwissTechKnife/bin') -Directory -Recurse -Filter feed -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
 New-Item -ItemType Directory -Force $feed | Out-Null
 
 function New-ModulePackage([string]$projectDir) {

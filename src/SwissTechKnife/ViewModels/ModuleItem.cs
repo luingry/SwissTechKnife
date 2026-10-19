@@ -77,7 +77,19 @@ namespace SwissTechKnife.ViewModels
 
         public string Homepage => Info.Homepage;
 
-        public string Byline => string.IsNullOrWhiteSpace(Author) ? Category : Category + "  ·  " + Author;
+        /// <summary>"Categoria · Autor · v1.0.0" under the name.</summary>
+        public string Byline
+        {
+            get
+            {
+                string text = Category;
+                if (!string.IsNullOrWhiteSpace(Author))
+                {
+                    text += "  ·  " + Author;
+                }
+                return string.IsNullOrWhiteSpace(Version) ? text : text + "  ·  v" + Version;
+            }
+        }
 
         public string Version => IsInstalled ? _installed.Version : Info.Version;
 
@@ -97,6 +109,26 @@ namespace SwissTechKnife.ViewModels
 
         public bool IsEnabled => _installed?.Enabled == true;
 
+        /// <summary>Set by the shell: performs enable/disable when the switch is flipped.</summary>
+        public Action<ModuleItem, bool> ToggleHandler { get; set; }
+
+        /// <summary>Two-way target for the enable switch on the card and in the dialog.</summary>
+        public bool IsActive
+        {
+            get => IsEnabled;
+            set
+            {
+                if (value != IsEnabled)
+                {
+                    ToggleHandler?.Invoke(this, value);
+                }
+                // Re-sync the switch if the change was refused or failed.
+                OnPropertyChanged(nameof(IsActive));
+            }
+        }
+
+        public string ActiveText => IsEnabled ? "Ativado" : "Desativado";
+
         public ModuleStatus Status =>
             _installed != null ? (_installed.Enabled ? ModuleStatus.Enabled : ModuleStatus.Disabled)
             : (_catalogEntry?.IsAvailable == true ? ModuleStatus.Available : ModuleStatus.ComingSoon);
@@ -108,6 +140,9 @@ namespace SwissTechKnife.ViewModels
         public bool HasUpdate => IsInstalled && _catalogEntry?.IsAvailable == true && Core.VersionText.IsNewer(_catalogEntry.Version, _installed.Version);
 
         public bool StartsWithHost => _installed?.Manifest?.StartsWithHost == true;
+
+        /// <summary>Enabled module that declares a settings view.</summary>
+        public bool HasSettings => IsEnabled && _installed.Manifest?.HasSettings == true;
 
         public string UpdateText => HasUpdate ? "v" + _catalogEntry.Version + " disponível" : null;
 
@@ -122,9 +157,7 @@ namespace SwissTechKnife.ViewModels
 
         public bool ShowOpenSecondary => Status == ModuleStatus.Enabled && HasUpdate;
 
-        public bool ShowEnable => Status == ModuleStatus.Disabled;
 
-        public bool ShowDisable => Status == ModuleStatus.Enabled;
 
         public bool IsBusy
         {

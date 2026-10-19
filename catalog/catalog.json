@@ -43,10 +43,10 @@
       "description": "Módulo de exemplo do SwissTechKnife. Mostra o uso do processador nos últimos 60 segundos, a memória em uso e há quanto tempo o Windows está ligado. As leituras só acontecem enquanto a página está aberta.",
       "category": "Sistema",
       "author": "SwissTechKnife",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "icon": "M3,12 L7,12 L10,5 L14,19 L17,12 L21,12",
       "accent": "#5FB3D0",
-      "package": "system-monitor-1.0.0.zip"
+      "package": "system-monitor-1.1.0.zip"
     },
     {
       "id": "hash-tool",

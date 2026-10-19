@@ -14,14 +14,25 @@ namespace SwissTechKnife.Samples.SystemMonitor
         private readonly double[] _cpu = new double[Samples];
         private readonly NativeStats _stats = new NativeStats();
         private readonly DispatcherTimer _timer;
+        private readonly MonitorSettings _settings;
         private int _count;
 
-        public MonitorView()
+        public MonitorView(MonitorSettings settings)
         {
+            _settings = settings;
             InitializeComponent();
-            _timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (s, e) => Tick(), Dispatcher);
+            _timer = new DispatcherTimer(TimeSpan.FromSeconds(settings.IntervalSeconds), DispatcherPriority.Background, (s, e) => Tick(), Dispatcher);
             _timer.Stop();
             ChartHost.SizeChanged += (s, e) => DrawChart();
+            settings.Changed += (s, e) => ApplySettings();
+            ApplySettings();
+        }
+
+        /// <summary>Settings edited in the host dialog apply live.</summary>
+        private void ApplySettings()
+        {
+            _timer.Interval = TimeSpan.FromSeconds(_settings.IntervalSeconds);
+            ChartArea.Visibility = _settings.ShowChart ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
         }
 
         public void OnViewShown()

@@ -40,6 +40,9 @@ namespace SwissTechKnife.Modules
 
         public ModuleRuntime Runtime => _runtime;
 
+        /// <summary>Assigned to every item; the shell owns enable/disable (navigation, notices).</summary>
+        public Action<ModuleItem, bool> ToggleHandler { get; set; }
+
         public ModuleItem Find(string id) => Items.FirstOrDefault(i => i.Id == id);
 
         /// <summary>Shows installed modules immediately (works offline, before the catalog arrives).</summary>
@@ -211,7 +214,7 @@ namespace SwissTechKnife.Modules
             ModuleItem item = Find(id);
             if (item == null)
             {
-                item = new ModuleItem(id);
+                item = new ModuleItem(id) { ToggleHandler = ToggleHandler };
                 Items.Add(item);
             }
             return item;

@@ -1,0 +1,29 @@
+<UserControl x:Class="SwissTechKnife.Samples.SystemMonitor.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Shown in the host's "Configurações" tab. Changes apply immediately. -->
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Intervalo de atualização" Style="{StaticResource Text.BodyStrong}" />
+                <TextBlock Text="Com que frequência as leituras são feitas." Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
+            </StackPanel>
+            <ComboBox x:Name="Interval" Grid.Column="1" Width="140" SelectionChanged="OnIntervalChanged">
+                <ComboBoxItem Content="1 segundo" Tag="1" />
+                <ComboBoxItem Content="2 segundos" Tag="2" />
+                <ComboBoxItem Content="5 segundos" Tag="5" />
+            </ComboBox>
+        </Grid>
+
+        <CheckBox x:Name="ShowChart" Style="{StaticResource Switch}" Margin="0,20,0,0" Checked="OnChartChanged" Unchecked="OnChartChanged">
+            <StackPanel>
+                <TextBlock Text="Mostrar gráfico do processador" Style="{StaticResource Text.BodyStrong}" />
+                <TextBlock Text="Desligue para uma página mais compacta." Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
+            </StackPanel>
+        </CheckBox>
+    </StackPanel>
+</UserControl>

@@ -103,6 +103,10 @@ namespace SwissTechKnife.Core
         [DataMember(Name = "loadMode", Order = 6, EmitDefaultValue = false)]
         public string LoadMode { get; set; }
 
+        /// <summary>True when the entry type implements IModuleSettings (shows the "Configurações" tab).</summary>
+        [DataMember(Name = "settings", Order = 7, EmitDefaultValue = false)]
+        public bool HasSettings { get; set; }
+
         public bool StartsWithHost => string.Equals(Activation, "startup", System.StringComparison.OrdinalIgnoreCase);
 
         public bool LoadsFromFile => string.Equals(LoadMode, "file", System.StringComparison.OrdinalIgnoreCase);

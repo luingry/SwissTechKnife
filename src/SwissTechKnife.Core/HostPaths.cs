@@ -20,8 +20,11 @@ namespace SwissTechKnife.Core
             CatalogCacheFile = Path.Combine(Cache, "catalog.json");
         }
 
+        /// <summary>%LOCALAPPDATA%\SwissTechKnife, or STK_HOME (isolated profile for development and tests).</summary>
         public static HostPaths Default { get; } = new HostPaths(
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SwissTechKnife"));
+            Environment.GetEnvironmentVariable("STK_HOME") is string home && home.Length > 0
+                ? Path.GetFullPath(home)
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SwissTechKnife"));
 
         public string Root { get; }
         public string Modules { get; }

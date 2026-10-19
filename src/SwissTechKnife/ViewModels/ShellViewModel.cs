@@ -47,6 +47,9 @@ namespace SwissTechKnife.ViewModels
         private ModuleItem _selectedModule;
         private CatalogState _catalogState = CatalogState.Loading;
         private string _catalogMessage;
+        private bool _isSettingsTab;
+        private FrameworkElement _settingsPage;
+        private string _settingsError;
 
         public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion)
         {
@@ -60,6 +63,7 @@ namespace SwissTechKnife.ViewModels
             _searchDebounce = new DispatcherTimer(TimeSpan.FromMilliseconds(140), DispatcherPriority.Input, (s, e) => ApplySearch(), Dispatcher.CurrentDispatcher);
             _searchDebounce.Stop();
             manager.Changed += (s, e) => RefreshLists();
+            manager.ToggleHandler = SetEnabled;
 
             ShowStoreCommand = new RelayCommand(_ => ShowStore());
             ShowTabCommand = new RelayCommand(p => { Tab = (StoreTab)p; ShowStore(); });
@@ -206,12 +210,53 @@ namespace SwissTechKnife.ViewModels
                 }
                 if (Set(ref _selectedModule, value))
                 {
+                    ShowDescriptionTab();
                     OnPropertyChanged(nameof(IsDialogOpen));
                 }
             }
         }
 
         public bool IsDialogOpen => _selectedModule != null;
+
+        /// <summary>Dialog tab: "Descrição" (default) or "Configurações" (modules with settings).</summary>
+        public bool IsDescriptionTab
+        {
+            get => !_isSettingsTab;
+            set
+            {
+                if (value)
+                {
+                    ShowDescriptionTab();
+                }
+            }
+        }
+
+        public bool IsSettingsTab
+        {
+            get => _isSettingsTab;
+            set
+            {
+                if (value && !_isSettingsTab && _selectedModule?.HasSettings == true)
+                {
+                    LoadSettingsPage(_selectedModule);
+                    _isSettingsTab = true;
+                    OnPropertyChanged(nameof(IsSettingsTab));
+                    OnPropertyChanged(nameof(IsDescriptionTab));
+                }
+            }
+        }
+
+        public FrameworkElement SettingsPage
+        {
+            get => _settingsPage;
+            private set => Set(ref _settingsPage, value);
+        }
+
+        public string SettingsError
+        {
+            get => _settingsError;
+            private set => Set(ref _settingsError, value);
+        }
 
         public CatalogState CatalogState
         {
@@ -357,6 +402,44 @@ namespace SwissTechKnife.ViewModels
             NotifyPageShown();
         }
 
+        private void ShowDescriptionTab()
+        {
+            if (_isSettingsTab)
+            {
+                _isSettingsTab = false;
+                OnPropertyChanged(nameof(IsSettingsTab));
+                OnPropertyChanged(nameof(IsDescriptionTab));
+            }
+        }
+
+        /// <summary>Activates the module if needed and asks it for its settings view.</summary>
+        private void LoadSettingsPage(ModuleItem item)
+        {
+            SettingsError = null;
+            FrameworkElement page = null;
+            if (_manager.TryActivate(item))
+            {
+                try
+                {
+                    page = _manager.Runtime.GetSettingsView(item.Id);
+                    if (page == null)
+                    {
+                        SettingsError = "Este módulo não oferece configurações nesta versão.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(Source, "CreateSettingsView failed for " + item.Id, ex);
+                    SettingsError = "As configurações não puderam ser abertas: " + ex.Message;
+                }
+            }
+            else
+            {
+                SettingsError = item.PageError;
+            }
+            SettingsPage = page;
+        }
+
         private void RetryPage()
         {
             ModuleItem item = _currentModule;
@@ -411,6 +494,11 @@ namespace SwissTechKnife.ViewModels
             {
                 ShowStore();
             }
+            if (ReferenceEquals(_selectedModule, item))
+            {
+                ShowDescriptionTab();
+                SettingsPage = null;
+            }
             _manager.Uninstall(item);
             Notify(item.Name + " desinstalado.", NotificationKind.Success);
         }
@@ -421,8 +509,12 @@ namespace SwissTechKnife.ViewModels
             {
                 ShowStore();
             }
+            if (!enabled && ReferenceEquals(_selectedModule, item))
+            {
+                ShowDescriptionTab();
+                SettingsPage = null;
+            }
             _manager.SetEnabled(item, enabled);
-            Notify(item.Name + (enabled ? " ativado." : " desativado."), NotificationKind.Info);
         }
 
         private void NotifyPageHidden()

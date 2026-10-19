@@ -72,6 +72,12 @@ namespace SwissTechKnife.Views
                 case nameof(ShellViewModel.CurrentPage):
                     AnimatePageIn();
                     break;
+                case nameof(ShellViewModel.IsSettingsTab):
+                    if (_shell.IsDialogOpen)
+                    {
+                        Dialog.AnimateTab();
+                    }
+                    break;
                 case nameof(ShellViewModel.IsDialogOpen):
                     if (_shell.IsDialogOpen)
                     {

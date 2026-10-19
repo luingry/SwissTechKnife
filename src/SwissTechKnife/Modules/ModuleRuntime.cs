@@ -89,6 +89,17 @@ namespace SwissTechKnife.Modules
             return active.View;
         }
 
+        /// <summary>The module's settings view, or null if it does not implement IModuleSettings.</summary>
+        public FrameworkElement GetSettingsView(string id)
+        {
+            ActiveModule active = _active[id];
+            if (active.SettingsView == null && active.Instance is IModuleSettings settings)
+            {
+                active.SettingsView = settings.CreateSettingsView();
+            }
+            return active.SettingsView;
+        }
+
         public void Deactivate(string id)
         {
             if (_active.TryGetValue(id, out ActiveModule active))
@@ -200,6 +211,7 @@ namespace SwissTechKnife.Modules
                 Log.Error(Source, "Dispose failed for " + active.Id, ex);
             }
             active.View = null;
+            active.SettingsView = null;
         }
 
         private sealed class LoadedCode
@@ -235,5 +247,7 @@ namespace SwissTechKnife.Modules
         public ModuleContext Context { get; }
 
         public FrameworkElement View { get; set; }
+
+        public FrameworkElement SettingsView { get; set; }
     }
 }

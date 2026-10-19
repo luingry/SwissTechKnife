@@ -112,7 +112,8 @@
     <CornerRadius x:Key="Radius.Md">10</CornerRadius>
     <CornerRadius x:Key="Radius.Lg">14</CornerRadius>
     <CornerRadius x:Key="Radius.Xl">20</CornerRadius>
-    <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
+    <!-- Half the chip height: WPF stretches radii larger than half the size into an oval. -->
+    <CornerRadius x:Key="Radius.Pill">11</CornerRadius>
 
     <!-- ═══ Sizes ═══ -->
     <sys:Double x:Key="Size.Control.Sm">28</sys:Double>

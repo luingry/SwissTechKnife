@@ -43,34 +43,66 @@
                             VerticalAlignment="Top" Margin="0,-10,-10,0" Click="OnCloseClick" />
                 </Grid>
 
-                <!-- Description -->
-                <ScrollViewer Grid.Row="1" MaxHeight="220" Margin="0,22,0,0" VerticalScrollBarVisibility="Auto">
-                    <TextBlock Text="{Binding Description}" Style="{StaticResource Text.Paragraph}" />
-                </ScrollViewer>
+                <!-- Tabs: "Configurações" appears only for enabled modules that offer settings -->
+                <StackPanel Grid.Row="1" Margin="0,22,0,0">
+                    <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left" Margin="0,0,0,20"
+                            Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Descrição"
+                                         IsChecked="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" AutomationProperties.Name="Configurações"
+                                         IsChecked="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE713;" Style="{StaticResource Text.Icon}" FontSize="12" Margin="0,0,7,0" />
+                                    <TextBlock Text="Configurações" />
+                                </StackPanel>
+                            </RadioButton>
+                        </StackPanel>
+                    </Border>
 
-                <!-- Facts -->
-                <Grid Grid.Row="2" Margin="0,22,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="Versão" Style="{StaticResource Text.Overline}" />
-                        <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
-                        <TextBlock Text="{Binding UpdateText}" Style="{StaticResource Text.Caption}" Foreground="{StaticResource Brush.Accent}" Margin="0,2,0,0"
-                                   Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="Tamanho" Style="{StaticResource Text.Overline}" />
-                        <TextBlock Text="{Binding SizeText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Categoria" Style="{StaticResource Text.Overline}" />
-                        <TextBlock Text="{Binding Category}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
-                    </StackPanel>
-                </Grid>
+                    <Grid x:Name="TabBody">
+                        <Grid.RenderTransform>
+                            <TranslateTransform x:Name="TabMove" />
+                        </Grid.RenderTransform>
 
+                        <!-- Descrição -->
+                        <StackPanel Visibility="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
+                            <ScrollViewer MaxHeight="220" VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding Description}" Style="{StaticResource Text.Paragraph}" />
+                            </ScrollViewer>
+                            <Grid Margin="0,22,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Versão" Style="{StaticResource Text.Overline}" />
+                                    <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
+                                    <TextBlock Text="{Binding UpdateText}" Style="{StaticResource Text.Caption}" Foreground="{StaticResource Brush.Success}" Margin="0,2,0,0"
+                                               Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Tamanho" Style="{StaticResource Text.Overline}" />
+                                    <TextBlock Text="{Binding SizeText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Categoria" Style="{StaticResource Text.Overline}" />
+                                    <TextBlock Text="{Binding Category}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Configurações -->
+                        <Grid Visibility="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
+                            <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
+                                <ContentPresenter Content="{Binding DataContext.SettingsPage, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            </ScrollViewer>
+                            <TextBlock Text="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource Text.Paragraph}"
+                                       Visibility="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NullToVisibility}}" />
+                        </Grid>
+                    </Grid>
+                </StackPanel>
                 <!-- Notices -->
                 <StackPanel Grid.Row="3">
                     <Border Background="{StaticResource Brush.Warning.Soft}" CornerRadius="{StaticResource Radius.Md}" Padding="14,10" Margin="0,20,0,0"
@@ -132,15 +164,9 @@
                     </Button>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE769;" Content="Desativar" Margin="8,0,0,0"
-                                Command="{Binding DataContext.DisableCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
-                                Visibility="{Binding ShowDisable, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE8A7;" Content="Abrir" Margin="8,0,0,0"
                                 Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowOpenSecondary, Converter={StaticResource BoolToVisibility}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE768;" Content="Ativar" Margin="8,0,0,0"
-                                Command="{Binding DataContext.EnableCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
-                                Visibility="{Binding ShowEnable, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE8A7;" Content="Abrir" Margin="8,0,0,0"
                                 Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowOpenPrimary, Converter={StaticResource BoolToVisibility}}" />
@@ -152,6 +178,11 @@
                                 Visibility="{Binding ShowInstall, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE823;" Content="Em breve" Margin="8,0,0,0" IsEnabled="False"
                                 Visibility="{Binding ShowComingSoon, Converter={StaticResource BoolToVisibility}}" />
+                        <CheckBox Style="{StaticResource Switch}" Margin="20,0,0,0" VerticalAlignment="Center"
+                                  IsChecked="{Binding IsActive, Mode=TwoWay}" Content="{Binding ActiveText}"
+                                  Foreground="{StaticResource Brush.Text.Secondary}"
+                                  AutomationProperties.Name="Ativar módulo"
+                                  Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibility}}" />
                     </StackPanel>
                 </Grid>
             </Grid>

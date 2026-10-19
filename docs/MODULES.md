@@ -39,6 +39,10 @@ public sealed class SmoothMiceModule : IBackgroundModule
 `IModuleContext` gives: `DataDirectory` (settings that survive updates), `InstallDirectory` (read-only), `Dispatcher`, `Log`, `Notify(...)` (host toast) and `ShowModulePage()`.
 Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timers while hidden.
 
+### Settings
+
+If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Configurações** tab next to **Descrição** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See `samples/SystemMonitor`.
+
 ## 3. module.json
 
 ```json
@@ -56,6 +60,7 @@ Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timer
 | Field | Values |
 |---|---|
 | `activation` | `onDemand` (default): created when the page is first opened. `startup`: created with the host; `IBackgroundModule.Start` is called. |
+| `settings` | `true` when the entry type implements `IModuleSettings` (shows the Configurações tab without loading the module first). |
 | `loadMode` | `memory` (default): assemblies are read into memory, files are never locked, uninstall/update apply at once. `file`: `Assembly.LoadFrom`, for code that needs `Assembly.Location` or native side-by-side DLLs (WebView2). File changes then apply after a restart. |
 
 ## 4. Package and catalog

@@ -14,6 +14,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -28,20 +29,16 @@
                         </StackPanel>
                         <ContentControl Grid.Column="2" Style="{StaticResource StatusChip}" VerticalAlignment="Top" />
                     </Grid>
-                    <TextBlock Grid.Row="1" Text="{Binding Tagline}" Style="{StaticResource Text.Paragraph}" Height="40" Margin="0,14,0,0"
+                    <TextBlock Grid.Row="1" Text="{Binding Tagline}" Style="{StaticResource Text.Paragraph}" Height="40" Margin="0,16,0,0"
                                TextTrimming="CharacterEllipsis" />
-                    <Grid Grid.Row="2" Margin="0,14,0,0" Height="16">
-                        <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" VerticalAlignment="Center" />
-                        <ProgressBar Value="{Binding Progress, Mode=OneWay}" Maximum="1" Width="96" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
-                        <TextBlock x:Name="Chevron" Text="&#xE76C;" Style="{StaticResource Text.Icon}" FontSize="11" HorizontalAlignment="Right"
-                                   Foreground="{StaticResource Brush.Text.Tertiary}" Opacity="0.6"
-                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
-                            <TextBlock.RenderTransform>
-                                <TranslateTransform x:Name="ChevronMove" />
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
-                    </Grid>
+                    <ProgressBar Grid.Row="2" Value="{Binding Progress, Mode=OneWay}" Maximum="1" Margin="0,14,0,0"
+                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    <!-- Enable switch (installed modules). It handles its own clicks, so the card does not open. -->
+                    <CheckBox Grid.Row="3" Style="{StaticResource Switch}" HorizontalAlignment="Right" Margin="0,12,0,0"
+                              IsChecked="{Binding IsActive, Mode=TwoWay}" Content="{Binding ActiveText}"
+                              Foreground="{StaticResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Caption}"
+                              AutomationProperties.Name="{Binding Name, StringFormat=Ativar {0}}"
+                              Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibility}}" />
                 </Grid>
                 <Button.RenderTransform>
                     <TranslateTransform x:Name="Enter" Y="8" />
@@ -56,24 +53,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
-                <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetName="Chevron" Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource Motion.Fast}" />
-                                <DoubleAnimation Storyboard.TargetName="ChevronMove" Storyboard.TargetProperty="X" To="3" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <Trigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetName="Chevron" Storyboard.TargetProperty="Opacity" To="0.6" Duration="{StaticResource Motion.Normal}" />
-                                <DoubleAnimation Storyboard.TargetName="ChevronMove" Storyboard.TargetProperty="X" To="0" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.ExitActions>
-                </Trigger>
+
             </DataTemplate.Triggers>
         </DataTemplate>
 
@@ -105,13 +85,13 @@
             </Grid.ColumnDefinitions>
             <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsAvailableTab}">
+                    <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsAvailableTab}" AutomationProperties.Name="Disponíveis">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Disponíveis" />
                             <TextBlock Text="{Binding AvailableCount}" Margin="8,0,0,0" Foreground="{StaticResource Brush.Text.Tertiary}" />
                         </StackPanel>
                     </RadioButton>
-                    <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsInstalledTab}">
+                    <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsInstalledTab}" AutomationProperties.Name="Instalados">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Instalados" />
                             <TextBlock Text="{Binding InstalledCount}" Margin="8,0,0,0" Foreground="{StaticResource Brush.Text.Tertiary}" />
@@ -151,9 +131,9 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.Items>
-                        <Border Style="{StaticResource Card}" Padding="18" Height="156" />
-                        <Border Style="{StaticResource Card}" Padding="18" Height="156" />
-                        <Border Style="{StaticResource Card}" Padding="18" Height="156" />
+                        <Border Style="{StaticResource Card}" Padding="18" Height="136" />
+                        <Border Style="{StaticResource Card}" Padding="18" Height="136" />
+                        <Border Style="{StaticResource Card}" Padding="18" Height="136" />
                     </ItemsControl.Items>
                     <ItemsControl.Triggers>
                         <EventTrigger RoutedEvent="FrameworkElement.Loaded">

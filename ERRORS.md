@@ -21,3 +21,8 @@
 
 - Cause: a `<StaticResource>` element reused a `DrawingGroup` as a child of another group.
 - Solution: share a frozen `DrawingCollection` (`Brand.MarkShapes`) via `Children="{StaticResource ...}"`.
+
+## 2026-10-19 — Status chips rendered as ovals
+
+- Cause: `Radius.Pill` was 999. WPF does not clamp corner radii to half the element size; it scales oversized radii proportionally, which turns a short pill into an ellipse.
+- Solution: chips have a fixed height (22) and `Radius.Pill` is half of it (11). Keep any pill radius ≤ half its height.

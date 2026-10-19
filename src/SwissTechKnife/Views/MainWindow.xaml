@@ -61,9 +61,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="&#xE71D;" Style="{StaticResource Text.Icon}" FontSize="15" Margin="2,0,12,0" />
                             <TextBlock Grid.Column="1" Text="Módulos" VerticalAlignment="Center" />
-                            <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{StaticResource Brush.Accent.Soft}" Padding="7,1"
+                            <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{StaticResource Brush.Success.Soft}" Padding="7,0" Height="20"
                                     Visibility="{Binding HasUpdates, Converter={StaticResource BoolToVisibility}}" ToolTip="Atualizações disponíveis">
-                                <TextBlock Text="{Binding UpdateCount}" Foreground="{StaticResource Brush.Accent}" FontSize="11" />
+                                <TextBlock Text="{Binding UpdateCount}" Foreground="{StaticResource Brush.Success}" FontSize="11" VerticalAlignment="Center" />
                             </Border>
                         </Grid>
                     </Button>
@@ -83,7 +83,7 @@
                                     </Grid.ColumnDefinitions>
                                     <ContentControl Style="{StaticResource IconTile}" Width="26" Height="26" Padding="5" ui:Ui.CornerRadius="7" />
                                     <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <Ellipse Grid.Column="2" Width="6" Height="6" Fill="{StaticResource Brush.Accent}" Margin="8,0,0,0" ToolTip="Atualização disponível"
+                                    <Ellipse Grid.Column="2" Width="6" Height="6" Fill="{StaticResource Brush.Success}" Margin="8,0,0,0" ToolTip="Atualização disponível"
                                              Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
                                 </Grid>
                             </DataTemplate>
@@ -119,7 +119,7 @@
                             <ContentControl Style="{StaticResource IconTile}" Width="36" Height="36" Padding="8" ui:Ui.CornerRadius="10" />
                             <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name}" Style="{StaticResource Text.Subtitle}" />
-                                <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" Margin="0,1,0,0" />
+                                <TextBlock Text="{Binding Byline}" Style="{StaticResource Text.Caption}" Margin="0,1,0,0" />
                             </StackPanel>
                             <Button Grid.Column="2" Style="{StaticResource Button.Ghost}" ui:Ui.Icon="&#xE946;" Content="Detalhes"
                                     Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />

@@ -38,6 +38,17 @@ namespace SwissTechKnife.Sdk
         void Stop();
     }
 
+    /// <summary>
+    /// Optional: the module offers customization. Requires <c>"settings": true</c> in <c>module.json</c>
+    /// (so the host can show the tab without loading the module). The view appears in the
+    /// "Configurações" tab of the module's details dialog; changes should apply immediately.
+    /// </summary>
+    public interface IModuleSettings
+    {
+        /// <summary>Called the first time the tab opens; the host keeps the element until the module is disposed.</summary>
+        FrameworkElement CreateSettingsView();
+    }
+
     /// <summary>Optional: notified when the module's page is shown or hidden (pause timers while hidden).</summary>
     public interface IModuleViewLifecycle
     {

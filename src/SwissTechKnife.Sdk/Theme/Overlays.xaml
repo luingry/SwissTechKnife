@@ -224,7 +224,8 @@
     <Style x:Key="Chip" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource Brush.Surface4}" />
         <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}" />
-        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="Padding" Value="9,0" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="TextElement.FontSize" Value="{StaticResource FontSize.Caption}" />

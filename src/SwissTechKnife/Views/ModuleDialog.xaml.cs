@@ -51,6 +51,15 @@ namespace SwissTechKnife.Views
             }
         }
 
+        /// <summary>Tab switch: the new tab content fades and rises in.</summary>
+        public void AnimateTab()
+        {
+            var ease = (IEasingFunction)FindResource("Ease.Emphasized");
+            var duration = (Duration)FindResource("Motion.Normal");
+            TabBody.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, duration) { EasingFunction = ease });
+            TabMove.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(6, 0, duration) { EasingFunction = ease });
+        }
+
         private void Animate(bool show, Action onDone)
         {
             var ease = (IEasingFunction)FindResource(show ? "Ease.Emphasized" : "Ease.Out");

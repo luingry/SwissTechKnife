@@ -28,9 +28,9 @@
                             <TextBlock x:Name="CpuText" Text="—" Style="{StaticResource Text.Display}" FontSize="40" />
                             <TextBlock Text="%" Style="{StaticResource Text.Title}" Foreground="{StaticResource Brush.Text.Tertiary}" VerticalAlignment="Bottom" Margin="4,0,0,8" />
                         </StackPanel>
-                        <TextBlock x:Name="CpuCaption" Style="{StaticResource Text.Caption}" Text="Uso nos últimos 60 segundos" />
+                        <TextBlock x:Name="CpuCaption" Style="{StaticResource Text.Caption}" Text="Uso recente do processador" />
                     </StackPanel>
-                    <Grid Grid.Row="1" Height="160" Margin="0,24,0,0" VerticalAlignment="Bottom">
+                    <Grid x:Name="ChartArea" Grid.Row="1" Height="160" Margin="0,24,0,0" VerticalAlignment="Bottom">
                         <Border Height="1" VerticalAlignment="Bottom" Background="{StaticResource Brush.Overlay.Hover}" />
                         <Border Height="1" VerticalAlignment="Center" Background="{StaticResource Brush.Overlay.Hover}" />
                         <Canvas x:Name="ChartHost" ClipToBounds="True">

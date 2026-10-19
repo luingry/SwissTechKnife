@@ -117,6 +117,7 @@
     </Style>
 
     <Style x:Key="Nav.ListItem" TargetType="ListBoxItem">
+        <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Padding" Value="8,0,10,0" />
@@ -169,8 +170,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ContentControl">
                     <Border Style="{StaticResource Chip}" Background="{TemplateBinding Background}">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="6" Height="6" Fill="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="0,1,6,0" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="6" Height="6" Fill="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="0,0,6,0" />
                             <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" FontSize="{StaticResource FontSize.Caption}" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>
@@ -178,18 +179,6 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:ModuleStatus.Enabled}">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Instalado" />
-                <Setter Property="Background" Value="{StaticResource Brush.Success.Soft}" />
-                <Setter Property="Foreground" Value="{StaticResource Brush.Success}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:ModuleStatus.Disabled}">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Desativado" />
-                <Setter Property="Background" Value="{StaticResource Brush.Surface4}" />
-                <Setter Property="Foreground" Value="{StaticResource Brush.Text.Tertiary}" />
-            </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:ModuleStatus.ComingSoon}">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Content" Value="Em breve" />
@@ -198,9 +187,9 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding HasUpdate}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Atualização" />
-                <Setter Property="Background" Value="{StaticResource Brush.Accent.Soft}" />
-                <Setter Property="Foreground" Value="{StaticResource Brush.Accent}" />
+                <Setter Property="Content" Value="Atualização disponível" />
+                <Setter Property="Background" Value="{StaticResource Brush.Success.Soft}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush.Success}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding RestartRequired}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -228,10 +217,7 @@
                 <ControlTemplate TargetType="Button">
                     <Grid x:Name="Root" Background="Transparent" RenderTransformOrigin="0.5,0.5">
                         <Grid.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform x:Name="Scale" />
-                                <TranslateTransform x:Name="Lift" />
-                            </TransformGroup>
+                            <ScaleTransform x:Name="Scale" />
                         </Grid.RenderTransform>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
@@ -243,14 +229,13 @@
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="Lift" Storyboard.TargetProperty="Y" To="-2" Duration="0" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.985" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.985" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.992" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.992" Duration="0" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
