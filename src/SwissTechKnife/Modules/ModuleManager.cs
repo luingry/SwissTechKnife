@@ -65,9 +65,12 @@ namespace SwissTechKnife.Modules
             }
         }
 
-        public async Task RefreshCatalogAsync(Uri catalogUri, CancellationToken cancellationToken)
+        /// <param name="live">False = use the saved catalog (no network) because an update check is not due.</param>
+        public async Task RefreshCatalogAsync(Uri catalogUri, bool live, CancellationToken cancellationToken)
         {
-            CatalogResult result = await _catalog.LoadAsync(catalogUri, cancellationToken);
+            CatalogResult result = live
+                ? await _catalog.LoadAsync(catalogUri, cancellationToken)
+                : await _catalog.LoadCachedAsync(catalogUri, cancellationToken);
             LastCatalog = result;
             var listed = new System.Collections.Generic.HashSet<string>(result.Catalog.Modules.Select(m => m.Id));
             foreach (CatalogEntry entry in result.Catalog.Modules)

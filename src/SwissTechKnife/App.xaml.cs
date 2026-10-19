@@ -22,6 +22,7 @@ namespace SwissTechKnife
         private SettingsStore _settings;
         private ModuleRuntime _runtime;
         private MainWindow _window;
+        private TrayIcon _tray;
 
         public static Version HostVersion { get; } = typeof(App).Assembly.GetName().Version;
 
@@ -82,14 +83,28 @@ namespace SwissTechKnife
             Func<Uri> catalogUri = () => CatalogClient.ResolveCatalogUri(
                 Environment.GetEnvironmentVariable("STK_CATALOG") ?? _settings.Current.Catalog,
                 AppDomain.CurrentDomain.BaseDirectory);
-            shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText);
+            string exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
+            shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText, _settings, exePath, ApplyTray);
+            bool atLogin = e.Args.Any(a => string.Equals(a, StartupRegistration.StartupArgument, StringComparison.OrdinalIgnoreCase));
 
             // First paint before any disk or network work.
             try
             {
                 _window = new MainWindow(shell, _settings);
                 MainWindow = _window;
-                _window.Show();
+                ApplyTray(_settings.Current.HideToTrayOnClose);
+                if (atLogin && _settings.Current.HideToTrayOnClose)
+                {
+                    // Started with Windows and kept in the notification area: no window until the user asks.
+                }
+                else
+                {
+                    if (atLogin)
+                    {
+                        _window.WindowState = WindowState.Minimized;
+                    }
+                    _window.Show();
+                }
             }
             catch (Exception ex)
             {
@@ -122,6 +137,30 @@ namespace SwissTechKnife
                 shell.Notify("Não foi possível carregar os módulos instalados.", NotificationKind.Error);
             }
             await shell.ReloadCatalogAsync();
+        }
+
+        /// <summary>Shows or removes the notification-area icon (WinForms loads only when it is first needed).</summary>
+        private void ApplyTray(bool enabled)
+        {
+            if (enabled && _tray == null)
+            {
+                CreateTray();
+            }
+            else if (!enabled && _tray != null)
+            {
+                _tray.Dispose();
+                _tray = null;
+                if (_window != null && !_window.IsVisible)
+                {
+                    _window.BringToFront();
+                }
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private void CreateTray()
+        {
+            _tray = new TrayIcon(() => _window?.BringToFront(), () => _window?.ExitApplication());
         }
 
         /// <summary>Diagnostics: logs every resource that fails to resolve (merged-dictionary ordering bugs).</summary>
@@ -175,6 +214,7 @@ namespace SwissTechKnife
         {
             try
             {
+                _tray?.Dispose();
                 _runtime?.DeactivateAll();
                 _settings?.Save();
                 Log.Info(Source, "Exit");

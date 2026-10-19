@@ -83,6 +83,27 @@ namespace SwissTechKnife.Core
             }
         }
 
+        /// <summary>
+        /// Uses the last saved catalog without touching the network (update checks not due).
+        /// Falls back to a live load when nothing is cached yet.
+        /// </summary>
+        public async Task<CatalogResult> LoadCachedAsync(Uri uri, CancellationToken cancellationToken)
+        {
+            if (File.Exists(_paths.CatalogCacheFile))
+            {
+                try
+                {
+                    Catalog cached = await Task.Run(() => Sanitize(Json.ReadFile<Catalog>(_paths.CatalogCacheFile)), cancellationToken).ConfigureAwait(false);
+                    return new CatalogResult(cached, uri, fromCache: true, error: null);
+                }
+                catch (Exception ex) when (!(ex is OperationCanceledException))
+                {
+                    Log.Warn(Source, "Catalog cache unreadable: " + ex.Message);
+                }
+            }
+            return await LoadAsync(uri, cancellationToken).ConfigureAwait(false);
+        }
+
         /// <summary>Drops malformed and duplicate entries so one bad entry never hides the rest.</summary>
         internal static Catalog Sanitize(Catalog catalog)
         {

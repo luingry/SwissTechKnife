@@ -50,9 +50,22 @@ namespace SwissTechKnife.ViewModels
         private bool _isSettingsTab;
         private FrameworkElement _settingsPage;
         private string _settingsError;
+        private readonly SettingsStore _settings;
+        private readonly DispatcherTimer _updateTimer;
+        private bool _isSettingsActive;
 
-        public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion)
+        public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion, SettingsStore settings, string exePath, Action<bool> applyTray)
         {
+            _settings = settings;
+            Settings = new SettingsViewModel(settings, exePath, applyTray, () => ReloadCatalogAsync(force: true, announce: true), Notify);
+            // Hourly look at the schedule; the check itself only runs when the chosen frequency is due.
+            _updateTimer = new DispatcherTimer(TimeSpan.FromHours(1), DispatcherPriority.Background, async (s, e) =>
+            {
+                if (!IsCatalogLoading && UpdateSchedule.IsDue(_settings.Current.UpdateFrequency, _settings.Current.LastUpdateCheckUtc, DateTime.UtcNow))
+                {
+                    await ReloadCatalogAsync(force: false, announce: true);
+                }
+            }, Dispatcher.CurrentDispatcher);
             _manager = manager;
             _catalogUri = catalogUri;
             _restart = restart;
@@ -66,6 +79,7 @@ namespace SwissTechKnife.ViewModels
             manager.ToggleHandler = SetEnabled;
 
             ShowStoreCommand = new RelayCommand(_ => ShowStore());
+            ShowSettingsCommand = new RelayCommand(_ => ShowSettings());
             ShowTabCommand = new RelayCommand(p => { Tab = (StoreTab)p; ShowStore(); });
             OpenDetailsCommand = new RelayCommand(p => SelectedModule = p as ModuleItem, p => p is ModuleItem);
             CloseDetailsCommand = new RelayCommand(_ => SelectedModule = null);
@@ -89,6 +103,9 @@ namespace SwissTechKnife.ViewModels
         public ObservableCollection<Toast> Toasts { get; } = new ObservableCollection<Toast>();
 
         public ICommand ShowStoreCommand { get; }
+        public ICommand ShowSettingsCommand { get; }
+
+        public SettingsViewModel Settings { get; }
         public ICommand ShowTabCommand { get; }
         public ICommand OpenDetailsCommand { get; }
         public ICommand CloseDetailsCommand { get; }
@@ -166,8 +183,28 @@ namespace SwissTechKnife.ViewModels
         public bool IsStoreActive
         {
             get => _isStoreActive;
-            private set => Set(ref _isStoreActive, value);
+            private set
+            {
+                if (Set(ref _isStoreActive, value))
+                {
+                    OnPropertyChanged(nameof(IsModulePageActive));
+                }
+            }
         }
+
+        public bool IsSettingsActive
+        {
+            get => _isSettingsActive;
+            private set
+            {
+                if (Set(ref _isSettingsActive, value))
+                {
+                    OnPropertyChanged(nameof(IsModulePageActive));
+                }
+            }
+        }
+
+        public bool IsModulePageActive => !_isStoreActive && !_isSettingsActive;
 
         /// <summary>Module whose page is shown (sidebar selection).</summary>
         public ModuleItem CurrentModule
@@ -177,7 +214,7 @@ namespace SwissTechKnife.ViewModels
             {
                 if (value == null)
                 {
-                    if (_currentModule != null && !IsStoreActive)
+                    if (_currentModule != null && IsModulePageActive)
                     {
                         // The sidebar list cleared its selection (item filtered out): fall back to the store.
                         ShowStore();
@@ -294,11 +331,29 @@ namespace SwissTechKnife.ViewModels
 
         public bool EmptyOffersAvailable { get; private set; }
 
-        public async Task ReloadCatalogAsync()
+        /// <summary>
+        /// Loads the catalog. A remote catalog is fetched only when <paramref name="force"/> is set or the update
+        /// frequency is due; otherwise the saved copy is used. A local (bundled) catalog is always read.
+        /// </summary>
+        public async Task ReloadCatalogAsync(bool force = false, bool announce = false)
         {
+            HostSettings settings = _settings.Current;
+            Uri uri = _catalogUri();
+            bool live = force || uri.IsFile || UpdateSchedule.IsDue(settings.UpdateFrequency, settings.LastUpdateCheckUtc, DateTime.UtcNow);
+            int updatesBefore = UpdateCount;
             CatalogState = CatalogState.Loading;
-            await _manager.RefreshCatalogAsync(_catalogUri(), CancellationToken.None);
+            await _manager.RefreshCatalogAsync(uri, live, CancellationToken.None);
             CatalogResult result = _manager.LastCatalog;
+            if (live && result.Error == null)
+            {
+                settings.LastUpdateCheckUtc = DateTime.UtcNow.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+                _settings.Save();
+            }
+            if (!_updateTimer.IsEnabled)
+            {
+                _updateTimer.Start();
+            }
+            Settings.Refresh();
             if (result.Error == null)
             {
                 CatalogState = CatalogState.Ready;
@@ -315,6 +370,22 @@ namespace SwissTechKnife.ViewModels
                 CatalogMessage = "Não foi possível carregar o catálogo de módulos.";
             }
             RefreshLists();
+            if (announce && result.Error == null)
+            {
+                int found = UpdateCount;
+                if (found > updatesBefore)
+                {
+                    Notify(found == 1 ? "1 atualização de módulo disponível." : found + " atualizações de módulos disponíveis.", NotificationKind.Success);
+                }
+                else if (force)
+                {
+                    Notify("Tudo atualizado.", NotificationKind.Info);
+                }
+            }
+            else if (announce && force)
+            {
+                Notify("Não foi possível verificar atualizações agora.", NotificationKind.Warning);
+            }
         }
 
         public void Notify(string message, NotificationKind kind)
@@ -365,7 +436,23 @@ namespace SwissTechKnife.ViewModels
             _currentModule = null;
             OnPropertyChanged(nameof(CurrentModule));
             CurrentPage = null;
+            IsSettingsActive = false;
             IsStoreActive = true;
+        }
+
+        private void ShowSettings()
+        {
+            if (IsSettingsActive)
+            {
+                return;
+            }
+            NotifyPageHidden();
+            _currentModule = null;
+            OnPropertyChanged(nameof(CurrentModule));
+            CurrentPage = null;
+            Settings.Refresh();
+            IsStoreActive = false;
+            IsSettingsActive = true;
         }
 
         private void OpenModule(ModuleItem item)
@@ -375,13 +462,14 @@ namespace SwissTechKnife.ViewModels
                 return;
             }
             SelectedModule = null;
-            if (ReferenceEquals(item, _currentModule) && !IsStoreActive)
+            if (ReferenceEquals(item, _currentModule) && IsModulePageActive)
             {
                 return;
             }
             NotifyPageHidden();
             _currentModule = item;
             OnPropertyChanged(nameof(CurrentModule));
+            IsSettingsActive = false;
             IsStoreActive = false;
 
             FrameworkElement page = null;
@@ -519,7 +607,7 @@ namespace SwissTechKnife.ViewModels
 
         private void NotifyPageHidden()
         {
-            if (!IsStoreActive && PageLifecycle is IModuleViewLifecycle lifecycle)
+            if (IsModulePageActive && PageLifecycle is IModuleViewLifecycle lifecycle)
             {
                 SafeLifecycle(lifecycle.OnViewHidden);
             }

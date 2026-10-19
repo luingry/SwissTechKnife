@@ -11,6 +11,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Net.Http" />
+    <!-- NotifyIcon (notification area); loaded only when the tray option is on. -->
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SwissTechKnife.Sdk\SwissTechKnife.Sdk.csproj" />

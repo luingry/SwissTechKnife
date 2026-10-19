@@ -17,6 +17,7 @@ namespace SwissTechKnife.Views
         private readonly ShellViewModel _shell;
         private readonly SettingsStore _settings;
         private bool _maximizeHot;
+        private bool _exiting;
 
         public MainWindow(ShellViewModel shell, SettingsStore settings)
         {
@@ -31,6 +32,13 @@ namespace SwissTechKnife.Views
             Closing += OnClosing;
             PreviewKeyDown += OnPreviewKeyDown;
             UpdateMaximizedState();
+        }
+
+        /// <summary>Real exit (tray "Sair"), bypassing hide-to-tray.</summary>
+        public void ExitApplication()
+        {
+            _exiting = true;
+            Close();
         }
 
         public void BringToFront()
@@ -69,6 +77,7 @@ namespace SwissTechKnife.Views
             switch (e.PropertyName)
             {
                 case nameof(ShellViewModel.IsStoreActive):
+                case nameof(ShellViewModel.IsSettingsActive):
                 case nameof(ShellViewModel.CurrentPage):
                     AnimatePageIn();
                     break;
@@ -153,6 +162,13 @@ namespace SwissTechKnife.Views
 
         private void OnClosing(object sender, CancelEventArgs e)
         {
+            if (!_exiting && _settings.Current.HideToTrayOnClose)
+            {
+                // Keep running in the notification area; modules keep working.
+                e.Cancel = true;
+                Hide();
+                return;
+            }
             Rect bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
             _settings.Current.Window = new WindowPlacement
             {

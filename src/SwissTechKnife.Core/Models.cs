@@ -174,6 +174,18 @@ namespace SwissTechKnife.Core
 
         [DataMember(Name = "lastPage", Order = 2, EmitDefaultValue = false)]
         public string LastPage { get; set; }
+
+        /// <summary>"daily" (default), "weekly", "monthly" or "never": how often a remote catalog is checked for updates.</summary>
+        [DataMember(Name = "updateFrequency", Order = 3, EmitDefaultValue = false)]
+        public string UpdateFrequency { get; set; }
+
+        /// <summary>UTC time of the last successful live catalog check (ISO 8601).</summary>
+        [DataMember(Name = "lastUpdateCheckUtc", Order = 4, EmitDefaultValue = false)]
+        public string LastUpdateCheckUtc { get; set; }
+
+        /// <summary>Closing the window keeps the host running in the notification area.</summary>
+        [DataMember(Name = "hideToTrayOnClose", Order = 5)]
+        public bool HideToTrayOnClose { get; set; }
     }
 
     [DataContract]
