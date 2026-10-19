@@ -35,6 +35,12 @@ namespace SwissTechKnife.Views
         }
 
         /// <summary>Real exit (tray "Sair"), bypassing hide-to-tray.</summary>
+        /// <summary>
+        /// Asked on close: returns true to hide in the notification area instead of exiting (the setting is on,
+        /// or a background module needs the process). Set by the app; null means exit.
+        /// </summary>
+        public Func<bool> HideOnClose { get; set; }
+
         public void ExitApplication()
         {
             _exiting = true;
@@ -172,7 +178,7 @@ namespace SwissTechKnife.Views
 
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            if (!_exiting && _settings.Current.HideToTrayOnClose)
+            if (!_exiting && HideOnClose != null && HideOnClose())
             {
                 // Keep running in the notification area; modules keep working.
                 e.Cancel = true;

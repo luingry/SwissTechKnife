@@ -48,6 +48,21 @@ foreach ($project in Get-ChildItem (Join-Path $root 'samples') -Directory) {
 }
 
 $catalog = Get-Content (Join-Path $root 'catalog/catalog.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+
+# Modules from sibling repositories (e.g. ..\Tamarillo): a built package at <repo>/artifacts/<id>-<version>.zip
+# joins the local feed, so it installs from the store without publishing a release first.
+foreach ($entry in $catalog.modules) {
+    if ($packages.ContainsKey($entry.id)) { continue }
+    $name = "$($entry.id)-$($entry.version).zip"
+    $built = Get-ChildItem (Split-Path -Parent $root) -Directory -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName "artifacts/$name" } |
+        Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($built) {
+        Copy-Item $built (Join-Path $feed $name) -Force
+        $packages[$entry.id] = [pscustomobject]@{ Id = $entry.id; File = $name; Sha256 = (Get-FileHash $built -Algorithm SHA256).Hash.ToLowerInvariant(); Size = (Get-Item $built).Length }
+        Write-Host "Added $name from $(Split-Path -Parent (Split-Path -Parent $built))"
+    }
+}
 foreach ($entry in $catalog.modules) {
     if ($packages.ContainsKey($entry.id)) {
         $p = $packages[$entry.id]

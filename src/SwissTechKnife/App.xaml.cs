@@ -92,6 +92,7 @@ namespace SwissTechKnife
             {
                 _window = new MainWindow(shell, _settings);
                 MainWindow = _window;
+                _window.HideOnClose = HideOnClose;
                 ApplyTray(_settings.Current.HideToTrayOnClose);
                 if (atLogin && _settings.Current.HideToTrayOnClose)
                 {
@@ -139,6 +140,31 @@ namespace SwissTechKnife
             await shell.ReloadCatalogAsync();
         }
 
+        /// <summary>
+        /// Closing the window keeps the process when the user asked for it, or when a background module (a global
+        /// shortcut, a hook) would otherwise die with it. Either way the tray icon is there to reopen or exit.
+        /// </summary>
+        private bool HideOnClose()
+        {
+            bool background = _runtime?.HasBackgroundModules == true;
+            if (!_settings.Current.HideToTrayOnClose && !background)
+            {
+                return false;
+            }
+            if (_tray == null)
+            {
+                CreateTray();
+                if (!_settings.Current.HideToTrayOnClose && !_backgroundHintShown)
+                {
+                    _backgroundHintShown = true;
+                    _tray.ShowHint("Continua na área de notificação para os módulos em segundo plano funcionarem. Para sair, use Sair aqui.");
+                }
+            }
+            return true;
+        }
+
+        private bool _backgroundHintShown;
+
         /// <summary>Shows or removes the notification-area icon (WinForms loads only when it is first needed).</summary>
         private void ApplyTray(bool enabled)
         {
@@ -146,7 +172,7 @@ namespace SwissTechKnife
             {
                 CreateTray();
             }
-            else if (!enabled && _tray != null)
+            else if (!enabled && _tray != null && _runtime?.HasBackgroundModules != true)
             {
                 _tray.Dispose();
                 _tray = null;

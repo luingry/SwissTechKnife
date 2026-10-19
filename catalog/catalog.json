@@ -90,6 +90,31 @@
           ]
         }
       ]
+    },
+    {
+      "id": "tamarillo",
+      "name": "Tamarillo",
+      "tagline": "Arraste, segure o atalho e solte: converta e trate arquivos numa roda.",
+      "description": "Segure Ctrl + Alt + Shift enquanto arrasta arquivos e uma roda aparece sob o cursor com o que dá para fazer com eles: converter imagens, áudio, vídeo, PDF e documentos, redimensionar, comprimir, girar, reconhecer texto, compactar e mais. Solte sobre a ação e o resultado aparece ao lado do original, com o progresso num aviso discreto.\n\nTudo roda neste computador com os componentes do Windows; FFmpeg e Office ampliam os formatos quando estão instalados. Com o Tamarillo ativo, fechar a janela mantém o SwissTechKnife na área de notificação para o atalho continuar funcionando.",
+      "version": "0.1.0",
+      "icon": "M11,5.5 A7.5,7.5 0 1 0 18.5,13 L11,13 Z M13.5,10.5 L13.5,3 A7.5,7.5 0 0 1 21,10.5 Z",
+      "accent": "#E65A70",
+      "iconImage": "icons/tamarillo.png",
+      "iconBackground": "#211F1D",
+      "homepage": "https://github.com/luingry/Tamarillo",
+      "package": "tamarillo-0.1.0.zip",
+      "settings": true,
+      "releaseNotes": [
+        {
+          "version": "0.1.0",
+          "date": "2026-10-19",
+          "notes": [
+            "Primeira versão: segure Ctrl + Alt + Shift enquanto arrasta arquivos e escolha a ação numa roda.",
+            "Converte imagens, áudio, vídeo, PDF, documentos, legendas e dados; redimensiona, comprime, gira, reconhece texto e compacta.",
+            "Sem arrastar: selecione arquivos no Explorador, segure o atalho e solte as teclas sobre a ação."
+          ]
+        }
+      ]
     }
   ]
 }

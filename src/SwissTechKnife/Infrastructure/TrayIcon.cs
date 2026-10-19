@@ -36,6 +36,15 @@ namespace SwissTechKnife.Infrastructure
             _icon.MouseClick += OnMouseClick;
         }
 
+        /// <summary>One-time native notification from the icon (e.g. why the app is still running).</summary>
+        public void ShowHint(string message)
+        {
+            _icon.BalloonTipTitle = "SwissTechKnife";
+            _icon.BalloonTipText = message;
+            _icon.BalloonTipIcon = Forms.ToolTipIcon.None;
+            _icon.ShowBalloonTip(4000);
+        }
+
         public void Dispose()
         {
             _menu.IsOpen = false;

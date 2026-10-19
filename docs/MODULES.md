@@ -85,7 +85,8 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 - Use only design-system keys (`docs/DESIGN_SYSTEM.md`); no native-looking controls, no hard-coded colors.
 - The module shares the host process: never block the UI thread, never call `Environment.Exit`, catch your own background exceptions, release hooks/handles in `Stop`/`Dispose`.
 - Do not bundle another copy of the SDK or of WPF/.NET assemblies.
-- Single-instance, tray icon, auto-start and updates belong to the host: remove them from the app when converting it.
+- Single-instance, tray icon, auto-start and updates belong to the host: remove them from the app when converting it. While any `IBackgroundModule` is active, closing the host window keeps the process in the notification area (a one-time hint explains why), so hooks and shortcuts keep working.
+- Local testing from a module's own repository: build its package to `<repo>/artifacts/<id>-<version>.zip` next to this repo; `scripts/pack-modules.ps1` adds it to the local feed for a catalog entry with that id and version.
 
 ## Conversion notes
 

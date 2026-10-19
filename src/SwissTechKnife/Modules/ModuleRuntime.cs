@@ -41,6 +41,9 @@ namespace SwissTechKnife.Modules
 
         public bool IsActive(string id) => _active.ContainsKey(id);
 
+        /// <summary>True while a started background module (hooks, listeners) is running: the host must stay alive.</summary>
+        public bool HasBackgroundModules => _active.Values.Any(a => a.Instance is IBackgroundModule);
+
         /// <summary>Version whose code is loaded in this process, or null.</summary>
         public string LoadedVersion(string id) => _code.TryGetValue(id, out LoadedCode code) ? code.Version : null;
 
