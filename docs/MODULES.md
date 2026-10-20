@@ -93,5 +93,5 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 | App | Notes |
 |---|---|
 | SmoothMice | `activation: startup` + `IBackgroundModule` for the `WH_MOUSE_LL` hook and scroll worker. Its settings move to `DataDirectory`. The host's single-instance guard replaces the app's. Its own WPF theme is replaced by the SDK theme. |
-| Winput LAN | WebView2 needs `loadMode: file` (native loader next to the assembly). The firewall rule and the elevated logon task need an elevation story in the host installer; plan this before converting. |
-| AQ Tracker | Catalog entry is a placeholder until its description and package exist. |
+| Winput LAN | Same supervised-process design as SmoothMice (`--hosted`), so WebView2 lives only in the child process and the module keeps `loadMode: memory`. No UAC on host start: the module launches an elevated scheduled task only when the user enabled admin control (one UAC on that click; the elevated copy lives in Program Files) and asks for the firewall rule on request. Details: `docs/SWISSTECHKNIFE.md` in its repository. Uninstalling the module cannot remove the task, the Program Files copy or the firewall rules (needs elevation; the SDK has no uninstall hook). |
+| AQ Tracker | Supervised process (`--hosted`): keeps SQLite, System.Text.Json 8 and the Codex app-server out of the host. Data in the module folder (copied once from `%APPDATA%\AqTracker`); the Claude token file stays shared with the standalone app because refresh tokens rotate. The module page replaces the tray menu. |
