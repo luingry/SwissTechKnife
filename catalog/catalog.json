@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.0",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/SwissTechKnife-0.4.0-setup.exe",
-    "sha256": "45ce0a34c271974ab9e20d02aaee881795bd244d11ef30def30f65fd94325259",
-    "size": 2461961,
+    "version": "0.4.1",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.1/SwissTechKnife-0.4.1-setup.exe",
+    "sha256": "8e8d67ce4f532690d28890494cc81bd6f72082c340741b347f88c96c7bd9c70f",
+    "size": 7119199,
     "releaseNotes": [
+      {
+        "version": "0.4.1",
+        "date": "2026-10-19",
+        "notes": [
+          "New Language setting: SwissTechKnife is now in English by default, with Brazilian Portuguese available in Settings.",
+          "Three new modules in the catalog: Winput LAN, AQ Tracker and VDGET."
+        ]
+      },
       {
         "version": "0.4.0",
         "date": "2026-10-19",
