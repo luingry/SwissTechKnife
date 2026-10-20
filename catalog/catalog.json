@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.1",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.1/SwissTechKnife-0.4.1-setup.exe",
-    "sha256": "8e8d67ce4f532690d28890494cc81bd6f72082c340741b347f88c96c7bd9c70f",
-    "size": 7119199,
+    "version": "0.4.2",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.2/SwissTechKnife-0.4.2-setup.exe",
+    "sha256": "a46e32e6c64ae43afbd62a50dfa8b4b0d0a1a8bc0cf02f549d13e6508e19abc1",
+    "size": 7126963,
     "releaseNotes": [
+      {
+        "version": "0.4.2",
+        "date": "2026-10-19",
+        "notes": [
+          "Text boxes show the text cursor anywhere inside them, not only over the typed text.",
+          "VDGET 1.1.0: YouTube downloads blocked by the bot check are retried automatically."
+        ]
+      },
       {
         "version": "0.4.1",
         "date": "2026-10-19",
@@ -189,14 +197,22 @@
       "name": "VDGET",
       "tagline": "Download videos and music from YouTube, X, Instagram, SoundCloud and more.",
       "description": "Paste one or more links and VDGET downloads them with yt-dlp: best quality, smallest size or audio only, into the folder you choose, with progress, thumbnails and a history of finished downloads. Pages whose player hides the video are rescued automatically with a headless browser.\n\nRequires Python 3; yt-dlp is installed automatically on first use. Everything runs inside SwissTechKnife, with no console or browser windows, and closes itself after a few idle minutes.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "icon": "M12,4 L12,15 M7,10.5 L12,15.5 L17,10.5 M5,19.5 L19,19.5",
       "accent": "#9B7BE8",
       "homepage": "https://github.com/luingry/vd-get",
-      "package": "https://github.com/luingry/vd-get/releases/download/module-v1.0.0/vd-get-1.0.0.zip",
-      "sha256": "ab59b282cf0b439695d2d7dd34acd13c50b327b5960e4fc554a02e8729c4db5e",
-      "size": 74321,
+      "package": "https://github.com/luingry/vd-get/releases/download/module-v1.1.0/vd-get-1.1.0.zip",
+      "sha256": "1a7a1ed6b7a8f42e179e16361e0c41fc5b474c9076d35d5732d737644da63cfd",
+      "size": 75856,
       "releaseNotes": [
+        {
+          "version": "1.1.0",
+          "date": "2026-10-19",
+          "notes": [
+            "YouTube downloads blocked with \"Sign in to confirm you're not a bot\" are retried automatically: with a cookies.txt file, your browsers' cookies, or a fallback player (up to 360p).",
+            "yt-dlp now updates itself in the background, at most once a day."
+          ]
+        },
         {
           "version": "1.0.0",
           "date": "2026-10-19",
