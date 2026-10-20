@@ -6,8 +6,8 @@
 // that its module.json carries the same id and version, and writes version, package, sha256, size and the
 // release notes into the catalog. A re-uploaded asset under the same URL only refreshes sha256 and size.
 //
-// Release notes come from `releaseNotes` (English sentences) in the package's module.json, falling back to
-// the bullet lines of the GitHub release body.
+// Release notes come from the `releaseNotes` entry for that version in the package's module.json
+// ([{ "version", "notes": [English sentences] }]), falling back to the bullet lines of the GitHub release body.
 //
 //   node scripts/sync-catalog.mjs [--dry-run]       GITHUB_TOKEN or GH_TOKEN raises the API rate limit
 //
@@ -137,9 +137,9 @@ async function sync(entry) {
   entry.sha256 = sha256;
   entry.size = zip.length;
   if (newer) {
-    const notes = Array.isArray(manifest.releaseNotes) && manifest.releaseNotes.length
-      ? manifest.releaseNotes.map(String)
-      : notesFromBody(release.body);
+    const own = (Array.isArray(manifest.releaseNotes) ? manifest.releaseNotes : [])
+      .find((note) => note && note.version === version && Array.isArray(note.notes) && note.notes.length);
+    const notes = own ? own.notes.map(String) : notesFromBody(release.body);
     const date = new Date(release.published_at || release.created_at || Date.now())
       .toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
     entry.releaseNotes = [

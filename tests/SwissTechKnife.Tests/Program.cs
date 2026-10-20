@@ -403,7 +403,7 @@ namespace SwissTechKnife.Tests
 
         private static void ManifestReleaseNotes()
         {
-            const string json = "{ \"id\": \"demo\", \"version\": \"1.2.0\", \"entryAssembly\": \"Demo.dll\", \"entryType\": \"Demo.Module\", \"sdkVersion\": 1, \"releaseNotes\": [\"First.\", \"Second.\"] }";
+            const string json = "{ \"id\": \"demo\", \"version\": \"1.2.0\", \"entryAssembly\": \"Demo.dll\", \"entryType\": \"Demo.Module\", \"sdkVersion\": 1, \"releaseNotes\": [{ \"version\": \"1.2.0\", \"notes\": [\"First.\"] }] }";
             ModuleManifest manifest = Json.Deserialize<ModuleManifest>(Encoding.UTF8.GetBytes(json));
             Assert(manifest.Id == "demo" && manifest.Version == "1.2.0" && manifest.EntryType == "Demo.Module", "known fields still read");
         }

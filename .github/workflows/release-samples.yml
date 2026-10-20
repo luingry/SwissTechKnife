@@ -41,7 +41,8 @@ jobs:
             $manifest = Get-Content $file.FullName -Raw | ConvertFrom-Json
             $name = "$($manifest.id)-$($manifest.version).zip"
             if ($published -contains $name) { continue }
-            $notes = @($manifest.releaseNotes | ForEach-Object { "- $_" }) -join "`n"
+            $own = @($manifest.releaseNotes | Where-Object { $_.version -eq $manifest.version }) | Select-Object -First 1
+            $notes = @($own.notes | ForEach-Object { "- $_" }) -join "`n"
             if (-not $notes) { $notes = "Version $($manifest.version)." }
             gh release create "$($manifest.id)-v$($manifest.version)" "artifacts/feed/$name" --title "$($manifest.id) $($manifest.version) (module)" --notes $notes --latest=false
             if ($LASTEXITCODE -ne 0) { throw "Failed to release $name" }
