@@ -6,4 +6,5 @@
 - Performance first: no work before first paint, nothing on the UI thread that touches disk/network, prefer opacity/transform animations, freeze brushes and geometries.
 - The SDK is a public contract for module repositories: only additive changes within 1.x; bump `SdkInfo.ContractVersion` for breaking changes.
 - Run `powershell -File scripts/build.ps1` before handing off; record non-trivial fixes in `ERRORS.md`.
+- Keep only the 3 most recent host releases on GitHub (`vX.Y.Z`); delete older ones together with their tags. `scripts/publish-host.ps1` prunes them after each publish (`-KeepReleases`).
 - Logo changes: edit `src/SwissTechKnife/Theme/Brand.xaml`, then `scripts/render-brand.ps1`.

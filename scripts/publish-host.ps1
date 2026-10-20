@@ -2,7 +2,8 @@
     Publishes a SwissTechKnife release for self-update:
       1. builds the installer (scripts/build.ps1 -Installer),
       2. creates (or updates) the GitHub release v<version> with the installer attached,
-      3. writes the "host" entry of catalog/catalog.json: version, installer URL, sha256, size, releaseNotes.
+      3. writes the "host" entry of catalog/catalog.json: version, installer URL, sha256, size, releaseNotes,
+      4. deletes older GitHub releases (and their tags) so only the newest -KeepReleases (default 3) remain.
     Commit and push catalog.json afterwards: running apps see the update at their next check.
 
     powershell -File scripts/publish-host.ps1 -Notes "Primeira nota.", "Segunda nota."
@@ -22,7 +23,10 @@ param(
     [switch]$SkipRelease,
     [string]$InstallerPath,
     # Defaults to the GitHub release asset URL; a bare file name is resolved relative to catalog.json.
-    [string]$InstallerUrl
+    [string]$InstallerUrl,
+    # Host releases (vX.Y.Z) kept on GitHub after publishing; older ones are deleted with their tags.
+    [ValidateRange(1, 100)]
+    [int]$KeepReleases = 3
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
@@ -88,6 +92,20 @@ if (-not $SkipRelease) {
         $served = (Get-FileHash $check -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($served -ne $sha256) { throw "Release asset hash $served does not match the local installer $sha256." }
     } finally { Remove-Item $check -ErrorAction SilentlyContinue }
+
+    # Keep only the newest $KeepReleases host releases; the catalog only ever points at the latest one.
+    $ErrorActionPreference = 'Continue'
+    $tags = @(& gh release list --repo $Repo --limit 200 --json tagName --jq '.[].tagName' 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning 'Could not list releases; old releases were not pruned.'
+        $tags = @()
+    }
+    $tags = @($tags | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' } | Sort-Object { [version]$_.Substring(1) } -Descending)
+    foreach ($tag in ($tags | Select-Object -Skip $KeepReleases)) {
+        & gh release delete $tag --repo $Repo --yes --cleanup-tag
+        if ($LASTEXITCODE -ne 0) { Write-Warning "Could not delete release $tag." } else { Write-Host "  pruned release $tag" }
+    }
+    $ErrorActionPreference = 'Stop'
 }
 
 # catalog.json "host" entry (written as text so the rest of the file keeps its formatting)
