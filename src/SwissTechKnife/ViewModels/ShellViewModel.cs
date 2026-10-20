@@ -84,6 +84,7 @@ namespace SwissTechKnife.ViewModels
 
             // Installed modules come first; within each group the catalog order is kept.
             _storeView = new ListCollectionView(manager.Items) { Filter = StoreFilter, CustomSort = new InstalledFirstComparer(manager.Items) };
+            ApplyStoreSections();
             _sidebarView = new ListCollectionView(manager.Items) { Filter = o => ((ModuleItem)o).IsEnabled };
             _searchDebounce = new DispatcherTimer(TimeSpan.FromMilliseconds(140), DispatcherPriority.Input, (s, e) => ApplySearch(), Dispatcher.CurrentDispatcher);
             _searchDebounce.Stop();
@@ -187,7 +188,12 @@ namespace SwissTechKnife.ViewModels
                     OnPropertyChanged(nameof(IsAllTab));
                     OnPropertyChanged(nameof(IsAvailableTab));
                     OnPropertyChanged(nameof(IsInstalledTab));
-                    RefreshLists();
+                    // One deferred refresh covers both the section change and the new membership.
+                    using (_storeView.DeferRefresh())
+                    {
+                        ApplyStoreSections();
+                        RefreshLists();
+                    }
                 }
             }
         }
@@ -790,6 +796,24 @@ namespace SwissTechKnife.ViewModels
             return inTab && item.Matches(_appliedSearch);
         }
 
+        /// <summary>The All tab splits the list into Installed and Available sections; the other tabs are one list.</summary>
+        private void ApplyStoreSections()
+        {
+            bool sectioned = _tab == StoreTab.All;
+            if (sectioned == (_storeView.GroupDescriptions.Count > 0))
+            {
+                return;
+            }
+            if (sectioned)
+            {
+                _storeView.GroupDescriptions.Add(new StoreSectionGroup());
+            }
+            else
+            {
+                _storeView.GroupDescriptions.Clear();
+            }
+        }
+
         private void RefreshLists()
         {
             // Refresh a view only when its membership changed: a refresh regenerates every card,
@@ -874,6 +898,13 @@ namespace SwissTechKnife.ViewModels
             Log.Error(Source, "Command failed", ex);
             Notify(Strings.Format("SomethingWentWrong", ex.Message), NotificationKind.Error);
         }
+    }
+
+    /// <summary>Store section of a module: <see cref="StoreTab.Installed"/> or <see cref="StoreTab.Available"/>.</summary>
+    internal sealed class StoreSectionGroup : GroupDescription
+    {
+        public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture) =>
+            ((ModuleItem)item).IsInstalled ? StoreTab.Installed : StoreTab.Available;
     }
 
     /// <summary>Installed modules before available ones; ties keep the source (catalog) order, so the sort is stable.</summary>

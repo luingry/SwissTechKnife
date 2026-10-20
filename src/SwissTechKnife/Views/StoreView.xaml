@@ -128,6 +128,39 @@
                             <controls:AdaptiveGrid MinColumnWidth="300" Gap="14" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
+                    <!-- Sections (All tab only): "Installed" / "Available" followed by a full-width hairline. -->
+                    <ItemsControl.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="GroupItem">
+                                    <Setter Property="Margin" Value="0,0,0,24" />
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Overline}">
+                                                    <Setter Property="Text" Value="{infra:Loc AvailableTab}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Name}" Value="{x:Static vm:StoreTab.Installed}">
+                                                            <Setter Property="Text" Value="{infra:Loc InstalledTab}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <Border Grid.Column="1" Height="1" Margin="14,0,0,0" VerticalAlignment="Center" Background="{StaticResource Brush.Overlay.Hover}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ItemsControl.GroupStyle>
                 </ItemsControl>
 
                 <!-- Skeletons while the catalog loads (only if nothing is shown yet) -->
