@@ -1,11 +1,22 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.3",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.3/SwissTechKnife-0.4.3-setup.exe",
-    "sha256": "172eac964e68322b52d3147a47ffc1e329ca988e838a4335a82a24a4dfd4433a",
-    "size": 7129135,
+    "version": "0.4.4",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.4/SwissTechKnife-0.4.4-setup.exe",
+    "sha256": "ebad712695e0ce65083a3f5cc2141dadfad7ec7685b890f5850d6de6077225a2",
+    "size": 2313662,
     "releaseNotes": [
+      {
+        "version": "0.4.4",
+        "date": "2026-10-19",
+        "notes": [
+          "The module store opens on a new All tab with every module.",
+          "Each installed module has an update button next to its version that checks for a newer version and offers to install it.",
+          "Clicking a module's version opens its release notes.",
+          "Modules with settings show a gear on their page that opens the settings directly.",
+          "Your modules shows each module's installed version and a green icon when an update is available."
+        ]
+      },
       {
         "version": "0.4.3",
         "date": "2026-10-19",
