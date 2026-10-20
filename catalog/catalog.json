@@ -175,6 +175,29 @@
       ],
       "sha256": "10a0ebacdaf9ccfa5987fdaf2ad9f956bd05af6ff1d5204894efdc675b438a0c",
       "size": 159368
+    },
+    {
+      "id": "vd-get",
+      "name": "VDGET",
+      "tagline": "Download videos and music from YouTube, X, Instagram, SoundCloud and more.",
+      "description": "Paste one or more links and VDGET downloads them with yt-dlp: best quality, smallest size or audio only, into the folder you choose, with progress, thumbnails and a history of finished downloads. Pages whose player hides the video are rescued automatically with a headless browser.\n\nRequires Python 3; yt-dlp is installed automatically on first use. Everything runs inside SwissTechKnife, with no console or browser windows, and closes itself after a few idle minutes.",
+      "version": "1.0.0",
+      "icon": "M12,4 L12,15 M7,10.5 L12,15.5 L17,10.5 M5,19.5 L19,19.5",
+      "accent": "#9B7BE8",
+      "homepage": "https://github.com/luingry/vd-get",
+      "package": "https://github.com/luingry/vd-get/releases/download/module-v1.0.0/vd-get-1.0.0.zip",
+      "sha256": "ab59b282cf0b439695d2d7dd34acd13c50b327b5960e4fc554a02e8729c4db5e",
+      "size": 74321,
+      "releaseNotes": [
+        {
+          "version": "1.0.0",
+          "date": "2026-10-19",
+          "notes": [
+            "First release as a SwissTechKnife module: downloads run inside SwissTechKnife, with no console or browser windows to keep open.",
+            "The download history, destination folders and preferred quality are remembered between sessions."
+          ]
+        }
+      ]
     }
   ]
 }
