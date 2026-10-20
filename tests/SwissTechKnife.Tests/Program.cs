@@ -26,6 +26,7 @@ namespace SwissTechKnife.Tests
             Run("Install refuses zip-slip entries", InstallZipSlip);
             Run("Install refuses a package for another module", InstallWrongId);
             Run("Install refuses a newer SDK contract", InstallNewerSdk);
+            Run("module.json tolerates catalog-only fields such as releaseNotes", ManifestReleaseNotes);
             Run("State survives a corrupt state.json via .bak", StateBackup);
             Run("Garbage collection removes orphan folders", CollectGarbage);
             Run("Garbage collection keeps the self-update record and installer", CollectGarbageKeepsHostUpdate);
@@ -399,6 +400,13 @@ namespace SwissTechKnife.Tests
         }
 
         // ── Helpers ───────────────────────────────────────────
+
+        private static void ManifestReleaseNotes()
+        {
+            const string json = "{ \"id\": \"demo\", \"version\": \"1.2.0\", \"entryAssembly\": \"Demo.dll\", \"entryType\": \"Demo.Module\", \"sdkVersion\": 1, \"releaseNotes\": [{ \"version\": \"1.2.0\", \"notes\": [\"First.\"] }] }";
+            ModuleManifest manifest = Json.Deserialize<ModuleManifest>(Encoding.UTF8.GetBytes(json));
+            Assert(manifest.Id == "demo" && manifest.Version == "1.2.0" && manifest.EntryType == "Demo.Module", "known fields still read");
+        }
 
         private static ModuleManifest Manifest(string id, int sdk = 1) => new ModuleManifest
         {

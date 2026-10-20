@@ -4,5 +4,14 @@
   "entryAssembly": "SwissTechKnife.Samples.SystemMonitor.dll",
   "entryType": "SwissTechKnife.Samples.SystemMonitor.SystemMonitorModule",
   "sdkVersion": 1,
-  "settings": true
+  "settings": true,
+  "releaseNotes": [
+    {
+      "version": "1.1.0",
+      "notes": [
+        "New Settings tab: refresh interval (1, 2 or 5 seconds) and an option to hide the processor chart.",
+        "Settings apply right away and are kept across updates."
+      ]
+    }
+  ]
 }
