@@ -25,7 +25,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Grid x:Name="Root" SnapsToDevicePixels="True">
+                    <!-- IBeam on the whole box, not just over the text lines (padding and empty rows included). -->
+                    <Grid x:Name="Root" SnapsToDevicePixels="True" Cursor="IBeam">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualStateGroup.Transitions>
@@ -86,6 +87,8 @@
                         </Trigger>
                         <Trigger Property="AcceptsReturn" Value="True">
                             <Setter TargetName="PART_ContentHost" Property="VerticalScrollBarVisibility" Value="Auto" />
+                            <!-- Fill the box so clicks below the last line still land in the text view. -->
+                            <Setter TargetName="PART_ContentHost" Property="VerticalAlignment" Value="Stretch" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
