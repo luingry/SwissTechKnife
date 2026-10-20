@@ -56,6 +56,9 @@
       "iconImage": "icons/winput-lan.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/WinputLan",
+      "package": "https://github.com/luingry/WinputLan/releases/download/v0.4.0/winput-lan-0.4.0.zip",
+      "sha256": "8e8aaa73c46cb85d18e6f0436dd5bc3eba4486e5400fbff7eff87f7568800660",
+      "size": 913020,
       "releaseNotes": [
         {
           "version": "0.4.0",
@@ -80,6 +83,9 @@
       "iconImage": "icons/aq-tracker.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/aq-tracker",
+      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.31.0/aq-tracker-0.31.0.zip",
+      "sha256": "a291587a20a171767d22e88a0c81e01a4d7a65aabb61fc16a0120dae22a869ab",
+      "size": 4568250,
       "releaseNotes": [
         {
           "version": "0.31.0",
