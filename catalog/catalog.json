@@ -10,11 +10,11 @@
         "version": "0.4.0",
         "date": "2026-10-19",
         "notes": [
-          "Primeira versão pública do SwissTechKnife: instale, ative e remova seus apps como módulos em um só lugar.",
-          "O SwissTechKnife agora se atualiza sozinho, na frequência escolhida em Configurações.",
-          "Nova tela de Configurações: verificação de atualizações, iniciar com o Windows e manter na área de notificação ao fechar.",
-          "Os módulos mostram as notas de cada versão e pedem confirmação antes de atualizar.",
-          "Animações mais suaves em switches, botões e abas."
+          "First public release of SwissTechKnife: install, enable and remove your apps as modules, all in one place.",
+          "SwissTechKnife now updates itself, as often as you choose in Settings.",
+          "New Settings page: update checks, start with Windows and keep running in the notification area on close.",
+          "Modules show the notes for each version and ask for confirmation before updating.",
+          "Smoother animations on switches, buttons and tabs."
         ]
       }
     ]
@@ -23,8 +23,8 @@
     {
       "id": "smooth-mice",
       "name": "SmoothMice",
-      "tagline": "Rolagem suave do mouse, com perfis por aplicativo.",
-      "description": "Suaviza a rolagem da roda do mouse em todo o Windows, com animação e aceleração configuráveis, perfis por aplicativo e detecção automática de jogos para não interferir neles.\n\nO SmoothMice roda em um processo próprio, iniciado junto com o SwissTechKnife, para que nada no SwissTechKnife atrase a rolagem. Abra a janela do SmoothMice pela página do módulo.",
+      "tagline": "Smooth mouse scrolling, with per-app profiles.",
+      "description": "Smooths mouse wheel scrolling across Windows, with configurable animation and acceleration, per-app profiles and automatic game detection so it never gets in the way.\n\nSmoothMice runs in its own process, started alongside SwissTechKnife, so nothing in SwissTechKnife can delay scrolling. Open the SmoothMice window from the module page.",
       "version": "3.0.0",
       "icon": "M12,3 C8.7,3 6,5.7 6,9 L6,15 C6,18.3 8.7,21 12,21 C15.3,21 18,18.3 18,15 L18,9 C18,5.7 15.3,3 12,3 Z M12,7 L12,10",
       "accent": "#F2A65A",
@@ -39,8 +39,8 @@
           "version": "3.0.0",
           "date": "2026-10-19",
           "notes": [
-            "Primeira versão como módulo do SwissTechKnife: inicia junto com ele e roda em um processo próprio, para que nada no SwissTechKnife atrase a rolagem.",
-            "A página do módulo mostra se o SmoothMice está ativo e abre a janela dele."
+            "First release as a SwissTechKnife module: starts with it and runs in its own process, so nothing in SwissTechKnife can delay scrolling.",
+            "The module page shows whether SmoothMice is running and opens its window."
           ]
         }
       ]
@@ -48,8 +48,8 @@
     {
       "id": "winput-lan",
       "name": "Winput LAN",
-      "tagline": "Um mouse e um teclado para vários PCs da rede local.",
-      "description": "Controle vários PCs Windows da mesma rede com um único mouse e teclado. Pareamento por código, alternância por atalho e controle que nunca sai da sua rede local.\n\nEm conversão para módulo: o pacote será publicado no repositório do Winput LAN.",
+      "tagline": "One mouse and keyboard for several PCs on your local network.",
+      "description": "Control several Windows PCs on the same network with a single mouse and keyboard. Pairing by code, switching by shortcut, and control that never leaves your local network.\n\nBeing converted into a module: the package will be published in the Winput LAN repository.",
       "version": "0.1.0",
       "icon": "M3,4 L11,4 L11,11 L3,11 Z M13,13 L21,13 L21,20 L13,20 Z M7,11 L7,16.5 L13,16.5 M17,13 L17,7.5 L11,7.5",
       "accent": "#6C9EF8",
@@ -58,17 +58,17 @@
     {
       "id": "aq-tracker",
       "name": "AQ Tracker",
-      "tagline": "Em conversão para módulo.",
-      "description": "A descrição completa será publicada junto com o primeiro pacote do módulo.",
+      "tagline": "Being converted into a module.",
+      "description": "The full description will be published with the module's first package.",
       "version": "0.1.0",
       "icon": "M12,3 A9,9 0 1 1 11.99,3 Z M12,8 A4,4 0 1 1 11.99,8 Z M12,12 L18.5,5.5",
       "accent": "#63C28F"
     },
     {
       "id": "system-monitor",
-      "name": "Monitor do Sistema",
-      "tagline": "CPU, memória e tempo ligado, em tempo real.",
-      "description": "Módulo de exemplo do SwissTechKnife. Mostra o uso do processador nos últimos 60 segundos, a memória em uso e há quanto tempo o Windows está ligado. As leituras só acontecem enquanto a página está aberta.",
+      "name": "System Monitor",
+      "tagline": "CPU, memory and uptime, in real time.",
+      "description": "SwissTechKnife sample module. Shows processor usage over the last 60 seconds, memory in use and how long Windows has been running. Readings only happen while the page is open.",
       "version": "1.1.0",
       "icon": "M3,12 L7,12 L10,5 L14,19 L17,12 L21,12",
       "accent": "#5FB3D0",
@@ -78,15 +78,15 @@
           "version": "1.1.0",
           "date": "2026-10-19",
           "notes": [
-            "Nova aba Configurações: intervalo de atualização (1, 2 ou 5 segundos) e opção de esconder o gráfico do processador.",
-            "As configurações são aplicadas na hora e mantidas entre atualizações."
+            "New Settings tab: refresh interval (1, 2 or 5 seconds) and an option to hide the processor chart.",
+            "Settings apply right away and are kept across updates."
           ]
         },
         {
           "version": "1.0.0",
           "date": "2026-10-19",
           "notes": [
-            "Primeira versão: uso do processador, memória em uso e tempo ligado, lidos só enquanto a página está aberta."
+            "First release: processor usage, memory in use and uptime, read only while the page is open."
           ]
         }
       ],
@@ -96,8 +96,8 @@
     {
       "id": "hash-tool",
       "name": "Hash",
-      "tagline": "MD5, SHA-1, SHA-256 e SHA-512 de textos e arquivos.",
-      "description": "Módulo de exemplo do SwissTechKnife. Calcula hashes de um texto enquanto você digita, ou de um arquivo arrastado para a página, lendo o arquivo uma única vez para todos os algoritmos.",
+      "tagline": "MD5, SHA-1, SHA-256 and SHA-512 for text and files.",
+      "description": "SwissTechKnife sample module. Hashes text as you type, or a file dropped on the page, reading the file only once for every algorithm.",
       "version": "1.0.0",
       "icon": "M9,4 L7,20 M17,4 L15,20 M4,9 L20,9 M3,15 L19,15",
       "accent": "#A98BF0",
@@ -107,7 +107,7 @@
           "version": "1.0.0",
           "date": "2026-10-19",
           "notes": [
-            "Primeira versão: MD5, SHA-1, SHA-256 e SHA-512 de textos e arquivos, com cópia em um clique."
+            "First release: MD5, SHA-1, SHA-256 and SHA-512 for text and files, with one-click copy."
           ]
         }
       ],
@@ -117,8 +117,8 @@
     {
       "id": "tamarillo",
       "name": "Tamarillo",
-      "tagline": "Arraste, segure o atalho e solte: converta e trate arquivos numa roda.",
-      "description": "Segure Ctrl + Alt + Shift enquanto arrasta arquivos e uma roda aparece sob o cursor com o que dá para fazer com eles: converter imagens, áudio, vídeo, PDF e documentos, redimensionar, comprimir, girar, reconhecer texto, compactar e mais. Solte sobre a ação e o resultado aparece ao lado do original, com o progresso num aviso discreto.\n\nTudo roda neste computador com os componentes do Windows; FFmpeg e Office ampliam os formatos quando estão instalados. Com o Tamarillo ativo, fechar a janela mantém o SwissTechKnife na área de notificação para o atalho continuar funcionando.",
+      "tagline": "Drag, hold the shortcut and drop: convert and process files from a wheel.",
+      "description": "Hold Ctrl + Alt + Shift while dragging files and a wheel appears under the cursor with everything you can do with them: convert images, audio, video, PDFs and documents, resize, compress, rotate, recognize text, zip and more. Drop on an action and the result appears next to the original, with progress in a discreet notification.\n\nEverything runs on this computer using Windows components; FFmpeg and Office add more formats when installed. While Tamarillo is enabled, closing the window keeps SwissTechKnife in the notification area so the shortcut keeps working.",
       "version": "0.1.0",
       "icon": "M11,5.5 A7.5,7.5 0 1 0 18.5,13 L11,13 Z M13.5,10.5 L13.5,3 A7.5,7.5 0 0 1 21,10.5 Z",
       "accent": "#E65A70",
@@ -132,9 +132,9 @@
           "version": "0.1.0",
           "date": "2026-10-19",
           "notes": [
-            "Primeira versão: segure Ctrl + Alt + Shift enquanto arrasta arquivos e escolha a ação numa roda.",
-            "Converte imagens, áudio, vídeo, PDF, documentos, legendas e dados; redimensiona, comprime, gira, reconhece texto e compacta.",
-            "Sem arrastar: selecione arquivos no Explorador, segure o atalho e solte as teclas sobre a ação."
+            "First release: hold Ctrl + Alt + Shift while dragging files and pick the action from a wheel.",
+            "Converts images, audio, video, PDFs, documents, subtitles and data; resizes, compresses, rotates, recognizes text and zips.",
+            "Without dragging: select files in Explorer, hold the shortcut and release the keys over the action."
           ]
         }
       ],

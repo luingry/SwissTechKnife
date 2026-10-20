@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Interop;
 using SwissTechKnife.Sdk;
 using Forms = System.Windows.Forms;
@@ -10,7 +11,7 @@ using Forms = System.Windows.Forms;
 namespace SwissTechKnife.Infrastructure
 {
     /// <summary>
-    /// Notification-area icon, created only while "manter na área de notificação" is on.
+    /// Notification-area icon, created only while "Hide to the notification area on close" is on.
     /// The shell's NotifyIcon is native, but its menu is the design-system WPF ContextMenu.
     /// </summary>
     internal sealed class TrayIcon : IDisposable
@@ -23,9 +24,9 @@ namespace SwissTechKnife.Infrastructure
         {
             _open = open;
             _menu = new ContextMenu();
-            _menu.Items.Add(CreateItem("Abrir SwissTechKnife", "", open));
+            _menu.Items.Add(CreateItem("TrayOpen", "", open));
             _menu.Items.Add(new Separator());
-            _menu.Items.Add(CreateItem("Sair", "", exit));
+            _menu.Items.Add(CreateItem("TrayExit", "", exit));
 
             _icon = new Forms.NotifyIcon
             {
@@ -71,9 +72,11 @@ namespace SwissTechKnife.Infrastructure
             }
         }
 
-        private static MenuItem CreateItem(string header, string glyph, Action action)
+        /// <summary>The header is bound, so the open menu follows a language change.</summary>
+        private static MenuItem CreateItem(string key, string glyph, Action action)
         {
-            var item = new MenuItem { Header = header };
+            var item = new MenuItem();
+            item.SetBinding(HeaderedItemsControl.HeaderProperty, new Binding("[" + key + "]") { Source = LocalizedStrings.Instance, Mode = BindingMode.OneWay });
             Ui.SetIcon(item, glyph);
             item.Click += (s, e) => action();
             return item;

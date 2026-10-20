@@ -59,7 +59,7 @@ namespace SwissTechKnife.Samples.SystemMonitor
             {
                 double used = total - available;
                 MemoryText.Text = (used / Gb).ToString("0.0", CultureInfo.CurrentCulture) + " GB";
-                MemoryCaption.Text = "de " + (total / Gb).ToString("0.0", CultureInfo.CurrentCulture) + " GB em uso";
+                MemoryCaption.Text = "in use of " + (total / Gb).ToString("0.0", CultureInfo.CurrentCulture) + " GB";
                 MemoryBar.Value = used / total;
             }
 

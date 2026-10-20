@@ -133,7 +133,7 @@ namespace SwissTechKnife.Modules
             item.Error = null;
             item.IsBusy = true;
             item.Progress = 0;
-            item.BusyText = previous == null ? "Instalando…" : "Atualizando…";
+            item.BusyText = Strings.Get(previous == null ? "Installing" : "Updating");
             try
             {
                 Uri packageUri = CatalogClient.ResolvePackageUri(LastCatalog.Source, entry.Package);
@@ -154,7 +154,7 @@ namespace SwissTechKnife.Modules
                 if (codeLoaded)
                 {
                     item.RestartRequired = true;
-                    item.RestartReason = "A versão " + installed.Version + " será usada após reiniciar.";
+                    item.RestartReason = Strings.Format("VersionAfterRestart", installed.Version);
                 }
                 else if (installed.Enabled && installed.Manifest.StartsWithHost)
                 {
@@ -185,7 +185,7 @@ namespace SwissTechKnife.Modules
             item.Error = null;
             item.PageError = null;
             item.RestartRequired = locked;
-            item.RestartReason = locked ? "Os arquivos serão removidos ao reiniciar." : null;
+            item.RestartReason = locked ? Strings.Get("FilesRemovedOnRestart") : null;
             if (item.CatalogEntry == null)
             {
                 Items.Remove(item);
@@ -237,7 +237,7 @@ namespace SwissTechKnife.Modules
             {
                 Exception root = ex is System.Reflection.TargetInvocationException tie && tie.InnerException != null ? tie.InnerException : ex;
                 Log.Error(Source, "Activation failed for " + item.Id, root);
-                item.PageError = "O módulo não conseguiu iniciar: " + root.Message;
+                item.PageError = Strings.Format("ModuleStartFailed", root.Message);
             }
             return false;
         }

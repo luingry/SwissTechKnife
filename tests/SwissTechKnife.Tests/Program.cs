@@ -37,6 +37,7 @@ namespace SwissTechKnife.Tests
             Run("Installer command line is unattended and quoted", HostArguments);
             Run("Installer download verifies SHA-256 and reuses a verified file", HostDownload);
             Run("Installer download refuses a hash mismatch and keeps nothing", HostDownloadMismatch);
+            Run("Every UI string has a pt-BR translation; unknown languages fall back to English", Localization);
 
             Console.WriteLine();
             Console.WriteLine($"{_passed} passed, {_failed} failed");
@@ -84,6 +85,25 @@ namespace SwissTechKnife.Tests
         }
 
         // ── Tests ─────────────────────────────────────────────
+
+        private static void Localization()
+        {
+            string missing = string.Join(", ", Strings.MissingTranslations());
+            Assert(missing.Length == 0, "missing pt-BR strings: " + missing);
+            Assert(Strings.Normalize(null) == Strings.English && Strings.Normalize("fr") == Strings.English, "unknown language is English");
+            Assert(Strings.Normalize("PT-br") == Strings.PortugueseBrazil, "language codes are case-insensitive");
+            try
+            {
+                Strings.SetLanguage(Strings.PortugueseBrazil);
+                Assert(Strings.Get("Install") == "Instalar", "pt-BR table is used");
+                Assert(Strings.Get("NoSuchKey") == "NoSuchKey", "unknown key returns itself");
+            }
+            finally
+            {
+                Strings.SetLanguage(Strings.English);
+            }
+            Assert(Strings.Get("Install") == "Install", "English is restored");
+        }
 
         private static void ModuleIds()
         {
@@ -174,9 +194,9 @@ namespace SwissTechKnife.Tests
             Assert(clean.Host != null && clean.Host.Version == "0.4.0", "valid host kept");
             Catalog dirty = CatalogClient.Sanitize(new Catalog { Host = Release("0.4.0", "short") });
             Assert(dirty.Host == null, "invalid host dropped");
-            byte[] json = Encoding.UTF8.GetBytes("{\"schema\":1,\"modules\":[],\"host\":{\"version\":\"0.4.0\",\"installer\":\"x.exe\",\"sha256\":\"" + new string('b', 64) + "\",\"size\":5,\"releaseNotes\":[{\"version\":\"0.4.0\",\"date\":\"2026-10-20\",\"notes\":[\"Atualização automática.\"]}]}}");
+            byte[] json = Encoding.UTF8.GetBytes("{\"schema\":1,\"modules\":[],\"host\":{\"version\":\"0.4.0\",\"installer\":\"x.exe\",\"sha256\":\"" + new string('b', 64) + "\",\"size\":5,\"releaseNotes\":[{\"version\":\"0.4.0\",\"date\":\"2026-10-20\",\"notes\":[\"Automatic updates.\"]}]}}");
             Catalog parsed = CatalogClient.Sanitize(Json.Deserialize<Catalog>(json));
-            Assert(parsed.Host?.ReleaseNotes?.Single().Notes.Single() == "Atualização automática.", "host entry parses from catalog.json");
+            Assert(parsed.Host?.ReleaseNotes?.Single().Notes.Single() == "Automatic updates.", "host entry parses from catalog.json");
             Assert(CatalogClient.Sanitize(Json.Deserialize<Catalog>(Encoding.UTF8.GetBytes("{\"modules\":[]}"))).Host == null, "catalog without host");
         }
 

@@ -37,7 +37,7 @@ namespace SwissTechKnife.Core
             ModuleId.Validate(entry.Id);
             if (!entry.IsAvailable)
             {
-                throw new ModuleInstallException("Este módulo ainda não tem um pacote publicado.");
+                throw new ModuleInstallException(Strings.Get("PackageNotPublished"));
             }
 
             Directory.CreateDirectory(_paths.Downloads);
@@ -50,7 +50,7 @@ namespace SwissTechKnife.Core
                 if (!string.Equals(hash, entry.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
                     Log.Warn(Source, $"Hash mismatch for {entry.Id}: expected {entry.Sha256}, got {hash}");
-                    throw new ModuleInstallException("O pacote baixado não confere com o catálogo (SHA-256). Nada foi alterado.");
+                    throw new ModuleInstallException(Strings.Get("PackageHashMismatch"));
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -88,20 +88,20 @@ namespace SwissTechKnife.Core
             }
             catch (HttpRequestException ex)
             {
-                throw new ModuleInstallException("Não foi possível baixar o módulo. Verifique a conexão e tente de novo.", ex);
+                throw new ModuleInstallException(Strings.Get("PackageDownloadFailed"), ex);
             }
             catch (IncompleteDownloadException ex)
             {
-                throw new ModuleInstallException("O download terminou incompleto. Tente de novo.", ex);
+                throw new ModuleInstallException(Strings.Get("DownloadIncomplete"), ex);
             }
             catch (InvalidDataException ex)
             {
-                throw new ModuleInstallException("O pacote do módulo está corrompido.", ex);
+                throw new ModuleInstallException(Strings.Get("PackageCorrupt"), ex);
             }
             catch (Exception ex)
             {
                 Log.Error(Source, "Install failed for " + entry.Id, ex);
-                throw new ModuleInstallException("A instalação falhou: " + ex.Message, ex);
+                throw new ModuleInstallException(Strings.Format("PackageInstallFailed", ex.Message), ex);
             }
             finally
             {
@@ -122,7 +122,7 @@ namespace SwissTechKnife.Core
                     string target = Path.GetFullPath(Path.Combine(staging, item.FullName));
                     if (!target.StartsWith(stagingRoot, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ModuleInstallException("O pacote contém caminhos inválidos e foi recusado.");
+                        throw new ModuleInstallException(Strings.Get("PackageBadPaths"));
                     }
                     if (item.FullName.EndsWith("/", StringComparison.Ordinal) || item.FullName.EndsWith("\\", StringComparison.Ordinal))
                     {
@@ -132,7 +132,7 @@ namespace SwissTechKnife.Core
                     extracted += item.Length;
                     if (extracted > MaxExtractedBytes)
                     {
-                        throw new ModuleInstallException("O pacote é grande demais e foi recusado.");
+                        throw new ModuleInstallException(Strings.Get("PackageTooLarge"));
                     }
                     Directory.CreateDirectory(Path.GetDirectoryName(target));
                     item.ExtractToFile(target, overwrite: false);
@@ -142,7 +142,7 @@ namespace SwissTechKnife.Core
             string manifestPath = Path.Combine(staging, "module.json");
             if (!File.Exists(manifestPath))
             {
-                throw new ModuleInstallException("O pacote não contém module.json.");
+                throw new ModuleInstallException(Strings.Get("PackageNoManifest"));
             }
             ModuleManifest manifest = Json.ReadFile<ModuleManifest>(manifestPath);
             Validate(manifest, expectedId, staging);
@@ -153,22 +153,22 @@ namespace SwissTechKnife.Core
         {
             if (manifest == null || manifest.Id != expectedId)
             {
-                throw new ModuleInstallException("O pacote pertence a outro módulo e foi recusado.");
+                throw new ModuleInstallException(Strings.Get("PackageWrongModule"));
             }
             if (!VersionText.TryParse(manifest.Version, out _))
             {
-                throw new ModuleInstallException("O pacote tem uma versão inválida.");
+                throw new ModuleInstallException(Strings.Get("PackageBadVersion"));
             }
             if (manifest.SdkVersion > _maxSdkVersion)
             {
-                throw new ModuleInstallException("Este módulo precisa de uma versão mais nova do SwissTechKnife. Atualize o app primeiro.");
+                throw new ModuleInstallException(Strings.Get("PackageNeedsNewerHost"));
             }
             if (string.IsNullOrWhiteSpace(manifest.EntryType)
                 || string.IsNullOrWhiteSpace(manifest.EntryAssembly)
                 || manifest.EntryAssembly.IndexOfAny(new[] { '/', '\\', ':' }) >= 0
                 || !File.Exists(Path.Combine(folder, manifest.EntryAssembly)))
             {
-                throw new ModuleInstallException("O pacote não aponta para um ponto de entrada válido.");
+                throw new ModuleInstallException(Strings.Get("PackageBadEntry"));
             }
         }
 

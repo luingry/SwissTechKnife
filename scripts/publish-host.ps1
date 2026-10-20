@@ -12,7 +12,7 @@
 #>
 [CmdletBinding()]
 param(
-    # User-facing changes in pt-BR, one sentence each. Required unless the catalog already has notes for this version.
+    # User-facing changes in English, one sentence each. Required unless the catalog already has notes for this version.
     [string[]]$Notes,
     [string]$Repo = 'luingry/SwissTechKnife',
     [string]$Catalog,
@@ -44,7 +44,7 @@ if ($Notes) {
 } elseif ($existing) {
     $entry = $existing
 } else {
-    throw "No release notes for $Version. Pass -Notes `"...`", `"...`" (pt-BR, one sentence each)."
+    throw "No release notes for $Version. Pass -Notes `"...`", `"...`" (English, one sentence each)."
 }
 $releaseNotes = @(@($entry) + $history | Sort-Object { [version]$_.version } -Descending)
 

@@ -12,7 +12,7 @@ using SwissTechKnife.Sdk;
 namespace SwissTechKnife.ViewModels
 {
     /// <summary>
-    /// SwissTechKnife's own update: the notice in Configurações, the confirmation popup and the
+    /// SwissTechKnife's own update: the notice in Settings, the confirmation popup and the
     /// download → verify → installer → exit flow. The installer relaunches the app when it is done.
     /// </summary>
     public sealed class HostUpdateViewModel : ObservableObject
@@ -109,7 +109,7 @@ namespace SwissTechKnife.ViewModels
 
         public bool HasError => _error != null;
 
-        /// <summary>The notice in Configurações: an update is offered, or the last attempt needs explaining.</summary>
+        /// <summary>The notice in Settings: an update is offered, or the last attempt needs explaining.</summary>
         public bool ShowNotice => IsAvailable || HasError;
 
         /// <summary>Takes the host entry of a freshly loaded catalog. Returns true the first time a version is offered.</summary>
@@ -148,7 +148,7 @@ namespace SwissTechKnife.ViewModels
                 case HostUpdateOutcome.Succeeded:
                     Log.Info(Source, $"Updated {pending.FromVersion} → {pending.ToVersion}");
                     await Task.Run(() => _updater.Finish(pending, succeeded: true));
-                    _notify("SwissTechKnife atualizado para v" + pending.ToVersion + ".", NotificationKind.Success);
+                    _notify(Strings.Format("HostUpdated", pending.ToVersion), NotificationKind.Success);
                     break;
                 case HostUpdateOutcome.Failed:
                     DateTime? started = UpdateSchedule.ParseUtc(pending.StartedUtc);
@@ -159,8 +159,8 @@ namespace SwissTechKnife.ViewModels
                     }
                     Log.Warn(Source, $"Update to {pending.ToVersion} did not complete (signal: {pending.Signal ?? "none"}); log: {pending.Log}");
                     await Task.Run(() => _updater.Finish(pending, succeeded: false));
-                    Error = "A atualização para v" + pending.ToVersion + " não foi concluída. Nada foi alterado; tente de novo. Registro do instalador: " + pending.Log;
-                    _notify("A atualização do SwissTechKnife não foi concluída.", NotificationKind.Error);
+                    Error = Strings.Format("HostUpdateIncomplete", pending.ToVersion, pending.Log);
+                    _notify(Strings.Get("HostUpdateIncompleteToast"), NotificationKind.Error);
                     break;
             }
         }
@@ -175,7 +175,7 @@ namespace SwissTechKnife.ViewModels
             }
             Error = null;
             Progress = 0;
-            BusyText = "Baixando a atualização…";
+            BusyText = Strings.Get("DownloadingUpdate");
             IsBusy = true;
             bool exiting = false;
             try
@@ -185,20 +185,20 @@ namespace SwissTechKnife.ViewModels
                 string installer = await _updater.DownloadAsync(release, installerUri, progress, CancellationToken.None);
 
                 Progress = 1;
-                BusyText = "Aguardando a permissão do Windows para instalar…";
+                BusyText = Strings.Get("WaitingForPermission");
                 Process process = await _updater.StartInstallerAsync(installer, release, _runningVersion, SingleInstance.MutexName, Process.GetCurrentProcess().MainModule.FileName);
                 using (process)
                 {
                     var (result, exitCode) = await _updater.WaitForStartAsync(process, CancellationToken.None);
                     if (result == InstallerStartResult.Exited)
                     {
-                        Error = "O instalador foi cancelado ou não pôde ser executado (código " + exitCode + "). Nada foi alterado.";
-                        _notify("Atualização do SwissTechKnife cancelada.", NotificationKind.Warning);
+                        Error = Strings.Format("InstallerCanceled", exitCode);
+                        _notify(Strings.Get("HostUpdateCanceledToast"), NotificationKind.Warning);
                         return;
                     }
                 }
 
-                BusyText = "Instalando. O SwissTechKnife vai fechar e abrir de novo sozinho.";
+                BusyText = Strings.Get("InstallingHost");
                 exiting = true;
                 Log.Info(Source, "Installer running; exiting for the update to " + release.Version);
                 _exitForUpdate();
@@ -206,7 +206,7 @@ namespace SwissTechKnife.ViewModels
             catch (HostUpdateException ex)
             {
                 Error = ex.Message;
-                _notify("Falha ao atualizar o SwissTechKnife.", NotificationKind.Error);
+                _notify(Strings.Get("HostUpdateFailedToast"), NotificationKind.Error);
             }
             finally
             {
@@ -221,8 +221,8 @@ namespace SwissTechKnife.ViewModels
         {
             Log.Error(Source, "Host update failed", ex);
             IsBusy = false;
-            Error = "A atualização falhou: " + ex.Message;
-            _notify("Falha ao atualizar o SwissTechKnife.", NotificationKind.Error);
+            Error = Strings.Format("HostUpdateFailed", ex.Message);
+            _notify(Strings.Get("HostUpdateFailedToast"), NotificationKind.Error);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace SwissTechKnife.Samples.HashTool
 
         private void OnPickFile(object sender, RoutedEventArgs e)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Escolher arquivo" };
+            var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Choose file" };
             if (dialog.ShowDialog(Window.GetWindow(this)) == true)
             {
                 _ = HashFileAsync(dialog.FileName);
@@ -77,7 +77,7 @@ namespace SwissTechKnife.Samples.HashTool
             catch (Exception ex)
             {
                 _context.Log.Error("Hash failed", ex);
-                _context.Notify("Não foi possível ler o arquivo.", NotificationKind.Error);
+                _context.Notify("Couldn't read the file.", NotificationKind.Error);
             }
             finally
             {
@@ -150,11 +150,11 @@ namespace SwissTechKnife.Samples.HashTool
                 try
                 {
                     Clipboard.SetText(value);
-                    _context.Notify("Hash copiado.", NotificationKind.Success);
+                    _context.Notify("Hash copied.", NotificationKind.Success);
                 }
                 catch (System.Runtime.InteropServices.COMException)
                 {
-                    _context.Notify("A área de transferência está ocupada. Tente de novo.", NotificationKind.Warning);
+                    _context.Notify("The clipboard is busy. Try again.", NotificationKind.Warning);
                 }
             }
         }

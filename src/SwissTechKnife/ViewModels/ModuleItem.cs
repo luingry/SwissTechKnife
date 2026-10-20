@@ -148,7 +148,10 @@ namespace SwissTechKnife.ViewModels
             }
         }
 
-        public string ActiveText => IsActive ? "Ativado" : "Desativado";
+        /// <summary>Language changed: every computed text (release notes and dates included) is read again.</summary>
+        public void RefreshText() => OnAllPropertiesChanged();
+
+        public string ActiveText => Strings.Get(IsActive ? "Enabled" : "Disabled");
 
         public ModuleStatus Status =>
             _installed != null ? (_installed.Enabled ? ModuleStatus.Enabled : ModuleStatus.Disabled)
@@ -207,7 +210,7 @@ namespace SwissTechKnife.ViewModels
                 .Where(n => n != null && Core.VersionText.TryParse(n.Version, out _))
                 .OrderByDescending(n => Core.VersionText.ParseOrZero(n.Version));
 
-        public string UpdateText => HasUpdate ? "v" + _catalogEntry.Version + " disponível" : null;
+        public string UpdateText => HasUpdate ? Strings.Format("VersionAvailable", _catalogEntry.Version) : null;
 
         // Dialog action layout: exactly one primary action per state.
         public bool ShowInstall => Status == ModuleStatus.Available;
@@ -263,7 +266,7 @@ namespace SwissTechKnife.ViewModels
             set => Set(ref _pageError, value);
         }
 
-        /// <summary>First click on "Desinstalar" arms it; the second click confirms.</summary>
+        /// <summary>First click on "Uninstall" arms it; the second click confirms.</summary>
         public bool ConfirmingUninstall
         {
             get => _confirmingUninstall;
@@ -362,18 +365,16 @@ namespace SwissTechKnife.ViewModels
         }
     }
 
-    /// <summary>One version in the "Notas da versão" tab or the update confirmation.</summary>
+    /// <summary>One version in the "Release notes" tab or the update confirmation.</summary>
     public sealed class ReleaseNoteView
     {
-        private static readonly CultureInfo PtBr = CultureInfo.GetCultureInfo("pt-BR");
-
         public ReleaseNoteView(ReleaseNote note, bool isCurrent)
         {
             VersionText = "v" + note.Version;
             IsCurrent = isCurrent;
             Notes = (note.Notes ?? new List<string>()).Where(n => !string.IsNullOrWhiteSpace(n)).ToList();
             DateText = DateTime.TryParseExact(note.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
-                ? date.ToString("d MMM yyyy", PtBr)
+                ? date.ToString(Strings.Get("ReleaseDateFormat"), Strings.Culture)
                 : null;
         }
 

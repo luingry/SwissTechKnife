@@ -68,6 +68,7 @@ namespace SwissTechKnife
 
             _settings = new SettingsStore(paths);
             _settings.Load();
+            Strings.SetLanguage(_settings.Current.Language);
             var state = new StateStore(paths);
             ShellViewModel shell = null;
             _runtime = new ModuleRuntime(paths, module => new ModuleContext(
@@ -116,7 +117,7 @@ namespace SwissTechKnife
             {
                 // Without a window the process would linger invisibly: report and exit.
                 Log.Error(Source, "Main window failed to load", ex);
-                MessageBox.Show("O SwissTechKnife não conseguiu abrir.\n\n" + ex.GetBaseException().Message, "SwissTechKnife", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Strings.Format("StartupFailed", ex.GetBaseException().Message), "SwissTechKnife", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
                 return;
             }
@@ -140,7 +141,7 @@ namespace SwissTechKnife
             catch (Exception ex)
             {
                 Log.Error(Source, "Could not load installed modules", ex);
-                shell.Notify("Não foi possível carregar os módulos instalados.", NotificationKind.Error);
+                shell.Notify(Strings.Get("LoadModulesFailed"), NotificationKind.Error);
             }
             try
             {
@@ -170,7 +171,7 @@ namespace SwissTechKnife
                 if (!_settings.Current.HideToTrayOnClose && !_backgroundHintShown)
                 {
                     _backgroundHintShown = true;
-                    _tray.ShowHint("Continua na área de notificação para os módulos em segundo plano funcionarem. Para sair, use Sair aqui.");
+                    _tray.ShowHint(Strings.Get("TrayHint"));
                 }
             }
             return true;
@@ -245,7 +246,7 @@ namespace SwissTechKnife
         {
             // A faulty module must not take the whole host down: log, tell the user, keep running.
             Log.Error(Source, "UI thread exception", e.Exception);
-            (_window?.DataContext as ShellViewModel)?.Notify("Um erro inesperado ocorreu e foi registrado no log.", NotificationKind.Error);
+            (_window?.DataContext as ShellViewModel)?.Notify(Strings.Get("UnexpectedError"), NotificationKind.Error);
             e.Handled = true;
         }
 

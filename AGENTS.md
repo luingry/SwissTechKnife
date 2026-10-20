@@ -1,6 +1,7 @@
 ## Conventions
 
-- Code, comments, docs and commit messages in English; UI text and the user-facing README in Brazilian Portuguese (technical docs live in `docs/`).
+- Everything in English: code, comments, docs, commit messages, README, catalog text and release notes (technical docs live in `docs/`).
+- UI text is localized: English (default) and Brazilian Portuguese. Host strings live in `src/SwissTechKnife.Core/Strings.cs` (add every key to both tables; the tests fail on a missing translation) and are used from XAML with `{infra:Loc Key}`, from code with `Strings.Get`/`Strings.Format`. Never hardcode UI text.
 - UI uses only design-system tokens and styles from `src/SwissTechKnife.Sdk/Theme` (see `docs/DESIGN_SYSTEM.md`). No solid borders, no native-looking controls, every state transition animated.
 - Performance first: no work before first paint, nothing on the UI thread that touches disk/network, prefer opacity/transform animations, freeze brushes and geometries.
 - The SDK is a public contract for module repositories: only additive changes within 1.x; bump `SdkInfo.ContractVersion` for breaking changes.
