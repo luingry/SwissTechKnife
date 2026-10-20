@@ -141,8 +141,56 @@ begin
     Log('App still running after 60 s; Restart Manager will close it.')
   else
     Log(Format('App released its mutex after %d ms.', [Waited]));
-  // Let the process finish tearing down so its files are no longer locked.
-  Sleep(1000);
+  // PrepareToInstall then waits for the process itself to be gone.
+end;
+
+const
+  GENERIC_WRITE = $40000000;
+  OPEN_EXISTING = 3;
+  INVALID_HANDLE_VALUE = -1;
+
+function CreateFile(lpFileName: String; dwDesiredAccess, dwShareMode: Cardinal; lpSecurityAttributes: Cardinal;
+  dwCreationDisposition, dwFlagsAndAttributes: Cardinal; hTemplateFile: THandle): THandle;
+  external 'CreateFileW@kernel32.dll stdcall';
+function CloseHandle(hObject: THandle): Boolean;
+  external 'CloseHandle@kernel32.dll stdcall';
+
+// True once no process maps the file (a running exe cannot be opened for writing).
+function FileIsFree(Path: String): Boolean;
+var
+  H: THandle;
+begin
+  Result := True;
+  if not FileExists(Path) then
+    Exit;
+  H := CreateFile(Path, GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+  Result := H <> THandle(INVALID_HANDLE_VALUE);
+  if Result then
+    CloseHandle(H);
+end;
+
+// Runs before Restart Manager looks for apps using our files. Releasing the mutex is not the end of the
+// process: modules and the runtime still tear down for a moment, and Restart Manager cannot close a process
+// without a window, so an unattended update would abort. Wait for the installed exe to be free instead.
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Exe: String;
+  Waited: Integer;
+begin
+  Result := '';
+  if not IsUpdateRun() then
+    Exit;
+  Exe := ExpandConstant('{app}\{#AppExeName}');
+  Waited := 0;
+  while not FileIsFree(Exe) and (Waited < 30000) do
+  begin
+    Sleep(250);
+    Waited := Waited + 250;
+  end;
+  if Waited >= 30000 then
+    Log('App process still running after 30 s; Restart Manager will try to close it.')
+  else
+    Log(Format('App process gone after %d ms.', [Waited]));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

@@ -67,3 +67,9 @@
 - Cause: `Process.Start` (UseShellExecute + elevation) never returned, so the code never got to polling the signal file. Seen when the app ran inside another app's MSIX package container (launched from the Claude desktop app: the installer log's "Original Setup EXE" pointed into `Packages\Claude_…\LocalCache`).
 - Solution: `HostUpdater.StartInstallerAsync` launches on its own background STA thread and polls the signal file while the launch is still pending; the launch result only matters when it fails (UAC declined → canceled) or the installer quits. `App.ExitForUpdate` also ends the process after 15 s if a module hangs the normal exit.
 - Prevention: never make the update hand-off depend on a shell call returning; the installer's signal is the source of truth.
+
+## 2026-10-20 — Self-update installer aborted: "Some applications could not be shut down"
+- Symptom: the app exited for the update and came back on the old version; the record said `signal: failed`. Installer log: "RestartManager found an application using one of our files: SwissTechKnife", then "Some applications could not be shut down… Defaulting to Abort".
+- Cause: the installer only waited for the app's mutex plus a fixed 1 s. The mutex is released in `OnExit`, but the process lives on a little longer (modules and the runtime tearing down). Restart Manager cannot close a process with no window, and with `/SUPPRESSMSGBOXES` the Abort/Retry/Ignore prompt defaults to Abort.
+- Solution: `PrepareToInstall` in `installer/SwissTechKnife.iss` (it runs before Restart Manager) waits up to 30 s until `{app}\SwissTechKnife.exe` can be opened for writing, which means no process maps it any more. The app-side 15 s exit watchdog covers a process that never ends.
+- Prevention: the installer that runs is the new version's, so installer-side waits fix updates from any older version. Never rely on a fixed sleep for "the process is gone".
