@@ -253,8 +253,12 @@ namespace SwissTechKnife.Tests
             var http = new Uri("https://example.com/feed/catalog.json");
             Assert(CatalogClient.ResolvePackageUri(http, "a-1.0.0.zip").ToString() == "https://example.com/feed/a-1.0.0.zip", "relative http");
             Assert(CatalogClient.ResolvePackageUri(http, "https://cdn.example.com/a.zip").Host == "cdn.example.com", "absolute wins");
-            Uri local = CatalogClient.ResolveCatalogUri(null, @"C:\App");
-            Assert(local.IsFile && local.LocalPath == @"C:\App\feed\catalog.json", "default catalog is next to the exe: " + local.LocalPath);
+            Uri remote = CatalogClient.ResolveCatalogUri(null, @"C:\App");
+            Assert(remote.AbsoluteUri == CatalogClient.DefaultCatalogUrl, "default catalog is the published one: " + remote);
+            Uri bundled = CatalogClient.BundledCatalogUri(@"C:\App");
+            Assert(bundled.IsFile && bundled.LocalPath == @"C:\App\feed\catalog.json", "bundled catalog is next to the exe: " + bundled.LocalPath);
+            Uri relative = CatalogClient.ResolveCatalogUri(@"feed\catalog.json", @"C:\App");
+            Assert(relative.IsFile && relative.LocalPath == @"C:\App\feed\catalog.json", "relative setting resolves next to the exe");
         }
 
         private static void InstallValid()

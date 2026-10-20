@@ -82,7 +82,8 @@ namespace SwissTechKnife
                     _window?.BringToFront();
                     shell?.ShowModule(id);
                 }));
-            var manager = new ModuleManager(paths, state, new CatalogClient(paths), new PackageInstaller(paths, SdkInfo.ContractVersion), _runtime);
+            var catalogClient = new CatalogClient(paths) { FallbackUri = CatalogClient.BundledCatalogUri(AppDomain.CurrentDomain.BaseDirectory) };
+            var manager = new ModuleManager(paths, state, catalogClient, new PackageInstaller(paths, SdkInfo.ContractVersion), _runtime);
             Func<Uri> catalogUri = () => CatalogClient.ResolveCatalogUri(
                 Environment.GetEnvironmentVariable("STK_CATALOG") ?? _settings.Current.Catalog,
                 AppDomain.CurrentDomain.BaseDirectory);

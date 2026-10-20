@@ -42,9 +42,15 @@ namespace SwissTechKnife.Core
 
         internal static HttpClient Http => SharedHttp.Value;
 
+        /// <summary>Published catalog: module and host updates reach every install through it.</summary>
+        public const string DefaultCatalogUrl = "https://raw.githubusercontent.com/luingry/SwissTechKnife/main/catalog/catalog.json";
+
+        /// <summary>Catalog bundled with the installer: used offline before any online catalog was cached.</summary>
+        public static Uri BundledCatalogUri(string appDirectory) => new Uri(Path.GetFullPath(Path.Combine(appDirectory, "feed", "catalog.json")));
+
         public static Uri ResolveCatalogUri(string setting, string appDirectory)
         {
-            string value = string.IsNullOrWhiteSpace(setting) ? Path.Combine("feed", "catalog.json") : setting.Trim();
+            string value = string.IsNullOrWhiteSpace(setting) ? DefaultCatalogUrl : setting.Trim();
             if (Uri.TryCreate(value, UriKind.Absolute, out Uri absolute) && (absolute.Scheme == Uri.UriSchemeHttps || absolute.Scheme == Uri.UriSchemeHttp || absolute.IsFile))
             {
                 return absolute;
@@ -55,19 +61,24 @@ namespace SwissTechKnife.Core
 
         public static Uri ResolvePackageUri(Uri catalogUri, string package) => new Uri(catalogUri, package);
 
+        /// <summary>Last resort when the catalog is unreachable and nothing is cached (e.g. first start offline).</summary>
+        public Uri FallbackUri { get; set; }
+
+        private string CacheSourceFile => _paths.CatalogCacheFile + ".source";
+
         public async Task<CatalogResult> LoadAsync(Uri uri, CancellationToken cancellationToken)
         {
             try
             {
                 byte[] bytes = await ReadAllAsync(uri, cancellationToken).ConfigureAwait(false);
                 Catalog catalog = Sanitize(Json.Deserialize<Catalog>(bytes));
-                TryWriteCache(bytes);
+                TryWriteCache(bytes, uri);
                 return new CatalogResult(catalog, uri, fromCache: false, error: null);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 Log.Warn(Source, "Catalog unavailable at " + uri + ": " + ex.Message);
-                if (File.Exists(_paths.CatalogCacheFile))
+                if (CacheMatches(uri))
                 {
                     try
                     {
@@ -77,6 +88,19 @@ namespace SwissTechKnife.Core
                     catch (Exception cacheError)
                     {
                         Log.Warn(Source, "Catalog cache unreadable: " + cacheError.Message);
+                    }
+                }
+                if (FallbackUri != null && FallbackUri != uri && FallbackUri.IsFile && File.Exists(FallbackUri.LocalPath))
+                {
+                    try
+                    {
+                        Catalog bundled = Sanitize(Json.ReadFile<Catalog>(FallbackUri.LocalPath));
+                        // Relative package paths resolve against the bundled feed, so its packages still install offline.
+                        return new CatalogResult(bundled, FallbackUri, fromCache: true, error: ex);
+                    }
+                    catch (Exception bundledError)
+                    {
+                        Log.Warn(Source, "Bundled catalog unreadable: " + bundledError.Message);
                     }
                 }
                 return new CatalogResult(new Catalog(), uri, fromCache: false, error: ex);
@@ -89,7 +113,7 @@ namespace SwissTechKnife.Core
         /// </summary>
         public async Task<CatalogResult> LoadCachedAsync(Uri uri, CancellationToken cancellationToken)
         {
-            if (File.Exists(_paths.CatalogCacheFile))
+            if (CacheMatches(uri))
             {
                 try
                 {
@@ -154,11 +178,27 @@ namespace SwissTechKnife.Core
             }
         }
 
-        private void TryWriteCache(byte[] bytes)
+        /// <summary>The cache is only valid for the catalog it came from (relative URLs resolve against it).</summary>
+        private bool CacheMatches(Uri uri)
+        {
+            try
+            {
+                return File.Exists(_paths.CatalogCacheFile)
+                    && File.Exists(CacheSourceFile)
+                    && string.Equals(File.ReadAllText(CacheSourceFile).Trim(), uri.AbsoluteUri, StringComparison.Ordinal);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+
+        private void TryWriteCache(byte[] bytes, Uri source)
         {
             try
             {
                 Directory.CreateDirectory(_paths.Cache);
+                File.WriteAllText(CacheSourceFile, source.AbsoluteUri);
                 string temp = _paths.CatalogCacheFile + ".tmp";
                 File.WriteAllBytes(temp, bytes);
                 if (File.Exists(_paths.CatalogCacheFile))

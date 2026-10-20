@@ -29,7 +29,7 @@ powershell -File scripts/render-brand.ps1       # after editing the logo
 Run: `src/SwissTechKnife/bin/Release/net48/SwissTechKnife.exe`.
 
 User data lives in `%LOCALAPPDATA%\SwissTechKnife` (`modules/`, `data/<module>/`, `state.json`, `settings.json`, `logs/host.log`).
-The catalog defaults to `feed/catalog.json` next to the exe; override with `"catalog"` in `settings.json` or the `STK_CATALOG` environment variable (path or https URL).
+The catalog defaults to the published `catalog/catalog.json` of this repository (raw GitHub URL), cached for offline use; before anything is cached, the copy bundled next to the exe (`feed/catalog.json`) is the fallback. Override with `"catalog"` in `settings.json` or the `STK_CATALOG` environment variable (path or https URL).
 
 ## Self-update
 
@@ -52,4 +52,4 @@ powershell -File scripts/publish-host.ps1 -Notes "Nota 1.", "Nota 2."   # instal
 powershell -File scripts/test-host-update.ps1                          # end-to-end update from a local feed (per-user test install, no UAC)
 ```
 
-Apps only see the update through a catalog they fetch: point `"catalog"`/`STK_CATALOG` at the published catalog.json (the bundled `feed/` copy always matches the installed version).
+Installs fetch the published catalog by default, so pushing `catalog/catalog.json` is what announces an update (the bundled `feed/` copy only serves offline first starts).
