@@ -82,7 +82,8 @@ namespace SwissTechKnife.ViewModels
             _restart = restart;
             HostVersion = "v" + hostVersion;
 
-            _storeView = new ListCollectionView(manager.Items) { Filter = StoreFilter };
+            // Installed modules come first; within each group the catalog order is kept.
+            _storeView = new ListCollectionView(manager.Items) { Filter = StoreFilter, CustomSort = new InstalledFirstComparer(manager.Items) };
             _sidebarView = new ListCollectionView(manager.Items) { Filter = o => ((ModuleItem)o).IsEnabled };
             _searchDebounce = new DispatcherTimer(TimeSpan.FromMilliseconds(140), DispatcherPriority.Input, (s, e) => ApplySearch(), Dispatcher.CurrentDispatcher);
             _searchDebounce.Stop();
@@ -170,9 +171,22 @@ namespace SwissTechKnife.ViewModels
             {
                 if (Set(ref _tab, value))
                 {
+                    OnPropertyChanged(nameof(IsAllTab));
                     OnPropertyChanged(nameof(IsAvailableTab));
                     OnPropertyChanged(nameof(IsInstalledTab));
                     RefreshLists();
+                }
+            }
+        }
+
+        public bool IsAllTab
+        {
+            get => _tab == StoreTab.All;
+            set
+            {
+                if (value)
+                {
+                    Tab = StoreTab.All;
                 }
             }
         }
@@ -200,6 +214,8 @@ namespace SwissTechKnife.ViewModels
                 }
             }
         }
+
+        public int AllCount => _manager.Items.Count;
 
         public int AvailableCount => _manager.Items.Count(i => !i.IsInstalled);
 
@@ -730,7 +746,7 @@ namespace SwissTechKnife.ViewModels
         private bool StoreFilter(object obj)
         {
             var item = (ModuleItem)obj;
-            bool inTab = _tab == StoreTab.Installed ? item.IsInstalled : !item.IsInstalled;
+            bool inTab = _tab == StoreTab.All || (_tab == StoreTab.Installed ? item.IsInstalled : !item.IsInstalled);
             return inTab && item.Matches(_appliedSearch);
         }
 
@@ -738,8 +754,10 @@ namespace SwissTechKnife.ViewModels
         {
             // Refresh a view only when its membership changed: a refresh regenerates every card,
             // which is visible (entry animations) and costly when, say, a switch just toggled.
-            RefreshIfChanged(_storeView, StoreFilter, ref _storeSignature);
-            RefreshIfChanged(_sidebarView, o => ((ModuleItem)o).IsEnabled, ref _sidebarSignature);
+            // The store signature carries the install state too: in the All tab installing moves a card up.
+            RefreshIfChanged(_storeView, StoreFilter, ref _storeSignature, i => (i.IsInstalled ? "+" : "-") + i.Id);
+            RefreshIfChanged(_sidebarView, o => ((ModuleItem)o).IsEnabled, ref _sidebarSignature, i => i.Id);
+            OnPropertyChanged(nameof(AllCount));
             OnPropertyChanged(nameof(AvailableCount));
             OnPropertyChanged(nameof(InstalledCount));
             OnPropertyChanged(nameof(UpdateCount));
@@ -748,9 +766,9 @@ namespace SwissTechKnife.ViewModels
             RefreshEmptyState();
         }
 
-        private void RefreshIfChanged(ListCollectionView view, Predicate<object> filter, ref string signature)
+        private void RefreshIfChanged(ListCollectionView view, Predicate<object> filter, ref string signature, Func<ModuleItem, string> key)
         {
-            string current = string.Join("|", _manager.Items.Where(i => filter(i)).Select(i => i.Id));
+            string current = string.Join("|", _manager.Items.Where(i => filter(i)).Select(key));
             if (current != signature)
             {
                 signature = current;
@@ -779,6 +797,12 @@ namespace SwissTechKnife.ViewModels
                 EmptyIcon = "";
                 EmptyTitle = Strings.Get("EmptyFailedTitle");
                 EmptyText = Strings.Get("EmptyFailedText");
+            }
+            else if (_tab == StoreTab.All)
+            {
+                EmptyIcon = "";
+                EmptyTitle = Strings.Get("EmptyCatalogTitle");
+                EmptyText = Strings.Get("EmptyCatalogText");
             }
             else
             {
@@ -809,6 +833,28 @@ namespace SwissTechKnife.ViewModels
         {
             Log.Error(Source, "Command failed", ex);
             Notify(Strings.Format("SomethingWentWrong", ex.Message), NotificationKind.Error);
+        }
+    }
+
+    /// <summary>Installed modules before available ones; ties keep the source (catalog) order, so the sort is stable.</summary>
+    internal sealed class InstalledFirstComparer : System.Collections.IComparer
+    {
+        private readonly System.Collections.Generic.IList<ModuleItem> _source;
+
+        public InstalledFirstComparer(System.Collections.Generic.IList<ModuleItem> source)
+        {
+            _source = source;
+        }
+
+        public int Compare(object x, object y)
+        {
+            var a = (ModuleItem)x;
+            var b = (ModuleItem)y;
+            if (a.IsInstalled != b.IsInstalled)
+            {
+                return a.IsInstalled ? -1 : 1;
+            }
+            return _source.IndexOf(a).CompareTo(_source.IndexOf(b));
         }
     }
 

@@ -86,6 +86,12 @@
             </Grid.ColumnDefinitions>
             <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left">
                 <ui:SegmentedPanel>
+                    <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsAllTab}" AutomationProperties.Name="{infra:Loc AllTab}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{infra:Loc AllTab}" />
+                            <TextBlock Text="{Binding AllCount}" Margin="8,0,0,0" Foreground="{StaticResource Brush.Text.Tertiary}" />
+                        </StackPanel>
+                    </RadioButton>
                     <RadioButton Style="{StaticResource Segmented.Item}" GroupName="StoreTab" IsChecked="{Binding IsAvailableTab}" AutomationProperties.Name="{infra:Loc AvailableTab}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{infra:Loc AvailableTab}" />
