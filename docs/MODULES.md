@@ -78,6 +78,12 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 }
 ```
 
+### Automatic catalog updates
+
+After the first entry is in the catalog, new versions reach every install on their own: the module repository only publishes a GitHub release with a `<id>-<x.y.z>.zip` asset (any tag name; the module repositories do it from CI when the version changes on `main`). The **Sync catalog** workflow (`.github/workflows/sync-catalog.yml`, every 15 minutes or on demand) runs `scripts/sync-catalog.mjs`, which reads the releases of each module's GitHub `homepage` (this repository for modules without one, such as `samples/`), and for a newer version checks the package's `module.json` (same id and version) and commits `version`, `package`, `sha256`, `size` and a release-notes entry to `main`. The repository must be public so installs can download the package.
+
+Release notes for the catalog come from an optional `releaseNotes` array in the package's `module.json` (English, one sentence per change, for that version only; the host ignores the field). Without it the bullet lines of the GitHub release body are used. Samples in this repository are released by `.github/workflows/release-samples.yml` when the version in their `module.json` changes on `main`.
+
 `releaseNotes` is a list of `{ "version", "date": "yyyy-MM-dd", "notes": ["…"] }` (English, one sentence per change): the details dialog shows them in **Release notes** (up to the current version, marked **Current**), and the update confirmation shows the versions being installed. `iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Coming soon**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Update available**.
 
 ## 5. Rules

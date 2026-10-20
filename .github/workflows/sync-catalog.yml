@@ -1,0 +1,50 @@
+name: Sync catalog
+
+# Picks up new module releases (see scripts/sync-catalog.mjs) and commits them to catalog/catalog.json on main,
+# which every install reads. Module repositories only need to publish a release with <id>-<version>.zip.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [module-released]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-catalog
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Sync and commit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # Retried from a fresh main when someone pushed in between.
+          for attempt in 1 2 3; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            node scripts/sync-catalog.mjs > "$RUNNER_TEMP/changes.txt"
+            if git diff --quiet -- catalog/catalog.json; then
+              echo 'Catalog is up to date.'
+              exit 0
+            fi
+            cat "$RUNNER_TEMP/changes.txt" | tee -a "$GITHUB_STEP_SUMMARY"
+            git commit -q -m "Catalog: $(paste -sd ';' "$RUNNER_TEMP/changes.txt" | sed 's/;/; /g')" -- catalog/catalog.json
+            if git push -q origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          echo '::error::Could not push the catalog update.'
+          exit 1

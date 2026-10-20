@@ -1,0 +1,50 @@
+name: Release sample modules
+
+# The modules that live in samples/ are released from this repository: a version change in a sample's
+# module.json on main publishes <id>-<version>.zip as release <id>-v<version>, then the catalog sync runs.
+on:
+  push:
+    branches: [main]
+    paths: ['samples/**/module.json']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: release-samples
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+      - name: Package samples
+        shell: pwsh
+        run: ./scripts/pack-modules.ps1 -Configuration Release
+      - name: Publish new versions
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $published = @(gh release list --limit 200 --json tagName --jq '.[].tagName' | ForEach-Object {
+            gh release view $_ --json assets --jq '.assets[].name'
+          })
+          $released = 0
+          foreach ($file in Get-ChildItem samples -Recurse -Filter module.json | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }) {
+            $manifest = Get-Content $file.FullName -Raw | ConvertFrom-Json
+            $name = "$($manifest.id)-$($manifest.version).zip"
+            if ($published -contains $name) { continue }
+            $notes = @($manifest.releaseNotes | ForEach-Object { "- $_" }) -join "`n"
+            if (-not $notes) { $notes = "Version $($manifest.version)." }
+            gh release create "$($manifest.id)-v$($manifest.version)" "artifacts/feed/$name" --title "$($manifest.id) $($manifest.version) (module)" --notes $notes --latest=false
+            if ($LASTEXITCODE -ne 0) { throw "Failed to release $name" }
+            $released++
+          }
+          if ($released) { gh workflow run sync-catalog.yml --ref main }
