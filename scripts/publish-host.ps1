@@ -63,6 +63,8 @@ if (-not $InstallerUrl) { $InstallerUrl = "https://github.com/$Repo/releases/dow
 # GitHub release
 if (-not $SkipRelease) {
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw 'GitHub CLI (gh) not found. Install it or pass -SkipRelease.' }
+    # Windows PowerShell 5.1 turns native stderr into terminating errors under ErrorActionPreference=Stop.
+    $ErrorActionPreference = 'Continue'
     & gh repo view $Repo --json name 2>$null | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "GitHub repository $Repo not found (or gh is not signed in). Create it first: gh repo create $Repo --private --source . --push" }
     $body = ($entry.notes | ForEach-Object { "- $_" }) -join "`n"
@@ -74,6 +76,7 @@ if (-not $SkipRelease) {
         & gh release create "v$Version" $InstallerPath --repo $Repo --title "SwissTechKnife $Version" --notes $body
         if ($LASTEXITCODE -ne 0) { throw "gh release create failed with exit code $LASTEXITCODE." }
     }
+    $ErrorActionPreference = 'Stop'
     # The catalog must never point at a file that does not match: check what GitHub now serves.
     $check = Join-Path ([IO.Path]::GetTempPath()) ("stk-release-" + [guid]::NewGuid().ToString('N') + '.exe')
     try {

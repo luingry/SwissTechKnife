@@ -1,5 +1,24 @@
 {
   "schema": 1,
+  "host": {
+    "version": "0.4.0",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/SwissTechKnife-0.4.0-setup.exe",
+    "sha256": "45ce0a34c271974ab9e20d02aaee881795bd244d11ef30def30f65fd94325259",
+    "size": 2461961,
+    "releaseNotes": [
+      {
+        "version": "0.4.0",
+        "date": "2026-10-19",
+        "notes": [
+          "Primeira versão pública do SwissTechKnife: instale, ative e remova seus apps como módulos em um só lugar.",
+          "O SwissTechKnife agora se atualiza sozinho, na frequência escolhida em Configurações.",
+          "Nova tela de Configurações: verificação de atualizações, iniciar com o Windows e manter na área de notificação ao fechar.",
+          "Os módulos mostram as notas de cada versão e pedem confirmação antes de atualizar.",
+          "Animações mais suaves em switches, botões e abas."
+        ]
+      }
+    ]
+  },
   "modules": [
     {
       "id": "smooth-mice",
@@ -53,7 +72,7 @@
       "version": "1.1.0",
       "icon": "M3,12 L7,12 L10,5 L14,19 L17,12 L21,12",
       "accent": "#5FB3D0",
-      "package": "system-monitor-1.1.0.zip",
+      "package": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/system-monitor-1.1.0.zip",
       "releaseNotes": [
         {
           "version": "1.1.0",
@@ -70,7 +89,9 @@
             "Primeira versão: uso do processador, memória em uso e tempo ligado, lidos só enquanto a página está aberta."
           ]
         }
-      ]
+      ],
+      "sha256": "225a78af3fe6bc229fb835bf27a89e1ca86b00bcac22b9bc2b6a3675f39cda49",
+      "size": 17935
     },
     {
       "id": "hash-tool",
@@ -80,7 +101,7 @@
       "version": "1.0.0",
       "icon": "M9,4 L7,20 M17,4 L15,20 M4,9 L20,9 M3,15 L19,15",
       "accent": "#A98BF0",
-      "package": "hash-tool-1.0.0.zip",
+      "package": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/hash-tool-1.0.0.zip",
       "releaseNotes": [
         {
           "version": "1.0.0",
@@ -89,7 +110,9 @@
             "Primeira versão: MD5, SHA-1, SHA-256 e SHA-512 de textos e arquivos, com cópia em um clique."
           ]
         }
-      ]
+      ],
+      "sha256": "5b1e722d95f5130d3798bfebef6abfb1aec048cdfbb3097bd2bd349134546799",
+      "size": 15531
     },
     {
       "id": "tamarillo",
@@ -102,7 +125,7 @@
       "iconImage": "icons/tamarillo.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/Tamarillo",
-      "package": "tamarillo-0.1.0.zip",
+      "package": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/tamarillo-0.1.0.zip",
       "settings": true,
       "releaseNotes": [
         {
@@ -114,7 +137,9 @@
             "Sem arrastar: selecione arquivos no Explorador, segure o atalho e solte as teclas sobre a ação."
           ]
         }
-      ]
+      ],
+      "sha256": "10a0ebacdaf9ccfa5987fdaf2ad9f956bd05af6ff1d5204894efdc675b438a0c",
+      "size": 159368
     }
   ]
 }
