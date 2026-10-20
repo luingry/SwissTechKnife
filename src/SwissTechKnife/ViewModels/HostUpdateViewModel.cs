@@ -28,6 +28,7 @@ namespace SwissTechKnife.ViewModels
         private Uri _catalogSource;
         private string _announcedVersion;
         private bool _isConfirmOpen;
+        private bool _isCurrentNotes;
         private bool _isBusy;
         private double _progress;
         private string _busyText;
@@ -39,12 +40,16 @@ namespace SwissTechKnife.ViewModels
             _runningVersion = runningVersion;
             _notify = notify;
             _exitForUpdate = exitForUpdate;
-            RequestCommand = new RelayCommand(_ => IsConfirmOpen = true, _ => IsAvailable && !_isBusy);
+            RequestCommand = new RelayCommand(_ => ShowUpdate(), _ => IsAvailable && !_isBusy);
+            ShowCurrentNotesCommand = new RelayCommand(_ => ShowCurrentNotes());
             CancelCommand = new RelayCommand(_ => IsConfirmOpen = false);
             ConfirmCommand = new AsyncCommand(_ => UpdateAsync(), _ => IsAvailable && !_isBusy, ReportUnexpected);
         }
 
         public ICommand RequestCommand { get; }
+
+        /// <summary>The same popup with the running version's notes only (click on the version number).</summary>
+        public ICommand ShowCurrentNotesCommand { get; }
 
         public ICommand CancelCommand { get; }
 
@@ -58,16 +63,48 @@ namespace SwissTechKnife.ViewModels
 
         public string SizeText => IsAvailable && _release.Size > 0 ? ModuleItem.FormatSize(_release.Size) : null;
 
-        public IReadOnlyList<ReleaseNoteView> Notes =>
-            HostUpdate.NotesFor(_release, _runningVersion).Select(n => new ReleaseNoteView(n, false)).ToList();
+        public IReadOnlyList<ReleaseNoteView> Notes => _isCurrentNotes
+            ? HostUpdate.NotesOf(_release, _runningVersion).Select(n => new ReleaseNoteView(n, true)).ToList()
+            : HostUpdate.NotesFor(_release, _runningVersion).Select(n => new ReleaseNoteView(n, false)).ToList();
 
         public bool HasNotes => Notes.Count > 0;
 
-        /// <summary>Confirmation popup (release notes + Cancelar/Atualizar).</summary>
+        /// <summary>True while the popup shows the running version's notes (nothing to confirm).</summary>
+        public bool IsCurrentNotes => _isCurrentNotes;
+
+        public bool IsUpdateConfirm => !_isCurrentNotes;
+
+        /// <summary>The popup: release notes, plus Cancel/Update when it confirms an update.</summary>
         public bool IsConfirmOpen
         {
             get => _isConfirmOpen;
-            set => Set(ref _isConfirmOpen, value && IsAvailable);
+            set => Set(ref _isConfirmOpen, value && (IsAvailable || _isCurrentNotes));
+        }
+
+        /// <summary>Opens the update confirmation (release notes + install) when a newer version is offered.</summary>
+        public void ShowUpdate()
+        {
+            if (!IsAvailable || _isBusy)
+            {
+                return;
+            }
+            SetMode(currentNotes: false);
+            IsConfirmOpen = true;
+        }
+
+        private void ShowCurrentNotes()
+        {
+            SetMode(currentNotes: true);
+            IsConfirmOpen = true;
+        }
+
+        private void SetMode(bool currentNotes)
+        {
+            _isCurrentNotes = currentNotes;
+            OnPropertyChanged(nameof(IsCurrentNotes));
+            OnPropertyChanged(nameof(IsUpdateConfirm));
+            OnPropertyChanged(nameof(Notes));
+            OnPropertyChanged(nameof(HasNotes));
         }
 
         public bool IsBusy
@@ -77,6 +114,7 @@ namespace SwissTechKnife.ViewModels
             {
                 if (Set(ref _isBusy, value))
                 {
+                    OnPropertyChanged(nameof(IsProgressIndeterminate));
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -85,8 +123,17 @@ namespace SwissTechKnife.ViewModels
         public double Progress
         {
             get => _progress;
-            private set => Set(ref _progress, value);
+            private set
+            {
+                if (Set(ref _progress, value))
+                {
+                    OnPropertyChanged(nameof(IsProgressIndeterminate));
+                }
+            }
         }
+
+        /// <summary>Downloaded and now waiting for UAC / the installer: no measurable progress left.</summary>
+        public bool IsProgressIndeterminate => _isBusy && _progress >= 1;
 
         public string BusyText
         {
@@ -121,7 +168,7 @@ namespace SwissTechKnife.ViewModels
             }
             _release = release;
             _catalogSource = catalogSource;
-            if (!IsAvailable)
+            if (!IsAvailable && !_isCurrentNotes)
             {
                 IsConfirmOpen = false;
             }
@@ -169,7 +216,7 @@ namespace SwissTechKnife.ViewModels
         {
             HostRelease release = _release;
             IsConfirmOpen = false;
-            if (!HostUpdate.IsOffered(release, _runningVersion))
+            if (_isCurrentNotes || !HostUpdate.IsOffered(release, _runningVersion))
             {
                 return;
             }
@@ -186,16 +233,13 @@ namespace SwissTechKnife.ViewModels
 
                 Progress = 1;
                 BusyText = Strings.Get("WaitingForPermission");
-                Process process = await _updater.StartInstallerAsync(installer, release, _runningVersion, SingleInstance.MutexName, Process.GetCurrentProcess().MainModule.FileName);
-                using (process)
+                var (result, exitCode) = await _updater.StartInstallerAsync(installer, release, _runningVersion, SingleInstance.MutexName,
+                    Process.GetCurrentProcess().MainModule.FileName, CancellationToken.None);
+                if (result == InstallerStartResult.Exited)
                 {
-                    var (result, exitCode) = await _updater.WaitForStartAsync(process, CancellationToken.None);
-                    if (result == InstallerStartResult.Exited)
-                    {
-                        Error = Strings.Format("InstallerCanceled", exitCode);
-                        _notify(Strings.Get("HostUpdateCanceledToast"), NotificationKind.Warning);
-                        return;
-                    }
+                    Error = Strings.Format("InstallerCanceled", exitCode);
+                    _notify(Strings.Get("HostUpdateCanceledToast"), NotificationKind.Warning);
+                    return;
                 }
 
                 BusyText = Strings.Get("InstallingHost");

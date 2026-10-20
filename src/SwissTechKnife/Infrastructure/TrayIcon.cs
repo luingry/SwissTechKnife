@@ -11,7 +11,7 @@ using Forms = System.Windows.Forms;
 namespace SwissTechKnife.Infrastructure
 {
     /// <summary>
-    /// Notification-area icon, created only while "Hide to the notification area on close" is on.
+    /// Notification-area icon, shown for the whole life of the process (created after first paint).
     /// The shell's NotifyIcon is native, but its menu is the design-system WPF ContextMenu.
     /// </summary>
     internal sealed class TrayIcon : IDisposable

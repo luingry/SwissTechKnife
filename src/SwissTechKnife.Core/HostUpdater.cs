@@ -34,6 +34,7 @@ namespace SwissTechKnife.Core
     {
         private const string Source = "HostUpdate";
         private const int DownloadAttempts = 3;
+        private const int ErrorCancelled = 1223;
         private readonly HostPaths _paths;
 
         public HostUpdater(HostPaths paths)
@@ -107,13 +108,18 @@ namespace SwissTechKnife.Core
         }
 
         /// <summary>
-        /// Re-checks the installer hash, records the attempt and starts the installer. The caller then waits with
-        /// <see cref="WaitForStartAsync"/> and exits once it reports <see cref="InstallerStartResult.Started"/>.
+        /// Re-checks the installer hash, records the attempt, starts the installer and waits until it signals that
+        /// it is running elevated (the caller then exits) or ends early (UAC declined, bad file…).
         /// </summary>
-        public async Task<Process> StartInstallerAsync(string installerPath, HostRelease release, string runningVersion, string mutexName, string appPath)
+        /// <remarks>
+        /// The elevated shell launch can block for good after the installer is already running (seen when the app
+        /// runs inside another app's package container), so the signal file is watched while the launch is still
+        /// pending, and the launch runs on its own background thread that never holds up the exit.
+        /// </remarks>
+        public async Task<(InstallerStartResult Result, int ExitCode)> StartInstallerAsync(string installerPath, HostRelease release, string runningVersion, string mutexName, string appPath, CancellationToken cancellationToken)
         {
             // The file sat on disk since the download: verify again right before running it.
-            bool intact = await Task.Run(() => File.Exists(installerPath) && FileDownload.HashEquals(FileDownload.HashFile(installerPath), release.Sha256)).ConfigureAwait(false);
+            bool intact = await Task.Run(() => File.Exists(installerPath) && FileDownload.HashEquals(FileDownload.HashFile(installerPath), release.Sha256), cancellationToken).ConfigureAwait(false);
             if (!intact)
             {
                 TryDelete(installerPath);
@@ -139,22 +145,44 @@ namespace SwissTechKnife.Core
                 UseShellExecute = true,
                 WorkingDirectory = _paths.Downloads,
             };
+            Log.Info(Source, "Starting " + installerPath + " " + info.Arguments);
+            Task<Process> launch = Launch(info);
             try
             {
-                Log.Info(Source, "Starting " + installerPath + " " + info.Arguments);
-                return Process.Start(info) ?? throw new HostUpdateException(Strings.Get("InstallerNotStarted"));
+                return await WaitForStartAsync(launch, cancellationToken).ConfigureAwait(false);
             }
-            catch (Win32Exception ex)
+            finally
             {
-                ClearPending();
-                throw new HostUpdateException(Strings.Format("InstallerNotStartedDetail", ex.Message), ex);
+                _ = launch.ContinueWith(t => t.Result?.Dispose(), CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
             }
         }
 
-        /// <summary>
-        /// Waits until the installer signals that it is running (after any UAC prompt) or exits early.
-        /// </summary>
-        public async Task<(InstallerStartResult Result, int ExitCode)> WaitForStartAsync(Process installer, CancellationToken cancellationToken)
+        /// <summary>Shell-executes on a background STA thread; the task completes whenever the shell returns.</summary>
+        private static Task<Process> Launch(ProcessStartInfo info)
+        {
+            var started = new TaskCompletionSource<Process>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    started.SetResult(Process.Start(info));
+                }
+                catch (Exception ex)
+                {
+                    started.SetException(ex);
+                }
+            })
+            {
+                IsBackground = true,
+                Name = "Installer launch",
+            };
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            return started.Task;
+        }
+
+        /// <summary>Polls for the installer's "started" signal; the launch result only matters when it fails or the installer quits.</summary>
+        private async Task<(InstallerStartResult Result, int ExitCode)> WaitForStartAsync(Task<Process> launch, CancellationToken cancellationToken)
         {
             while (true)
             {
@@ -163,17 +191,37 @@ namespace SwissTechKnife.Core
                 {
                     return (InstallerStartResult.Started, 0);
                 }
-                if (installer.HasExited)
+                if (launch.IsFaulted)
                 {
-                    // The signal may have landed between the two checks.
-                    if (ReadSignal() != null)
-                    {
-                        return (InstallerStartResult.Started, 0);
-                    }
-                    int code = installer.ExitCode;
-                    Log.Warn(Source, "Installer exited before starting, code " + code);
                     ClearPending();
-                    return (InstallerStartResult.Exited, code);
+                    Exception error = launch.Exception.GetBaseException();
+                    if (error is Win32Exception win32 && win32.NativeErrorCode == ErrorCancelled)
+                    {
+                        Log.Warn(Source, "Installer elevation was declined");
+                        return (InstallerStartResult.Exited, win32.NativeErrorCode);
+                    }
+                    throw new HostUpdateException(Strings.Format("InstallerNotStartedDetail", error.Message), error);
+                }
+                if (launch.IsCompleted)
+                {
+                    Process installer = launch.Result;
+                    if (installer == null)
+                    {
+                        ClearPending();
+                        throw new HostUpdateException(Strings.Get("InstallerNotStarted"));
+                    }
+                    if (installer.HasExited)
+                    {
+                        // The signal may have landed between the two checks.
+                        if (ReadSignal() != null)
+                        {
+                            return (InstallerStartResult.Started, 0);
+                        }
+                        int code = installer.ExitCode;
+                        Log.Warn(Source, "Installer exited before starting, code " + code);
+                        ClearPending();
+                        return (InstallerStartResult.Exited, code);
+                    }
                 }
                 await Task.Delay(200, cancellationToken).ConfigureAwait(false);
             }

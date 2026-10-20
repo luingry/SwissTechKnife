@@ -90,7 +90,7 @@ namespace SwissTechKnife
                 AppDomain.CurrentDomain.BaseDirectory);
             string exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
             shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText, _settings, exePath, ApplyTray,
-                new HostUpdater(paths), () => _window?.ExitApplication());
+                new HostUpdater(paths), ExitForUpdate);
             bool atLogin = e.Args.Any(a => string.Equals(a, StartupRegistration.StartupArgument, StringComparison.OrdinalIgnoreCase));
 
             // First paint before any disk or network work.
@@ -99,7 +99,6 @@ namespace SwissTechKnife
                 _window = new MainWindow(shell, _settings);
                 MainWindow = _window;
                 _window.HideOnClose = HideOnClose;
-                ApplyTray(_settings.Current.HideToTrayOnClose);
                 if (atLogin && _settings.Current.HideToTrayOnClose)
                 {
                     // Started with Windows and kept in the notification area: no window until the user asks.
@@ -121,6 +120,8 @@ namespace SwissTechKnife
                 Shutdown(1);
                 return;
             }
+            // The notification-area icon is always there; WinForms loads only after first paint.
+            Dispatcher.BeginInvoke(new Action(EnsureTray), DispatcherPriority.ApplicationIdle);
             _instance.ListenForActivation(() => Dispatcher.BeginInvoke(new Action(() => _window.BringToFront())));
 
             _ = InitializeModulesAsync(state, manager, shell);
@@ -165,35 +166,28 @@ namespace SwissTechKnife
             {
                 return false;
             }
-            if (_tray == null)
+            EnsureTray();
+            if (!_settings.Current.HideToTrayOnClose && !_backgroundHintShown)
             {
-                CreateTray();
-                if (!_settings.Current.HideToTrayOnClose && !_backgroundHintShown)
-                {
-                    _backgroundHintShown = true;
-                    _tray.ShowHint(Strings.Get("TrayHint"));
-                }
+                _backgroundHintShown = true;
+                _tray.ShowHint(Strings.Get("TrayHint"));
             }
             return true;
         }
 
         private bool _backgroundHintShown;
 
-        /// <summary>Shows or removes the notification-area icon (WinForms loads only when it is first needed).</summary>
-        private void ApplyTray(bool enabled)
+        /// <summary>The icon stays in the notification area whether or not the window is open; the setting only changes what closing does.</summary>
+        private void ApplyTray(bool hideToTrayOnClose)
         {
-            if (enabled && _tray == null)
+            EnsureTray();
+        }
+
+        private void EnsureTray()
+        {
+            if (_tray == null)
             {
                 CreateTray();
-            }
-            else if (!enabled && _tray != null && _runtime?.HasBackgroundModules != true)
-            {
-                _tray.Dispose();
-                _tray = null;
-                if (_window != null && !_window.IsVisible)
-                {
-                    _window.BringToFront();
-                }
             }
         }
 
@@ -240,6 +234,24 @@ namespace SwissTechKnife
             {
                 Log.Error(Source, "Restart failed", ex);
             }
+        }
+
+        private System.Threading.Timer _exitWatchdog;
+
+        /// <summary>
+        /// The installer is waiting for this process to release its mutex. A module that hangs while stopping must not
+        /// hold the update back, so the process is ended outright if the normal exit takes too long.
+        /// </summary>
+        private void ExitForUpdate()
+        {
+            _exitWatchdog = new System.Threading.Timer(_ =>
+            {
+                Log.Warn(Source, "Exit for the update is taking too long; ending the process");
+                Log.Flush();
+                // The mutex goes with the process (it is owned by the UI thread, so it cannot be released here).
+                Environment.Exit(0);
+            }, null, TimeSpan.FromSeconds(15), System.Threading.Timeout.InfiniteTimeSpan);
+            _window?.ExitApplication();
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

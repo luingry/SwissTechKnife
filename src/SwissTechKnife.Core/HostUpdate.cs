@@ -70,6 +70,19 @@ namespace SwissTechKnife.Core
                 .ToList();
         }
 
+        /// <summary>The notes of exactly <paramref name="version"/>, from any host entry (what the running build brought).</summary>
+        public static IReadOnlyList<ReleaseNote> NotesOf(HostRelease release, string version)
+        {
+            if (release?.ReleaseNotes == null || !VersionText.TryParse(version, out Version wanted))
+            {
+                return new ReleaseNote[0];
+            }
+            return release.ReleaseNotes
+                .Where(n => n != null && VersionText.TryParse(n.Version, out Version v) && v == wanted)
+                .Take(1)
+                .ToList();
+        }
+
         /// <summary>Downloaded installer name; the version is normalized so the catalog cannot inject a path.</summary>
         public static string InstallerFileName(string version) =>
             "SwissTechKnife-" + VersionText.ParseOrZero(version) + "-setup.exe";

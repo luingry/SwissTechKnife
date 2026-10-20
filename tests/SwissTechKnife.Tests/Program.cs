@@ -186,6 +186,9 @@ namespace SwissTechKnife.Tests
             HostRelease bare = Release("0.4.0");
             bare.ReleaseNotes = null;
             Assert(HostUpdate.NotesFor(bare, "0.3.0").Count == 0, "missing notes");
+            Assert(HostUpdate.NotesOf(Release("0.4.0"), "0.3.1").Single().Version == "0.3.1", "running version's own notes");
+            Assert(HostUpdate.NotesOf(Release("0.4.0"), "0.2.9").Count == 0, "no notes for an unknown version");
+            Assert(HostUpdate.NotesOf(bare, "0.4.0").Count == 0 && HostUpdate.NotesOf(null, "0.4.0").Count == 0, "no catalog notes");
         }
 
         private static void HostSanitize()

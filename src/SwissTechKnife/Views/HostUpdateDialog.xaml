@@ -25,10 +25,17 @@
                     </Grid.ColumnDefinitions>
                     <Image Source="{StaticResource Brand.Logo}" Width="40" Height="40" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
                     <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="{infra:Loc HostUpdateTitle}" Style="{StaticResource Text.Subtitle}" />
-                        <TextBlock Style="{StaticResource Text.Caption}" Margin="0,2,0,0">
+                        <TextBlock Text="{infra:Loc HostUpdateTitle}" Style="{StaticResource Text.Subtitle}"
+                                   Visibility="{Binding IsUpdateConfirm, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Style="{StaticResource Text.Caption}" Margin="0,2,0,0"
+                                   Visibility="{Binding IsUpdateConfirm, Converter={StaticResource BoolToVisibility}}">
                             <Run Text="{Binding CurrentVersionText, Mode=OneWay}" /> <Run Text="→" /> <Run Text="{Binding LatestVersionText, Mode=OneWay}" Foreground="{StaticResource Brush.Success}" />
                         </TextBlock>
+                        <!-- Current version's notes (click on the version in the title bar) -->
+                        <TextBlock Text="SwissTechKnife" Style="{StaticResource Text.Subtitle}"
+                                   Visibility="{Binding IsCurrentNotes, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Text="{Binding CurrentVersionText}" Style="{StaticResource Text.Caption}" Margin="0,2,0,0"
+                                   Visibility="{Binding IsCurrentNotes, Converter={StaticResource BoolToVisibility}}" />
                     </StackPanel>
                 </Grid>
 
@@ -39,7 +46,8 @@
                 <TextBlock Text="{infra:Loc NoReleaseNotes}" Style="{StaticResource Text.Paragraph}"
                            Visibility="{Binding HasNotes, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
 
-                <Border Background="{StaticResource Brush.Info.Soft}" CornerRadius="{StaticResource Radius.Md}" Padding="14,10" Margin="0,20,0,0">
+                <Border Background="{StaticResource Brush.Info.Soft}" CornerRadius="{StaticResource Radius.Md}" Padding="14,10" Margin="0,20,0,0"
+                        Visibility="{Binding IsUpdateConfirm, Converter={StaticResource BoolToVisibility}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -52,8 +60,20 @@
                 </Border>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-                    <Button x:Name="CancelButton" Style="{StaticResource Button.Secondary}" Content="{infra:Loc Cancel}" Command="{Binding CancelCommand}" />
-                    <Button x:Name="ConfirmButton" Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="{infra:Loc Update}" Margin="8,0,0,0" Command="{Binding ConfirmCommand}" />
+                    <Button x:Name="CancelButton" Command="{Binding CancelCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+                                <Setter Property="Content" Value="{infra:Loc Cancel}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCurrentNotes}" Value="True">
+                                        <Setter Property="Content" Value="{infra:Loc Close}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button x:Name="ConfirmButton" Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="{infra:Loc Update}" Margin="8,0,0,0" Command="{Binding ConfirmCommand}"
+                            Visibility="{Binding IsUpdateConfirm, Converter={StaticResource BoolToVisibility}}" />
                 </StackPanel>
             </StackPanel>
         </Border>

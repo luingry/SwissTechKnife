@@ -61,3 +61,9 @@
 - Cause: a `ComboBoxItem`'s accessible name comes from the item's `ToString()`, and the items were `KeyValuePair<string, string>`.
 - Solution: bind the combo to small option classes (`LanguageOption`, `FrequencyOption`) whose `ToString()` returns the display text.
 - Prevention: never use `KeyValuePair`/tuples as items of a selectable control; give options a class with a meaningful `ToString()`.
+
+## 2026-10-20 — Self-update stuck on "Waiting for Windows permission to install…"
+- Symptom: after confirming UAC the progress card stayed at 100 % forever. The installer log showed "App still running after 60 s", then it installed anyway and wrote the `ok` signal, but the old app neither exited nor reported a cancel.
+- Cause: `Process.Start` (UseShellExecute + elevation) never returned, so the code never got to polling the signal file. Seen when the app ran inside another app's MSIX package container (launched from the Claude desktop app: the installer log's "Original Setup EXE" pointed into `Packages\Claude_…\LocalCache`).
+- Solution: `HostUpdater.StartInstallerAsync` launches on its own background STA thread and polls the signal file while the launch is still pending; the launch result only matters when it fails (UAC declined → canceled) or the installer quits. `App.ExitForUpdate` also ends the process after 15 s if a module hangs the normal exit.
+- Prevention: never make the update hand-off depend on a shell call returning; the installer's signal is the source of truth.

@@ -100,6 +100,8 @@ namespace SwissTechKnife.ViewModels
             OpenModuleCommand = new RelayCommand(p => OpenModule((ModuleItem)p), p => p is ModuleItem m && m.IsEnabled);
             Strings.LanguageChanged += (s, e) => OnLanguageChanged();
             ReloadCatalogCommand = new AsyncCommand(_ => ReloadCatalogAsync(), _ => CatalogState != CatalogState.Loading, ex => ReportError(ex));
+            CheckHostUpdateCommand = new AsyncCommand(_ => ReloadCatalogAsync(force: true, announce: true, openHostUpdate: true),
+                _ => CatalogState != CatalogState.Loading && !Settings.HostUpdate.IsBusy, ex => ReportError(ex));
             RestartCommand = new RelayCommand(_ => _restart());
             DismissToastCommand = new RelayCommand(p => DismissToast(p as Toast));
             RetryPageCommand = new RelayCommand(_ => RetryPage(), _ => _currentModule != null);
@@ -137,6 +139,9 @@ namespace SwissTechKnife.ViewModels
         public ICommand DisableCommand { get; }
         public ICommand OpenModuleCommand { get; }
         public ICommand ReloadCatalogCommand { get; }
+
+        /// <summary>Title-bar "Check for updates": a live catalog check; a newer SwissTechKnife opens its confirmation.</summary>
+        public ICommand CheckHostUpdateCommand { get; }
         public ICommand RestartCommand { get; }
         public ICommand DismissToastCommand { get; }
         public ICommand RetryPageCommand { get; }
@@ -412,8 +417,9 @@ namespace SwissTechKnife.ViewModels
         /// <summary>
         /// Loads the catalog. A remote catalog is fetched only when <paramref name="force"/> is set or the update
         /// frequency is due; otherwise the saved copy is used. A local (bundled) catalog is always read.
+        /// With <paramref name="openHostUpdate"/>, a newer SwissTechKnife opens its confirmation instead of a toast.
         /// </summary>
-        public async Task ReloadCatalogAsync(bool force = false, bool announce = false)
+        public async Task ReloadCatalogAsync(bool force = false, bool announce = false, bool openHostUpdate = false)
         {
             HostSettings settings = _settings.Current;
             Uri uri = _catalogUri();
@@ -446,7 +452,11 @@ namespace SwissTechKnife.ViewModels
             }
             RefreshLists();
             bool hostOffered = Settings.HostUpdate.SetRelease(result.Catalog.Host, result.Source);
-            if (hostOffered || (announce && force && Settings.HostUpdate.IsAvailable))
+            if (openHostUpdate && Settings.HostUpdate.IsAvailable)
+            {
+                Settings.HostUpdate.ShowUpdate();
+            }
+            else if (hostOffered || (announce && force && Settings.HostUpdate.IsAvailable))
             {
                 // The first check that finds a new SwissTechKnife says so, startup included; "Check now" repeats it.
                 Notify(Strings.Format("HostUpdateToast", Settings.HostUpdate.LatestVersionText), NotificationKind.Success);

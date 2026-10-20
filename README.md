@@ -74,6 +74,8 @@ Click the gear at the bottom of the sidebar:
 
 SwissTechKnife and its modules update from inside the app. When a new version is available you see what changed and choose when to update; everything else is automatic.
 
+Click the version number next to the title to see what's new in the version you're running, or the arrows button beside it to check for a new SwissTechKnife right away. The icon near the clock is always there while SwissTechKnife runs.
+
 ## Privacy and security
 
 - Everything runs on your computer. The app only goes online to check for new modules and updates, and to download them.

@@ -3,7 +3,7 @@
       1. builds two per-user test installers (/DTestInstall) for an "old" and a "new" version,
       2. installs the old one into %LOCALAPPDATA%\SwissTechKnife-Test,
       3. writes artifacts/test-feed/catalog.json with a "host" entry for the new one (scripts/publish-host.ps1),
-      4. starts the old app on an isolated profile (STK_HOME) and clicks Configuracoes > Atualizar > Atualizar
+      4. starts the old app on an isolated profile (STK_HOME) and clicks Settings > Update > Update
          through UI Automation,
       5. waits for the installer to replace the app and relaunch it, then checks the version, the outcome record
          and the update log.
@@ -105,8 +105,8 @@ try {
     $env:STK_CATALOG = Join-Path $feed 'catalog.json'
     $old = Start-Process $exe -PassThru
 
-    $configuracoes = 'Configura' + [char]0xE7 + [char]0xF5 + 'es'
-    $nav = Wait-Until { Find-Control $old.Id $null $configuracoes } 30 'the Configuracoes button'
+    # By AutomationId: the label follows the UI language.
+    $nav = Wait-Until { Find-Control $old.Id 'SettingsNavButton' $null } 30 'the Settings button'
     Invoke-Control $nav
     $notice = Wait-Until { Find-Control $old.Id 'HostUpdateButton' $null } 30 'the update notice'
     Write-Host 'Update notice shown.'

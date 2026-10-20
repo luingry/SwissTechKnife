@@ -31,7 +31,41 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                 <Image Source="{StaticResource Brand.Logo}" Width="18" Height="18" RenderOptions.BitmapScalingMode="HighQuality" />
                 <TextBlock Text="SwissTechKnife" Style="{StaticResource Text.BodyStrong}" Margin="10,0,0,0" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding HostVersion}" Style="{StaticResource Text.Caption}" Margin="8,1,0,0" VerticalAlignment="Center" />
+                <Button Style="{StaticResource Button.Ghost}" Content="{Binding HostVersion}" Command="{Binding Settings.HostUpdate.ShowCurrentNotesCommand}"
+                        FontSize="{StaticResource FontSize.Caption}" FontWeight="Normal" Padding="6,0" MinHeight="24" Margin="4,1,0,0"
+                        ui:Ui.CornerRadius="{StaticResource Radius.Sm}" WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Center"
+                        ToolTip="{infra:Loc ReleaseNotesTab}" AutomationProperties.Name="{infra:Loc ReleaseNotesTab}" />
+                <Grid Width="24" Height="24" Margin="2,1,0,0" VerticalAlignment="Center">
+                    <Button Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE72C;" Command="{Binding CheckHostUpdateCommand}"
+                            Width="24" Height="24" FontSize="11" WindowChrome.IsHitTestVisibleInChrome="True"
+                            ToolTip="{infra:Loc CheckForUpdates}" AutomationProperties.Name="{infra:Loc CheckForUpdates}" />
+                    <!-- Self-update progress: download fills the ring, then it spins while Windows asks and the installer starts. -->
+                    <infra:ProgressRing Value="{Binding Settings.HostUpdate.Progress, Mode=OneWay}" IsIndeterminate="{Binding Settings.HostUpdate.IsProgressIndeterminate, Mode=OneWay}"
+                                        Stroke="{StaticResource Brush.Accent}" Track="{StaticResource Brush.Accent.Soft}" Thickness="2" Opacity="0">
+                        <infra:ProgressRing.Style>
+                            <Style TargetType="infra:ProgressRing">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.HostUpdate.IsBusy}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </infra:ProgressRing.Style>
+                    </infra:ProgressRing>
+                </Grid>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button x:Name="MinimizeButton" Style="{StaticResource Button.Caption}" ui:Ui.Icon="&#xE921;" Click="OnMinimize" ToolTip="{infra:Loc Minimize}" />
@@ -51,7 +85,7 @@
             <DockPanel Grid.Column="0" Margin="12,6,12,14">
 
                 <!-- Settings entry pinned to the bottom of the sidebar -->
-                <Button DockPanel.Dock="Bottom" Style="{StaticResource Nav.Button}" Command="{Binding ShowSettingsCommand}" Tag="{Binding IsSettingsActive}"
+                <Button x:Name="SettingsNavButton" DockPanel.Dock="Bottom" Style="{StaticResource Nav.Button}" Command="{Binding ShowSettingsCommand}" Tag="{Binding IsSettingsActive}"
                         AutomationProperties.Name="{infra:Loc SettingsTitle}" Margin="0,8,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
