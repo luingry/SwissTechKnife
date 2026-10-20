@@ -31,9 +31,10 @@ namespace SwissTechKnife.ViewModels
         private bool _isChecking;
         private bool? _pendingStartup;
 
-        public SettingsViewModel(SettingsStore settings, string exePath, Action<bool> applyTray, Func<System.Threading.Tasks.Task> checkNow, Action<string, NotificationKind> notify)
+        public SettingsViewModel(SettingsStore settings, string exePath, Action<bool> applyTray, Func<System.Threading.Tasks.Task> checkNow, Action<string, NotificationKind> notify, HostUpdateViewModel hostUpdate)
         {
             _settings = settings;
+            HostUpdate = hostUpdate;
             _exePath = exePath;
             _applyTray = applyTray;
             _notify = notify;
@@ -61,6 +62,9 @@ namespace SwissTechKnife.ViewModels
         };
 
         public ICommand CheckNowCommand { get; }
+
+        /// <summary>SwissTechKnife's own update (notice at the top of "Atualizações").</summary>
+        public HostUpdateViewModel HostUpdate { get; }
 
         public string UpdateFrequency
         {

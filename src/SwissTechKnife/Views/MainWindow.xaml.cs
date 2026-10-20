@@ -27,6 +27,20 @@ namespace SwissTechKnife.Views
             DataContext = shell;
             RestorePlacement();
             shell.PropertyChanged += OnShellPropertyChanged;
+            shell.Settings.HostUpdate.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(HostUpdateViewModel.IsConfirmOpen))
+                {
+                    if (shell.Settings.HostUpdate.IsConfirmOpen)
+                    {
+                        HostDialog.Open();
+                    }
+                    else
+                    {
+                        HostDialog.Close();
+                    }
+                }
+            };
             SourceInitialized += OnSourceInitialized;
             StateChanged += (s, e) => UpdateMaximizedState();
             Closing += OnClosing;
@@ -127,7 +141,12 @@ namespace SwissTechKnife.Views
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape && _shell.IsDialogOpen)
+            if (e.Key == Key.Escape && _shell.Settings.HostUpdate.IsConfirmOpen)
+            {
+                _shell.Settings.HostUpdate.IsConfirmOpen = false;
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape && _shell.IsDialogOpen)
             {
                 _shell.CloseTopOverlay();
                 e.Handled = true;

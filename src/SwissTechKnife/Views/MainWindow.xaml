@@ -56,9 +56,14 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="&#xE713;" Style="{StaticResource Text.Icon}" FontSize="15" Margin="2,0,12,0" />
                         <TextBlock Grid.Column="1" Text="Configurações" VerticalAlignment="Center" />
+                        <Border Grid.Column="2" Style="{StaticResource Chip}" Background="{StaticResource Brush.Success.Soft}" Padding="7,0" Height="20"
+                                Visibility="{Binding Settings.HostUpdate.IsAvailable, Converter={StaticResource BoolToVisibility}}" ToolTip="Atualização do SwissTechKnife disponível">
+                            <TextBlock Text="&#xE895;" Style="{StaticResource Text.Icon}" Foreground="{StaticResource Brush.Success}" FontSize="11" VerticalAlignment="Center" />
+                        </Border>
                     </Grid>
                 </Button>
 
@@ -167,6 +172,9 @@
 
             <!-- Details dialog (over the body; the title bar stays usable) -->
             <views:ModuleDialog x:Name="Dialog" Grid.ColumnSpan="2" />
+
+            <!-- SwissTechKnife update confirmation (from Configurações) -->
+            <views:HostUpdateDialog x:Name="HostDialog" Grid.ColumnSpan="2" DataContext="{Binding Settings.HostUpdate}" />
         </Grid>
 
         <!-- Toasts -->

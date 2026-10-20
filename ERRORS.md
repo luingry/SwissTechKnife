@@ -1,5 +1,17 @@
 # Resolved errors
 
+## 2026-10-19 — Host self-update design: avoid the micesmooth OTA failures
+
+- Context: micesmooth's OTA (D:\Dev\micesmooth\ERRORS.md, 2026-10-01) lost the installer exit code (`%%ERRORLEVEL%%` in a .bat) and skipped waits (`timeout.exe` without a console / GNU `timeout` first in PATH), so setup ran while the app still held its files.
+- Solution here: no batch file at all. The app starts the Inno installer directly (shell execute, so Inno raises UAC itself and `ExecAsOriginalUser` relaunches non-elevated). The installer's `[Code]` writes `/STKSIGNAL` = `started` only in the instance that installs (`IsAdmin` on the admin build: with UAC a non-elevated instance may run first), the app exits only after seeing it, and `InitializeSetup` polls the app's single-instance mutex (`/STKMUTEX`, up to 60 s, then 1 s for process teardown) before any file is replaced; `/CLOSEAPPLICATIONS` is the fallback. `DeinitializeSetup` writes `ok`/`failed` and relaunches `/STKAPP` either way, so the user is never left without the app. An installer that exits before `started` (UAC declined) is reported with its real exit code while the app keeps running. Downloads retry 3× and the hash is re-checked right before running.
+- Testing: `scripts/test-host-update.ps1` runs the whole flow on a per-user `/DTestInstall` build with an isolated `STK_HOME` (which also isolates the single-instance mutex), driving the UI through UI Automation.
+
+## 2026-10-19 — PowerShell 5.1 script fails to parse: `')' ausente na chamada do método` / garbled `→`
+
+- Cause: Windows PowerShell 5.1 reads a `.ps1` without a BOM as ANSI, so UTF-8 characters (`→`, `—`, `ç`) in strings become multi-byte garbage that can break quoting.
+- Solution: keep scripts ASCII-only (build non-ASCII UI strings with `[char]0xE7`), or save them as UTF-8 with BOM.
+- Related trap: static `[regex]::Replace($s, $pattern, $evaluator, 1)` binds `1` to `RegexOptions` (IgnoreCase), not a count; use `[regex]::Match` + `Substring`, or an instance `Regex.Replace(input, evaluator, count)`.
+
 ## 2026-10-19 — Startup crash: `'{DependencyProperty.UnsetValue}' não é um valor válido para a propriedade 'Foreground'` / `Não é possível encontrar o recurso denominado 'Motion.Fast'`
 
 - Symptom: the main window failed to load; the process stayed alive with no window (the exception was swallowed by the dispatcher handler).

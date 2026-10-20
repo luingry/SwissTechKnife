@@ -12,6 +12,59 @@ namespace SwissTechKnife.Core
 
         [DataMember(Name = "modules", Order = 1)]
         public List<CatalogEntry> Modules { get; set; } = new List<CatalogEntry>();
+
+        /// <summary>Latest SwissTechKnife release (self-update). Optional.</summary>
+        [DataMember(Name = "host", Order = 2, EmitDefaultValue = false)]
+        public HostRelease Host { get; set; }
+    }
+
+    /// <summary>The host's own release, advertised next to the modules.</summary>
+    [DataContract]
+    public sealed class HostRelease
+    {
+        [DataMember(Name = "version", Order = 0)]
+        public string Version { get; set; }
+
+        /// <summary>Inno Setup installer URL (absolute, or relative to the catalog).</summary>
+        [DataMember(Name = "installer", Order = 1)]
+        public string Installer { get; set; }
+
+        [DataMember(Name = "sha256", Order = 2)]
+        public string Sha256 { get; set; }
+
+        [DataMember(Name = "size", Order = 3, EmitDefaultValue = false)]
+        public long Size { get; set; }
+
+        /// <summary>Release notes, one entry per version (same shape as module notes).</summary>
+        [DataMember(Name = "releaseNotes", Order = 4, EmitDefaultValue = false)]
+        public List<ReleaseNote> ReleaseNotes { get; set; }
+    }
+
+    /// <summary>
+    /// downloads/host-update.json: written before the installer starts, read by the next start
+    /// (new version on success, old version on failure) to report the outcome.
+    /// </summary>
+    [DataContract]
+    public sealed class PendingHostUpdate
+    {
+        [DataMember(Name = "fromVersion", Order = 0)]
+        public string FromVersion { get; set; }
+
+        [DataMember(Name = "toVersion", Order = 1)]
+        public string ToVersion { get; set; }
+
+        [DataMember(Name = "installer", Order = 2)]
+        public string Installer { get; set; }
+
+        [DataMember(Name = "log", Order = 3)]
+        public string Log { get; set; }
+
+        /// <summary>Written by the installer: "started" (elevated and running), then "ok" or "failed".</summary>
+        [DataMember(Name = "signal", Order = 4)]
+        public string Signal { get; set; }
+
+        [DataMember(Name = "startedUtc", Order = 5)]
+        public string StartedUtc { get; set; }
     }
 
     /// <summary>One module as advertised by the catalog.</summary>

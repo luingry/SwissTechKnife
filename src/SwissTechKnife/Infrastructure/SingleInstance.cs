@@ -9,8 +9,10 @@ namespace SwissTechKnife.Infrastructure
     /// </summary>
     public sealed class SingleInstance : IDisposable
     {
-        private const string MutexName = @"Local\SwissTechKnife.Host";
-        private const string ActivateName = @"Local\SwissTechKnife.Activate";
+        // An isolated profile (STK_HOME) is an isolated instance, so a dev or test host can run next to the installed one.
+        // Declared first: static initializers run in order.
+        private static readonly string Suffix = ProfileSuffix();
+        private static readonly string ActivateName = @"Local\SwissTechKnife.Activate" + Suffix;
         private readonly Mutex _mutex;
         private readonly EventWaitHandle _activate;
         private RegisteredWaitHandle _registration;
@@ -22,6 +24,9 @@ namespace SwissTechKnife.Infrastructure
             _activate = activate;
             _owned = owned;
         }
+
+        /// <summary>Held while the host runs; the installer waits for it to be released before replacing files.</summary>
+        public static string MutexName { get; } = @"Local\SwissTechKnife.Host" + Suffix;
 
         public bool IsOwner => _owned;
 
@@ -43,6 +48,20 @@ namespace SwissTechKnife.Infrastructure
         }
 
         public void SignalOwner() => _activate.Set();
+
+        private static string ProfileSuffix()
+        {
+            string home = Environment.GetEnvironmentVariable("STK_HOME");
+            if (string.IsNullOrEmpty(home))
+            {
+                return string.Empty;
+            }
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(System.IO.Path.GetFullPath(home).ToUpperInvariant()));
+                return "." + BitConverter.ToString(hash, 0, 6).Replace("-", string.Empty);
+            }
+        }
 
         /// <summary>Invokes <paramref name="onActivate"/> (on a pool thread) whenever another launch signals.</summary>
         public void ListenForActivation(Action onActivate)

@@ -1,0 +1,60 @@
+<UserControl x:Class="SwissTechKnife.Views.HostUpdateDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:SwissTechKnife.Sdk;assembly=SwissTechKnife.Sdk"
+             Visibility="Collapsed"
+             KeyboardNavigation.TabNavigation="Cycle">
+    <!-- DataContext: HostUpdateViewModel. Same look as the module update confirmation. -->
+    <Grid>
+        <Border x:Name="Scrim" Background="{StaticResource Brush.Scrim}" Opacity="0" CornerRadius="{StaticResource Radius.Lg}" MouseLeftButtonDown="OnScrimClick" />
+        <Border x:Name="Card" Width="460" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24"
+                Background="{StaticResource Brush.Surface3}" CornerRadius="{StaticResource Radius.Xl}"
+                Effect="{StaticResource Elevation.Overlay}" Opacity="0" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="CardScale" ScaleX="0.96" ScaleY="0.96" />
+                    <TranslateTransform x:Name="CardMove" Y="10" />
+                </TransformGroup>
+            </Border.RenderTransform>
+            <StackPanel Margin="26,24,26,22">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{StaticResource Brand.Logo}" Width="40" Height="40" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Atualizar o SwissTechKnife" Style="{StaticResource Text.Subtitle}" />
+                        <TextBlock Style="{StaticResource Text.Caption}" Margin="0,2,0,0">
+                            <Run Text="{Binding CurrentVersionText, Mode=OneWay}" /> <Run Text="→" /> <Run Text="{Binding LatestVersionText, Mode=OneWay}" Foreground="{StaticResource Brush.Success}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="O que muda" Style="{StaticResource Text.Overline}" Margin="0,22,0,10" />
+                <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Notes}" ItemTemplate="{StaticResource ReleaseNoteTemplate}" Focusable="False" Margin="0,0,0,-18" />
+                </ScrollViewer>
+                <TextBlock Text="Esta versão não tem notas publicadas." Style="{StaticResource Text.Paragraph}"
+                           Visibility="{Binding HasNotes, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
+
+                <Border Background="{StaticResource Brush.Info.Soft}" CornerRadius="{StaticResource Radius.Md}" Padding="14,10" Margin="0,20,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="&#xE946;" Style="{StaticResource Text.Icon}" FontSize="14" Foreground="{StaticResource Brush.Info}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                        <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" TextWrapping="Wrap" TextTrimming="None" Margin="12,0,0,0"
+                                   Text="O SwissTechKnife fecha, instala a nova versão e abre de novo sozinho. O Windows pode pedir permissão para instalar." />
+                    </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                    <Button x:Name="CancelButton" Style="{StaticResource Button.Secondary}" Content="Cancelar" Command="{Binding CancelCommand}" />
+                    <Button x:Name="ConfirmButton" Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" Margin="8,0,0,0" Command="{Binding ConfirmCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

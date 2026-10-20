@@ -331,4 +331,32 @@
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
+
+    <!-- Release notes, one version: "v1.1.0  19 out 2026  [Atual]" + bullet list (module dialog, host update popup). -->
+    <DataTemplate x:Key="ReleaseNoteTemplate">
+        <StackPanel Margin="0,0,0,18">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.BodyStrong}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding DateText}" Style="{StaticResource Text.Caption}" Margin="10,1,0,0" VerticalAlignment="Center" />
+                <Border Style="{StaticResource Chip}" Background="{StaticResource Brush.Accent.Soft}" Margin="10,0,0,0"
+                        Visibility="{Binding IsCurrent, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Atual" Foreground="{StaticResource Brush.Accent}" VerticalAlignment="Center" />
+                </Border>
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding Notes}" Margin="0,8,0,0" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="4" Height="4" Fill="{StaticResource Brush.Text.Tertiary}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2,8,0,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource Text.Paragraph}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </DataTemplate>
 </ResourceDictionary>

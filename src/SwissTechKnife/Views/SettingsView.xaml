@@ -10,6 +10,51 @@
 
             <!-- Atualizações -->
             <TextBlock Text="Atualizações" Style="{StaticResource Text.Overline}" Margin="2,32,0,10" />
+
+            <!-- SwissTechKnife's own update: shown when the catalog offers a newer host, or after a failed attempt -->
+            <Border x:Name="HostUpdateNotice" DataContext="{Binding HostUpdate}" Background="{StaticResource Brush.Success.Soft}"
+                    CornerRadius="{StaticResource Radius.Lg}" Padding="20,16" Margin="0,0,0,12" Visibility="Collapsed" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="HostUpdateMove" Y="6" />
+                </Border.RenderTransform>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{StaticResource Brand.Logo}" Width="40" Height="40" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+                        <StackPanel Grid.Column="1" Margin="14,0,16,0" VerticalAlignment="Center">
+                            <TextBlock Text="Atualização do SwissTechKnife disponível" Style="{StaticResource Text.BodyStrong}" Foreground="{StaticResource Brush.Success}" />
+                            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,3,0,0">
+                                <Run Text="{Binding CurrentVersionText, Mode=OneWay}" /> <Run Text="→" /> <Run Text="{Binding LatestVersionText, Mode=OneWay}" Foreground="{StaticResource Brush.Success}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Button x:Name="HostUpdateButton" Grid.Column="2" Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" VerticalAlignment="Center"
+                                Command="{Binding RequestCommand}" />
+                    </Grid>
+                    <StackPanel Margin="0,16,0,0" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="{Binding BusyText}" Style="{StaticResource Text.Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="0,0,48,0" />
+                            <TextBlock Text="{Binding Progress, Converter={StaticResource Percent}}" Style="{StaticResource Text.Caption}" HorizontalAlignment="Right" />
+                        </Grid>
+                        <ProgressBar Value="{Binding Progress, Mode=OneWay}" Maximum="1" />
+                    </StackPanel>
+                    <Border Background="{StaticResource Brush.Danger.Soft}" CornerRadius="{StaticResource Radius.Md}" Padding="14,10" Margin="0,16,0,0"
+                            Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE783;" Style="{StaticResource Text.Icon}" FontSize="14" Foreground="{StaticResource Brush.Danger}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                            <TextBlock Grid.Column="1" Text="{Binding Error}" Style="{StaticResource Text.Body}" TextWrapping="Wrap" TextTrimming="None" Margin="12,0,0,0" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
             <Border Style="{StaticResource Card}" Padding="22,18">
                 <StackPanel>
                     <Grid>
@@ -19,7 +64,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
                             <TextBlock Text="Verificar atualizações" Style="{StaticResource Text.BodyStrong}" />
-                            <TextBlock Text="Com que frequência o catálogo é consultado em busca de novas versões dos módulos."
+                            <TextBlock Text="Com que frequência o catálogo é consultado em busca de novas versões do SwissTechKnife e dos módulos."
                                        Style="{StaticResource Text.Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="0,3,0,0" />
                         </StackPanel>
                         <ComboBox Grid.Column="1" Width="160" VerticalAlignment="Center" AutomationProperties.Name="Verificar atualizações"

@@ -64,10 +64,11 @@ namespace SwissTechKnife.ViewModels
         private string _storeSignature;
         private string _sidebarSignature;
 
-        public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion, SettingsStore settings, string exePath, Action<bool> applyTray)
+        public ShellViewModel(ModuleManager manager, Func<Uri> catalogUri, Action restart, string hostVersion, SettingsStore settings, string exePath, Action<bool> applyTray, HostUpdater hostUpdater, Action exitForUpdate)
         {
             _settings = settings;
-            Settings = new SettingsViewModel(settings, exePath, applyTray, () => ReloadCatalogAsync(force: true, announce: true), Notify);
+            var hostUpdate = new HostUpdateViewModel(hostUpdater, hostVersion, Notify, exitForUpdate);
+            Settings = new SettingsViewModel(settings, exePath, applyTray, () => ReloadCatalogAsync(force: true, announce: true), Notify, hostUpdate);
             // Hourly look at the schedule; the check itself only runs when the chosen frequency is due.
             _updateTimer = new DispatcherTimer(TimeSpan.FromHours(1), DispatcherPriority.Background, async (s, e) =>
             {
@@ -447,6 +448,12 @@ namespace SwissTechKnife.ViewModels
                 CatalogMessage = "Não foi possível carregar o catálogo de módulos.";
             }
             RefreshLists();
+            bool hostOffered = Settings.HostUpdate.SetRelease(result.Catalog.Host, result.Source);
+            if (hostOffered || (announce && force && Settings.HostUpdate.IsAvailable))
+            {
+                // The first check that finds a new SwissTechKnife says so, startup included; "Verificar agora" repeats it.
+                Notify("Atualização do SwissTechKnife disponível: " + Settings.HostUpdate.LatestVersionText + ". Veja em Configurações.", NotificationKind.Success);
+            }
             if (announce && result.Error == null)
             {
                 int found = UpdateCount;
@@ -454,7 +461,7 @@ namespace SwissTechKnife.ViewModels
                 {
                     Notify(found == 1 ? "1 atualização de módulo disponível." : found + " atualizações de módulos disponíveis.", NotificationKind.Success);
                 }
-                else if (force)
+                else if (force && !Settings.HostUpdate.IsAvailable)
                 {
                     Notify("Tudo atualizado.", NotificationKind.Info);
                 }

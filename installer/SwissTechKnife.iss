@@ -5,23 +5,36 @@
 #define AppPublisher "luingry"
 #define AppExeName "SwissTechKnife.exe"
 #define Bin "..\src\SwissTechKnife\bin\Release\net48"
+; /DTestInstall: per-user build with its own AppId and folder, for exercising the self-update without UAC
+; or touching the real install (scripts/test-host-update.ps1).
+#ifdef TestInstall
+  #define AppIdValue "{{6E7C0F3A-41B2-4C7E-9A0B-2B1E3F5D8C12}"
+  #define Privileges "lowest"
+  #define InstallDir "{localappdata}\SwissTechKnife-Test"
+  #define OutputSuffix "-test"
+#else
+  #define AppIdValue "{{6E7C0F3A-41B2-4C7E-9A0B-2B1E3F5D8C11}"
+  #define Privileges "admin"
+  #define InstallDir "{autopf}\SwissTechKnife"
+  #define OutputSuffix ""
+#endif
 
 [Setup]
-AppId={{6E7C0F3A-41B2-4C7E-9A0B-2B1E3F5D8C11}
+AppId={#AppIdValue}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
-DefaultDirName={autopf}\SwissTechKnife
+DefaultDirName={#InstallDir}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputDir=..\artifacts\installer
-OutputBaseFilename=SwissTechKnife-{#AppVersion}-setup
+OutputBaseFilename=SwissTechKnife-{#AppVersion}-setup{#OutputSuffix}
 SetupIconFile=..\assets\brand\swisstechknife.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 Compression=lzma2/ultra
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
-PrivilegesRequired=admin
+PrivilegesRequired={#Privileges}
 WizardStyle=modern
 WizardImageFile=..\assets\brand\installer\wizard-164x314.bmp,..\assets\brand\installer\wizard-328x628.bmp
 WizardSmallImageFile=..\assets\brand\installer\wizard-small-55x58.bmp,..\assets\brand\installer\wizard-small-110x116.bmp
@@ -58,6 +71,98 @@ Filename: "{app}\{#AppExeName}"; Description: "Abrir o SwissTechKnife"; Flags: n
 Filename: "{code:NgenPath}"; Parameters: "uninstall ""{app}\{#AppExeName}"" /nologo /silent"; Flags: runhidden waituntilterminated; Check: NgenAvailable; RunOnceId: "RemoveNativeImages"
 
 [Code]
+// Self-update (the running app starts this installer; see src/SwissTechKnife.Core/HostUpdater.cs):
+//   /STKUPDATE          unattended update started by the app
+//   /STKSIGNAL=<file>   "started" once running (elevated), then "ok" or "failed"
+//   /STKMUTEX=<name>    the app's single-instance mutex: wait for its release before replacing files
+//   /STKAPP=<exe>       relaunched when Setup ends, after success or failure, so the app always comes back
+var
+  InstallDone: Boolean;
+
+function HasSwitch(Name: String): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), Name) = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+end;
+
+// Only the instance that installs reports: with UAC, a non-elevated instance may start first.
+function IsUpdateRun(): Boolean;
+begin
+#if Privileges == "admin"
+  Result := HasSwitch('/STKUPDATE') and IsAdmin;
+#else
+  Result := HasSwitch('/STKUPDATE');
+#endif
+end;
+
+procedure WriteSignal(Value: String);
+var
+  Path: String;
+begin
+  Path := ExpandConstant('{param:STKSIGNAL|}');
+  if (Path <> '') and not SaveStringToFile(Path, Value, False) then
+    Log('Could not write the update signal to ' + Path);
+end;
+
+function InitializeSetup(): Boolean;
+var
+  Mutex: String;
+  Waited: Integer;
+begin
+  Result := True;
+  if not IsUpdateRun() then
+    Exit;
+  WriteSignal('started');
+  Mutex := ExpandConstant('{param:STKMUTEX|Local\SwissTechKnife.Host}');
+  // The app exits once it reads "started"; the mutex goes after its modules stop and settings are saved.
+  Waited := 0;
+  while CheckForMutexes(Mutex) and (Waited < 60000) do
+  begin
+    Sleep(250);
+    Waited := Waited + 250;
+  end;
+  if Waited >= 60000 then
+    Log('App still running after 60 s; Restart Manager will close it.')
+  else
+    Log(Format('App released its mutex after %d ms.', [Waited]));
+  // Let the process finish tearing down so its files are no longer locked.
+  Sleep(1000);
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    InstallDone := True;
+end;
+
+procedure DeinitializeSetup();
+var
+  App: String;
+  Code: Integer;
+begin
+  if not IsUpdateRun() then
+    Exit;
+  if InstallDone then
+    WriteSignal('ok')
+  else
+    WriteSignal('failed');
+  App := ExpandConstant('{param:STKAPP|}');
+  if (App <> '') and FileExists(App) then
+  begin
+    if ExecAsOriginalUser(App, '--updated', '', SW_SHOWNORMAL, ewNoWait, Code) then
+      Log('Relaunched ' + App)
+    else
+      Log(Format('Relaunch of %s failed: %d', [App, Code]));
+  end;
+end;
+
 // AnyCPU runs as a 64-bit process on a 64-bit OS, so its native images come from Framework64.
 function NgenPath(Param: String): String;
 begin
@@ -67,7 +172,8 @@ begin
     Result := ExpandConstant('{win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe');
 end;
 
+// ngen needs admin rights: the per-user test build skips it.
 function NgenAvailable(): Boolean;
 begin
-  Result := FileExists(NgenPath(''));
+  Result := IsAdminInstallMode and FileExists(NgenPath(''));
 end;

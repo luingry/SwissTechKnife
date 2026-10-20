@@ -108,6 +108,17 @@ namespace SwissTechKnife.Core
         internal static Catalog Sanitize(Catalog catalog)
         {
             var result = new Catalog { Schema = catalog?.Schema ?? 1 };
+            if (catalog?.Host != null)
+            {
+                if (HostUpdate.IsValid(catalog.Host))
+                {
+                    result.Host = catalog.Host;
+                }
+                else
+                {
+                    Log.Warn(Source, "Skipped invalid host entry: " + (catalog.Host.Version ?? "<null>"));
+                }
+            }
             if (catalog?.Modules == null)
             {
                 return result;

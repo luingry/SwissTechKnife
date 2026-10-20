@@ -348,7 +348,7 @@ namespace SwissTechKnife.ViewModels
             return geometry;
         }
 
-        private static string FormatSize(long bytes)
+        internal static string FormatSize(long bytes)
         {
             if (bytes <= 0)
             {

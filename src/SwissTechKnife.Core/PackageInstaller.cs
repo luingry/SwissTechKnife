@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,7 +46,7 @@ namespace SwissTechKnife.Core
             string staging = Path.Combine(moduleRoot, ".staging-" + Guid.NewGuid().ToString("N"));
             try
             {
-                string hash = await DownloadAsync(packageUri, download, entry.Size, progress, cancellationToken).ConfigureAwait(false);
+                string hash = await FileDownload.CopyAsync(packageUri, download, entry.Size, progress, 0.95, cancellationToken).ConfigureAwait(false);
                 if (!string.Equals(hash, entry.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
                     Log.Warn(Source, $"Hash mismatch for {entry.Id}: expected {entry.Sha256}, got {hash}");
@@ -91,6 +90,10 @@ namespace SwissTechKnife.Core
             {
                 throw new ModuleInstallException("Não foi possível baixar o módulo. Verifique a conexão e tente de novo.", ex);
             }
+            catch (IncompleteDownloadException ex)
+            {
+                throw new ModuleInstallException("O download terminou incompleto. Tente de novo.", ex);
+            }
             catch (InvalidDataException ex)
             {
                 throw new ModuleInstallException("O pacote do módulo está corrompido.", ex);
@@ -104,54 +107,6 @@ namespace SwissTechKnife.Core
             {
                 TryDeleteFile(download);
                 StateStore.TryDelete(staging);
-            }
-        }
-
-        /// <summary>Copies the package to <paramref name="destination"/> and returns its SHA-256 (lowercase hex).</summary>
-        private static async Task<string> DownloadAsync(Uri uri, string destination, long expectedSize, IProgress<double> progress, CancellationToken cancellationToken)
-        {
-            using (SHA256 sha = SHA256.Create())
-            using (var output = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, useAsync: true))
-            {
-                HttpResponseMessage response = null;
-                Stream input;
-                long total = expectedSize;
-                if (uri.IsFile)
-                {
-                    input = new FileStream(uri.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, useAsync: true);
-                    total = input.Length;
-                }
-                else
-                {
-                    response = await CatalogClient.Http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    response.EnsureSuccessStatusCode();
-                    total = response.Content.Headers.ContentLength ?? expectedSize;
-                    input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                }
-
-                using (response)
-                using (input)
-                {
-                    var buffer = new byte[81920];
-                    long read = 0;
-                    int count;
-                    while ((count = await input.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
-                    {
-                        sha.TransformBlock(buffer, 0, count, null, 0);
-                        await output.WriteAsync(buffer, 0, count, cancellationToken).ConfigureAwait(false);
-                        read += count;
-                        if (total > 0)
-                        {
-                            progress?.Report(Math.Min(0.95, 0.95 * read / total));
-                        }
-                    }
-                    sha.TransformFinalBlock(buffer, 0, 0);
-                    if (total > 0 && read < total)
-                    {
-                        throw new ModuleInstallException("O download terminou incompleto. Tente de novo.");
-                    }
-                }
-                return ToHex(sha.Hash);
             }
         }
 
@@ -215,18 +170,6 @@ namespace SwissTechKnife.Core
             {
                 throw new ModuleInstallException("O pacote não aponta para um ponto de entrada válido.");
             }
-        }
-
-        private static string ToHex(byte[] bytes)
-        {
-            var chars = new char[bytes.Length * 2];
-            const string digits = "0123456789abcdef";
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                chars[i * 2] = digits[bytes[i] >> 4];
-                chars[i * 2 + 1] = digits[bytes[i] & 0xF];
-            }
-            return new string(chars);
         }
 
         private static void TryDeleteFile(string path)

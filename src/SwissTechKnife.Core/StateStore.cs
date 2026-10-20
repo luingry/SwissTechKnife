@@ -140,6 +140,11 @@ namespace SwissTechKnife.Core
             }
             foreach (string file in Directory.EnumerateFiles(_paths.Downloads))
             {
+                if (HostUpdater.OwnsDownload(Path.GetFileName(file)))
+                {
+                    // The self-update record and installer must survive the restart they cause; HostUpdater cleans them.
+                    continue;
+                }
                 try
                 {
                     File.Delete(file);

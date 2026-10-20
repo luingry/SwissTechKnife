@@ -30,7 +30,8 @@ namespace SwissTechKnife
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            bool relaunch = e.Args.Any(a => string.Equals(a, "--restart", StringComparison.OrdinalIgnoreCase));
+            // --updated: started by the installer after a self-update (or after it failed); the old process may still be exiting.
+            bool relaunch = e.Args.Any(a => string.Equals(a, "--restart", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "--updated", StringComparison.OrdinalIgnoreCase));
             _instance = SingleInstance.Acquire(relaunch ? TimeSpan.FromSeconds(10) : TimeSpan.Zero);
             if (!_instance.IsOwner)
             {
@@ -86,7 +87,8 @@ namespace SwissTechKnife
                 Environment.GetEnvironmentVariable("STK_CATALOG") ?? _settings.Current.Catalog,
                 AppDomain.CurrentDomain.BaseDirectory);
             string exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
-            shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText, _settings, exePath, ApplyTray);
+            shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText, _settings, exePath, ApplyTray,
+                new HostUpdater(paths), () => _window?.ExitApplication());
             bool atLogin = e.Args.Any(a => string.Equals(a, StartupRegistration.StartupArgument, StringComparison.OrdinalIgnoreCase));
 
             // First paint before any disk or network work.
@@ -138,6 +140,14 @@ namespace SwissTechKnife
             {
                 Log.Error(Source, "Could not load installed modules", ex);
                 shell.Notify("Não foi possível carregar os módulos instalados.", NotificationKind.Error);
+            }
+            try
+            {
+                await shell.Settings.HostUpdate.ReportPreviousAttemptAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(Source, "Could not read the last update attempt", ex);
             }
             await shell.ReloadCatalogAsync();
         }
