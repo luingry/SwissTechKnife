@@ -36,16 +36,25 @@ SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired={#Privileges}
 WizardStyle=modern
+ShowLanguageDialog=auto
 WizardImageFile=..\assets\brand\installer\wizard-164x314.bmp,..\assets\brand\installer\wizard-328x628.bmp
 WizardSmallImageFile=..\assets\brand\installer\wizard-small-55x58.bmp,..\assets\brand\installer\wizard-small-110x116.bmp
 CloseApplications=yes
 RestartApplications=no
 
 [Languages]
+; English first: it is the default whenever Windows' display language is not Brazilian Portuguese.
+Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
+[CustomMessages]
+english.OptimizingStartup=Optimizing startup...
+english.LaunchApp=Open SwissTechKnife
+brazilianportuguese.OptimizingStartup=Otimizando a inicialização...
+brazilianportuguese.LaunchApp=Abrir o SwissTechKnife
+
 [Tasks]
-Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "{#Bin}\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -64,8 +73,8 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "
 
 [Run]
 ; Native images: a cold start does not JIT the host. Best effort; the app runs with JIT if ngen is missing.
-Filename: "{code:NgenPath}"; Parameters: "install ""{app}\{#AppExeName}"" /nologo /silent"; Flags: runhidden waituntilterminated; StatusMsg: "Otimizando a inicialização..."; Check: NgenAvailable
-Filename: "{app}\{#AppExeName}"; Description: "Abrir o SwissTechKnife"; Flags: nowait postinstall skipifsilent runasoriginaluser
+Filename: "{code:NgenPath}"; Parameters: "install ""{app}\{#AppExeName}"" /nologo /silent"; Flags: runhidden waituntilterminated; StatusMsg: "{cm:OptimizingStartup}"; Check: NgenAvailable
+Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 
 [UninstallRun]
 Filename: "{code:NgenPath}"; Parameters: "uninstall ""{app}\{#AppExeName}"" /nologo /silent"; Flags: runhidden waituntilterminated; Check: NgenAvailable; RunOnceId: "RemoveNativeImages"

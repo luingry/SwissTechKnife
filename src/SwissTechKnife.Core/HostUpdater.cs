@@ -58,7 +58,7 @@ namespace SwissTechKnife.Core
         {
             if (!HostUpdate.IsValid(release))
             {
-                throw new HostUpdateException("O catálogo anuncia uma atualização inválida.");
+                throw new HostUpdateException(Strings.Get("UpdateInvalid"));
             }
             Directory.CreateDirectory(_paths.Downloads);
             string target = Path.Combine(_paths.Downloads, HostUpdate.InstallerFileName(release.Version));
@@ -79,7 +79,7 @@ namespace SwissTechKnife.Core
                     if (!FileDownload.HashEquals(hash, release.Sha256))
                     {
                         Log.Warn(Source, $"Hash mismatch for {release.Version}: expected {release.Sha256}, got {hash}");
-                        throw new HostUpdateException("O instalador baixado não confere com o catálogo (SHA-256). Nada foi alterado.");
+                        throw new HostUpdateException(Strings.Get("UpdateHashMismatch"));
                     }
                     TryDelete(target);
                     File.Move(partial, target);
@@ -93,11 +93,11 @@ namespace SwissTechKnife.Core
                 }
                 catch (HttpRequestException ex)
                 {
-                    throw new HostUpdateException("Não foi possível baixar a atualização. Verifique a conexão e tente de novo.", ex);
+                    throw new HostUpdateException(Strings.Get("UpdateDownloadFailed"), ex);
                 }
                 catch (IncompleteDownloadException ex)
                 {
-                    throw new HostUpdateException("O download terminou incompleto. Tente de novo.", ex);
+                    throw new HostUpdateException(Strings.Get("DownloadIncomplete"), ex);
                 }
                 finally
                 {
@@ -117,7 +117,7 @@ namespace SwissTechKnife.Core
             if (!intact)
             {
                 TryDelete(installerPath);
-                throw new HostUpdateException("O instalador baixado foi alterado ou removido. Tente de novo.");
+                throw new HostUpdateException(Strings.Get("InstallerChanged"));
             }
 
             string log = Path.Combine(_paths.Downloads, "host-update-" + VersionText.ParseOrZero(release.Version) + ".log");
@@ -142,12 +142,12 @@ namespace SwissTechKnife.Core
             try
             {
                 Log.Info(Source, "Starting " + installerPath + " " + info.Arguments);
-                return Process.Start(info) ?? throw new HostUpdateException("O instalador não iniciou.");
+                return Process.Start(info) ?? throw new HostUpdateException(Strings.Get("InstallerNotStarted"));
             }
             catch (Win32Exception ex)
             {
                 ClearPending();
-                throw new HostUpdateException("O instalador não iniciou: " + ex.Message, ex);
+                throw new HostUpdateException(Strings.Format("InstallerNotStartedDetail", ex.Message), ex);
             }
         }
 

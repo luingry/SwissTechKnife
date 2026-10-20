@@ -41,7 +41,7 @@ namespace SwissTechKnife.Sdk
     /// <summary>
     /// Optional: the module offers customization. Requires <c>"settings": true</c> in <c>module.json</c>
     /// (so the host can show the tab without loading the module). The view appears in the
-    /// "Configurações" tab of the module's details dialog; changes should apply immediately.
+    /// "Settings" tab of the module's details dialog; changes should apply immediately.
     /// </summary>
     public interface IModuleSettings
     {

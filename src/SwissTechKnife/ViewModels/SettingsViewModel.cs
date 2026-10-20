@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Input;
 using SwissTechKnife.Core;
 using SwissTechKnife.Infrastructure;
@@ -8,20 +9,45 @@ using SwissTechKnife.Sdk;
 
 namespace SwissTechKnife.ViewModels
 {
-    public sealed class FrequencyOption
+    /// <summary>Combo box option whose label follows the UI language (the selected value never changes).</summary>
+    public sealed class FrequencyOption : ObservableObject
     {
-        public FrequencyOption(string value, string label)
+        private readonly string _labelKey;
+
+        public FrequencyOption(string value, string labelKey)
         {
             Value = value;
-            Label = label;
+            _labelKey = labelKey;
         }
 
         public string Value { get; }
 
-        public string Label { get; }
+        public string Label => Strings.Get(_labelKey);
+
+        public void RefreshLabel() => OnPropertyChanged(nameof(Label));
+
+        /// <summary>Also the item's accessible name.</summary>
+        public override string ToString() => Label;
     }
 
-    /// <summary>Host settings page ("Configurações" at the bottom of the sidebar).</summary>
+    /// <summary>A supported UI language, shown by its native name.</summary>
+    public sealed class LanguageOption
+    {
+        public LanguageOption(string code, string name)
+        {
+            Code = code;
+            Name = name;
+        }
+
+        public string Code { get; }
+
+        public string Name { get; }
+
+        /// <summary>Also the item's accessible name.</summary>
+        public override string ToString() => Name;
+    }
+
+    /// <summary>Host settings page ("Settings" at the bottom of the sidebar).</summary>
     public sealed class SettingsViewModel : ObservableObject
     {
         private readonly SettingsStore _settings;
@@ -30,6 +56,7 @@ namespace SwissTechKnife.ViewModels
         private readonly Action<string, NotificationKind> _notify;
         private bool _isChecking;
         private bool? _pendingStartup;
+        private string _pendingLanguage;
 
         public SettingsViewModel(SettingsStore settings, string exePath, Action<bool> applyTray, Func<System.Threading.Tasks.Task> checkNow, Action<string, NotificationKind> notify, HostUpdateViewModel hostUpdate)
         {
@@ -50,20 +77,52 @@ namespace SwissTechKnife.ViewModels
                     IsChecking = false;
                     CommandManager.InvalidateRequerySuggested();
                 }
-            }, _ => !_isChecking, ex => notify("Não foi possível verificar: " + ex.Message, NotificationKind.Error));
+            }, _ => !_isChecking, ex => notify(Strings.Format("CheckFailed", ex.Message), NotificationKind.Error));
+            Strings.LanguageChanged += (s, e) => OnLanguageChanged();
         }
 
         public IReadOnlyList<FrequencyOption> FrequencyOptions { get; } = new[]
         {
-            new FrequencyOption(UpdateSchedule.Daily, "Diário"),
-            new FrequencyOption(UpdateSchedule.Weekly, "Semanal"),
-            new FrequencyOption(UpdateSchedule.Monthly, "Mensal"),
-            new FrequencyOption(UpdateSchedule.Never, "Nunca"),
+            new FrequencyOption(UpdateSchedule.Daily, "Daily"),
+            new FrequencyOption(UpdateSchedule.Weekly, "Weekly"),
+            new FrequencyOption(UpdateSchedule.Monthly, "Monthly"),
+            new FrequencyOption(UpdateSchedule.Never, "Never"),
         };
+
+        /// <summary>Supported UI languages as (code, native name); names are not translated.</summary>
+        public IReadOnlyList<LanguageOption> LanguageOptions { get; } = Strings.Languages.Select(l => new LanguageOption(l.Key, l.Value)).ToList();
+
+        public string Language
+        {
+            get => _pendingLanguage ?? Strings.Language;
+            set
+            {
+                string normalized = Strings.Normalize(value);
+                if (normalized == Language)
+                {
+                    return;
+                }
+                _pendingLanguage = normalized;
+                _settings.Current.Language = normalized;
+                OnPropertyChanged();
+                // Switching re-renders every localized text: let the combo box close first.
+                AfterAnimation.Run(() =>
+                {
+                    if (_pendingLanguage == null)
+                    {
+                        return;
+                    }
+                    string target = _pendingLanguage;
+                    _pendingLanguage = null;
+                    _settings.Save();
+                    Strings.SetLanguage(target);
+                });
+            }
+        }
 
         public ICommand CheckNowCommand { get; }
 
-        /// <summary>SwissTechKnife's own update (notice at the top of "Atualizações").</summary>
+        /// <summary>SwissTechKnife's own update (notice at the top of "Updates").</summary>
         public HostUpdateViewModel HostUpdate { get; }
 
         public string UpdateFrequency
@@ -99,7 +158,7 @@ namespace SwissTechKnife.ViewModels
                     _pendingStartup = null;
                     if (target != StartupRegistration.IsEnabled(_exePath) && !StartupRegistration.TrySet(_exePath, target))
                     {
-                        _notify("Não foi possível alterar a inicialização com o Windows.", NotificationKind.Error);
+                        _notify(Strings.Get("StartupChangeFailed"), NotificationKind.Error);
                     }
                     OnPropertyChanged(nameof(StartWithWindows));
                 });
@@ -143,20 +202,30 @@ namespace SwissTechKnife.ViewModels
             {
                 if (_isChecking)
                 {
-                    return "Verificando…";
+                    return Strings.Get("Checking");
                 }
                 DateTime? last = UpdateSchedule.ParseUtc(_settings.Current.LastUpdateCheckUtc);
                 if (last == null)
                 {
-                    return "Ainda não verificado";
+                    return Strings.Get("NeverChecked");
                 }
                 DateTime local = last.Value.ToLocalTime();
-                CultureInfo culture = CultureInfo.GetCultureInfo("pt-BR");
-                string day = local.Date == DateTime.Today ? "hoje"
-                    : local.Date == DateTime.Today.AddDays(-1) ? "ontem"
-                    : local.ToString("dd 'de' MMM", culture);
-                return "Última verificação: " + day + " às " + local.ToString("HH:mm", culture);
+                CultureInfo culture = Strings.Culture;
+                string day = local.Date == DateTime.Today ? Strings.Get("Today")
+                    : local.Date == DateTime.Today.AddDays(-1) ? Strings.Get("Yesterday")
+                    : local.ToString(Strings.Get("ShortDateFormat"), culture);
+                return Strings.Format("LastCheck", day, local.ToString("t", culture));
             }
+        }
+
+        private void OnLanguageChanged()
+        {
+            foreach (FrequencyOption option in FrequencyOptions)
+            {
+                option.RefreshLabel();
+            }
+            OnPropertyChanged(nameof(Language));
+            OnPropertyChanged(nameof(LastCheckText));
         }
 
         public void Refresh()

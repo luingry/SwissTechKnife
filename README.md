@@ -1,72 +1,91 @@
 <p align="center">
-  <img src="assets/brand/png/logo-128.png" alt="SwissTechKnife" width="96" />
+  <img src="assets/brand/png/logo-256.png" alt="SwissTechKnife logo" width="128" height="128" />
 </p>
 
 <h1 align="center">SwissTechKnife</h1>
 
 <p align="center">
-  Seus utilitários para Windows num só lugar.<br />
-  Instale só o que você usa, ligue e desligue quando quiser.
+  <strong>All your Windows utilities in one place.</strong><br />
+  Install only what you use, and turn each tool on or off whenever you want.
 </p>
 
 <p align="center">
-  <a href="https://github.com/luingry/SwissTechKnife/releases/latest"><b>Baixar para Windows</b></a>
+  <a href="https://github.com/luingry/SwissTechKnife/releases/latest"><img src="https://img.shields.io/github/v/release/luingry/SwissTechKnife?style=flat-square&label=release&color=E8743C" alt="Latest release" /></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Windows 10 | 11" />
+  <img src="https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?style=flat-square" alt=".NET Framework 4.8" />
+  <img src="https://img.shields.io/badge/languages-English%20%7C%20Portugu%C3%AAs-555?style=flat-square" alt="English | Português" />
 </p>
 
 <p align="center">
-  <img src="docs/preview.png" alt="Tela de módulos do SwissTechKnife" width="780" />
+  <a href="https://github.com/luingry/SwissTechKnife/releases/latest"><b>⬇ Download for Windows</b></a>
+  &nbsp;·&nbsp;
+  <a href="#modules">Modules</a>
+  &nbsp;·&nbsp;
+  <a href="#getting-started">Getting started</a>
+  &nbsp;·&nbsp;
+  <a href="#for-developers">For developers</a>
 </p>
 
-## O que é
+<p align="center">
+  <img src="docs/preview.png" alt="SwissTechKnife module store" width="780" />
+</p>
 
-O SwissTechKnife é um app leve que reúne várias ferramentas, chamadas de **módulos**. Em vez de instalar e manter um programa para cada coisa, você escolhe na lista os módulos que quer usar, e eles passam a funcionar dentro do SwissTechKnife, com o mesmo visual e as mesmas configurações.
+## What it is
 
-## Módulos
+SwissTechKnife is a lightweight app that brings many tools together as **modules**. Instead of installing and maintaining a separate program for every little thing, you pick the modules you want from a list and they run inside SwissTechKnife, with the same look and the same settings.
 
-| Módulo | Para que serve |
+- **Lightweight.** A small Windows app that starts fast; modules only load when you enable them.
+- **Modular.** Install, enable, disable and remove tools one by one, without touching the rest.
+- **Always up to date.** SwissTechKnife and its modules update from inside the app, and you decide when.
+- **Private by design.** Everything runs on your computer.
+
+## Modules
+
+| Module | What it does |
 |---|---|
-| **SmoothMice** | Deixa a rolagem do mouse suave em todo o Windows, com ajustes por aplicativo e sem interferir nos jogos. |
-| **Tamarillo** | Segure Ctrl + Alt + Shift enquanto arrasta arquivos e escolha numa roda o que fazer com eles: converter, redimensionar, comprimir, reconhecer texto e mais. |
-| **Monitor do Sistema** | Mostra o uso do processador, da memória e há quanto tempo o PC está ligado. |
-| **Hash** | Calcula MD5, SHA-1, SHA-256 e SHA-512 de textos e arquivos. |
-| **Winput LAN** | *Em breve:* um mouse e um teclado para vários PCs da rede. |
-| **AQ Tracker** | *Em breve.* |
+| **SmoothMice** | Smooth mouse scrolling across Windows, with per-app tuning and no interference with games. |
+| **Tamarillo** | Hold Ctrl + Alt + Shift while dragging files and pick what to do from a wheel: convert, resize, compress, recognize text and more. |
+| **System Monitor** | Shows processor and memory usage and how long your PC has been on. |
+| **Hash** | Computes MD5, SHA-1, SHA-256 and SHA-512 for text and files. |
+| **Winput LAN** | *Coming soon:* one mouse and keyboard for several PCs on your network. |
+| **AQ Tracker** | *Coming soon.* |
 
-Novos módulos aparecem sozinhos na lista quando são publicados.
+New modules show up in the list automatically as soon as they're published.
 
-## Como usar
+## Getting started
 
-1. Baixe e execute o instalador `SwissTechKnife-<versão>-setup.exe`.
-2. Abra o SwissTechKnife e vá em **Módulos**.
-3. Clique no módulo que quer usar e depois em **Instalar**.
-4. Ele aparece na barra lateral, em **Seus módulos**. Clique para abrir.
+1. Download and run the installer, `SwissTechKnife-<version>-setup.exe`.
+2. Open SwissTechKnife and go to **Modules**.
+3. Click the module you want, then **Install**.
+4. It appears in the sidebar under **Your modules**. Click it to open.
 
-Use o switch no card para **ativar ou desativar** um módulo sem desinstalá-lo. Se o módulo tiver opções, elas ficam na aba **Configurações** da janela dele, e a aba **Notas da versão** mostra o que mudou em cada versão.
+Use the switch on a module's card to **enable or disable** it without uninstalling. If a module has options, they're in the **Settings** tab of its window, and the **Release notes** tab shows what changed in each version.
 
-## Configurações
+## Settings
 
-Clique na engrenagem no canto inferior da barra lateral:
+Click the gear at the bottom of the sidebar:
 
-- **Verificar atualizações:** diário, semanal, mensal ou nunca. Também dá para verificar na hora.
-- **Iniciar com o Windows:** o SwissTechKnife abre sozinho quando você entra no Windows.
-- **Esconder na área de notificação ao fechar:** fechar a janela mantém os módulos funcionando. Para sair de vez, clique com o botão direito no ícone perto do relógio e escolha **Sair**.
+- **Language:** English (default) or Português (Brasil). The change applies instantly.
+- **Check for updates:** daily, weekly, monthly or never. You can also check right away.
+- **Start with Windows:** SwissTechKnife opens on its own when you sign in.
+- **Hide to the notification area on close:** closing the window keeps your modules running. To quit for good, right-click the icon near the clock and choose **Exit**.
 
-## Atualizações
+## Updates
 
-O SwissTechKnife e os módulos se atualizam pelo próprio app. Quando há versão nova, você vê o que mudou e decide quando atualizar; o resto é automático.
+SwissTechKnife and its modules update from inside the app. When a new version is available you see what changed and choose when to update; everything else is automatic.
 
-## Privacidade e segurança
+## Privacy and security
 
-- Tudo roda no seu computador. O app só acessa a internet para ver se há módulos e atualizações novos e para baixá-los.
-- Cada módulo e cada atualização é conferido antes de instalar; se o arquivo baixado não for exatamente o publicado, ele é recusado e nada muda.
-- Desinstalar um módulo remove os arquivos dele na hora. As preferências do módulo ficam guardadas, caso você o instale de novo.
+- Everything runs on your computer. The app only goes online to check for new modules and updates, and to download them.
+- Every module and update is verified before it's installed: if the downloaded file isn't exactly the one that was published, it's rejected and nothing changes.
+- Uninstalling a module removes its files right away. Its preferences are kept, in case you install it again.
 
-## Requisitos
+## Requirements
 
-Windows 10 ou 11, 64 bits.
+Windows 10 or 11, 64-bit.
 
-## Para desenvolvedores
+## For developers
 
-- [Desenvolvimento, build e releases](docs/DEVELOPMENT.md)
-- [Como criar um módulo](docs/MODULES.md)
+- [Development, builds and releases](docs/DEVELOPMENT.md)
+- [Building a module](docs/MODULES.md)
 - [Design system](docs/DESIGN_SYSTEM.md)

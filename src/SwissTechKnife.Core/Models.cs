@@ -183,7 +183,7 @@ namespace SwissTechKnife.Core
         [DataMember(Name = "loadMode", Order = 6, EmitDefaultValue = false)]
         public string LoadMode { get; set; }
 
-        /// <summary>True when the entry type implements IModuleSettings (shows the "Configurações" tab).</summary>
+        /// <summary>True when the entry type implements IModuleSettings (shows the "Settings" tab).</summary>
         [DataMember(Name = "settings", Order = 7, EmitDefaultValue = false)]
         public bool HasSettings { get; set; }
 
@@ -258,6 +258,10 @@ namespace SwissTechKnife.Core
         /// <summary>Closing the window keeps the host running in the notification area.</summary>
         [DataMember(Name = "hideToTrayOnClose", Order = 5)]
         public bool HideToTrayOnClose { get; set; }
+
+        /// <summary>UI language: "en" (default) or "pt-BR".</summary>
+        [DataMember(Name = "language", Order = 6, EmitDefaultValue = false)]
+        public string Language { get; set; }
     }
 
     [DataContract]

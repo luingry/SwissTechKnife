@@ -53,7 +53,6 @@ namespace SwissTechKnife.ViewModels
         private FrameworkElement _currentPage;
         private ModuleItem _selectedModule;
         private CatalogState _catalogState = CatalogState.Loading;
-        private string _catalogMessage;
         private DialogTab _dialogTab;
         private ModuleItem _pendingUpdate;
         private FrameworkElement _settingsPage;
@@ -99,6 +98,7 @@ namespace SwissTechKnife.ViewModels
             EnableCommand = new RelayCommand(p => SetEnabled((ModuleItem)p, true), p => p is ModuleItem m && m.IsInstalled && !m.IsEnabled && !m.IsBusy);
             DisableCommand = new RelayCommand(p => SetEnabled((ModuleItem)p, false), p => p is ModuleItem m && m.IsEnabled && !m.IsBusy);
             OpenModuleCommand = new RelayCommand(p => OpenModule((ModuleItem)p), p => p is ModuleItem m && m.IsEnabled);
+            Strings.LanguageChanged += (s, e) => OnLanguageChanged();
             ReloadCatalogCommand = new AsyncCommand(_ => ReloadCatalogAsync(), _ => CatalogState != CatalogState.Loading, ex => ReportError(ex));
             RestartCommand = new RelayCommand(_ => _restart());
             DismissToastCommand = new RelayCommand(p => DismissToast(p as Toast));
@@ -281,7 +281,7 @@ namespace SwissTechKnife.ViewModels
 
         public bool IsDialogOpen => _selectedModule != null;
 
-        /// <summary>Dialog tab: Descrição (default), Notas da versão, Configurações (modules with settings).</summary>
+        /// <summary>Dialog tab: Description (default), Release notes, Settings (modules with settings).</summary>
         public DialogTab DialogTab
         {
             get => _dialogTab;
@@ -382,6 +382,7 @@ namespace SwissTechKnife.ViewModels
                 {
                     OnPropertyChanged(nameof(IsCatalogLoading));
                     OnPropertyChanged(nameof(HasCatalogNotice));
+                    OnPropertyChanged(nameof(CatalogMessage));
                     RefreshEmptyState();
                 }
             }
@@ -391,11 +392,10 @@ namespace SwissTechKnife.ViewModels
 
         public bool HasCatalogNotice => _catalogState == CatalogState.Offline || _catalogState == CatalogState.Failed;
 
-        public string CatalogMessage
-        {
-            get => _catalogMessage;
-            private set => Set(ref _catalogMessage, value);
-        }
+        public string CatalogMessage =>
+            _catalogState == CatalogState.Offline ? Strings.Get("CatalogOffline")
+            : _catalogState == CatalogState.Failed ? Strings.Get("CatalogFailed")
+            : null;
 
         public bool IsListEmpty => !IsCatalogLoading && _storeView.IsEmpty;
 
@@ -435,40 +435,37 @@ namespace SwissTechKnife.ViewModels
             if (result.Error == null)
             {
                 CatalogState = CatalogState.Ready;
-                CatalogMessage = null;
             }
             else if (result.FromCache)
             {
                 CatalogState = CatalogState.Offline;
-                CatalogMessage = "Sem conexão com o catálogo. Mostrando a última lista salva.";
             }
             else
             {
                 CatalogState = CatalogState.Failed;
-                CatalogMessage = "Não foi possível carregar o catálogo de módulos.";
             }
             RefreshLists();
             bool hostOffered = Settings.HostUpdate.SetRelease(result.Catalog.Host, result.Source);
             if (hostOffered || (announce && force && Settings.HostUpdate.IsAvailable))
             {
-                // The first check that finds a new SwissTechKnife says so, startup included; "Verificar agora" repeats it.
-                Notify("Atualização do SwissTechKnife disponível: " + Settings.HostUpdate.LatestVersionText + ". Veja em Configurações.", NotificationKind.Success);
+                // The first check that finds a new SwissTechKnife says so, startup included; "Check now" repeats it.
+                Notify(Strings.Format("HostUpdateToast", Settings.HostUpdate.LatestVersionText), NotificationKind.Success);
             }
             if (announce && result.Error == null)
             {
                 int found = UpdateCount;
                 if (found > updatesBefore)
                 {
-                    Notify(found == 1 ? "1 atualização de módulo disponível." : found + " atualizações de módulos disponíveis.", NotificationKind.Success);
+                    Notify(found == 1 ? Strings.Get("ModuleUpdatesOne") : Strings.Format("ModuleUpdatesMany", found), NotificationKind.Success);
                 }
                 else if (force && !Settings.HostUpdate.IsAvailable)
                 {
-                    Notify("Tudo atualizado.", NotificationKind.Info);
+                    Notify(Strings.Get("AllUpToDate"), NotificationKind.Info);
                 }
             }
             else if (announce && force)
             {
-                Notify("Não foi possível verificar atualizações agora.", NotificationKind.Warning);
+                Notify(Strings.Get("UpdateCheckFailed"), NotificationKind.Warning);
             }
         }
 
@@ -567,7 +564,7 @@ namespace SwissTechKnife.ViewModels
                 catch (Exception ex)
                 {
                     Log.Error(Source, "CreateView failed for " + item.Id, ex);
-                    item.PageError = "A página do módulo falhou ao abrir: " + ex.Message;
+                    item.PageError = Strings.Format("PageFailed", ex.Message);
                 }
             }
             CurrentPage = page;
@@ -588,13 +585,13 @@ namespace SwissTechKnife.ViewModels
                     page = _manager.Runtime.GetSettingsView(item.Id);
                     if (page == null)
                     {
-                        SettingsError = "Este módulo não oferece configurações nesta versão.";
+                        SettingsError = Strings.Get("NoSettingsInVersion");
                     }
                 }
                 catch (Exception ex)
                 {
                     Log.Error(Source, "CreateSettingsView failed for " + item.Id, ex);
-                    SettingsError = "As configurações não puderam ser abertas: " + ex.Message;
+                    SettingsError = Strings.Format("SettingsOpenFailed", ex.Message);
                 }
             }
             else
@@ -625,17 +622,17 @@ namespace SwissTechKnife.ViewModels
                 await _manager.InstallAsync(item);
                 if (item.RestartRequired)
                 {
-                    Notify(item.Name + " atualizado. Reinicie para aplicar.", NotificationKind.Info);
+                    Notify(Strings.Format("ModuleUpdatedRestart", item.Name), NotificationKind.Info);
                 }
                 else
                 {
-                    Notify(item.Name + (update ? " atualizado." : " instalado."), NotificationKind.Success);
+                    Notify(Strings.Format(update ? "ModuleUpdated" : "ModuleInstalled", item.Name), NotificationKind.Success);
                 }
             }
             catch (ModuleInstallException ex)
             {
                 item.Error = ex.Message;
-                Notify("Falha ao instalar " + item.Name + ".", NotificationKind.Error);
+                Notify(Strings.Format("InstallFailed", item.Name), NotificationKind.Error);
             }
         }
 
@@ -664,7 +661,7 @@ namespace SwissTechKnife.ViewModels
                 SettingsPage = null;
             }
             _manager.Uninstall(item);
-            Notify(item.Name + " desinstalado.", NotificationKind.Success);
+            Notify(Strings.Format("ModuleUninstalled", item.Name), NotificationKind.Success);
         }
 
         private void SetEnabled(ModuleItem item, bool enabled)
@@ -756,27 +753,27 @@ namespace SwissTechKnife.ViewModels
             if (!string.IsNullOrEmpty(_appliedSearch))
             {
                 EmptyIcon = "";
-                EmptyTitle = "Nada encontrado";
-                EmptyText = "Nenhum módulo corresponde a “" + _appliedSearch + "”.";
+                EmptyTitle = Strings.Get("EmptySearchTitle");
+                EmptyText = Strings.Format("EmptySearchText", _appliedSearch);
             }
             else if (_tab == StoreTab.Installed)
             {
                 EmptyIcon = "";
-                EmptyTitle = "Nenhum módulo instalado";
-                EmptyText = "Escolha o que você quer usar na aba Disponíveis.";
+                EmptyTitle = Strings.Get("EmptyInstalledTitle");
+                EmptyText = Strings.Get("EmptyInstalledText");
                 EmptyOffersAvailable = AvailableCount > 0;
             }
             else if (_catalogState == CatalogState.Failed)
             {
                 EmptyIcon = "";
-                EmptyTitle = "Catálogo indisponível";
-                EmptyText = "Verifique a conexão e tente de novo.";
+                EmptyTitle = Strings.Get("EmptyFailedTitle");
+                EmptyText = Strings.Get("EmptyFailedText");
             }
             else
             {
                 EmptyIcon = "";
-                EmptyTitle = "Tudo instalado";
-                EmptyText = "Você já tem todos os módulos do catálogo.";
+                EmptyTitle = Strings.Get("EmptyAllTitle");
+                EmptyText = Strings.Get("EmptyAllText");
             }
             OnPropertyChanged(nameof(EmptyIcon));
             OnPropertyChanged(nameof(EmptyTitle));
@@ -786,10 +783,21 @@ namespace SwissTechKnife.ViewModels
             OnPropertyChanged(nameof(ShowSkeletons));
         }
 
+        /// <summary>Re-reads every text the view models build in code; XAML text follows on its own.</summary>
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(CatalogMessage));
+            RefreshEmptyState();
+            foreach (ModuleItem item in _manager.Items)
+            {
+                item.RefreshText();
+            }
+        }
+
         private void ReportError(Exception ex)
         {
             Log.Error(Source, "Command failed", ex);
-            Notify("Algo deu errado: " + ex.Message, NotificationKind.Error);
+            Notify(Strings.Format("SomethingWentWrong", ex.Message), NotificationKind.Error);
         }
     }
 

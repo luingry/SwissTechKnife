@@ -9,23 +9,23 @@
             <Border Style="{StaticResource Card}" Padding="24">
                 <StackPanel>
                     <Grid>
-                        <TextBlock Text="Origem" Style="{StaticResource Text.Overline}" VerticalAlignment="Center" />
+                        <TextBlock Text="Source" Style="{StaticResource Text.Overline}" VerticalAlignment="Center" />
                         <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Right">
                             <ui:SegmentedPanel>
-                                <RadioButton x:Name="TextTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="Texto" IsChecked="True" Checked="OnModeChanged" />
-                                <RadioButton x:Name="FileTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="Arquivo" Checked="OnModeChanged" />
+                                <RadioButton x:Name="TextTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="Text" IsChecked="True" Checked="OnModeChanged" />
+                                <RadioButton x:Name="FileTab" Style="{StaticResource Segmented.Item}" GroupName="Mode" Content="File" Checked="OnModeChanged" />
                             </ui:SegmentedPanel>
                         </Border>
                     </Grid>
 
                     <TextBox x:Name="Input" Margin="0,16,0,0" Height="120" AcceptsReturn="True" TextWrapping="Wrap"
-                             ui:Ui.Placeholder="Digite ou cole o texto…" TextChanged="OnInputChanged" />
+                             ui:Ui.Placeholder="Type or paste text…" TextChanged="OnInputChanged" />
 
                     <Border x:Name="DropZone" Margin="0,16,0,0" Height="120" CornerRadius="{StaticResource Radius.Md}" Background="{StaticResource Brush.Surface3}" Visibility="Collapsed">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="&#xE8E5;" Style="{StaticResource Text.Icon}" FontSize="22" Foreground="{StaticResource Brush.Text.Tertiary}" />
-                            <TextBlock x:Name="FileLabel" Text="Arraste um arquivo para cá" Style="{StaticResource Text.Secondary}" HorizontalAlignment="Center" Margin="0,10,0,10" />
-                            <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE838;" Content="Escolher arquivo" HorizontalAlignment="Center" Click="OnPickFile" />
+                            <TextBlock x:Name="FileLabel" Text="Drop a file here" Style="{StaticResource Text.Secondary}" HorizontalAlignment="Center" Margin="0,10,0,10" />
+                            <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE838;" Content="Choose file" HorizontalAlignment="Center" Click="OnPickFile" />
                         </StackPanel>
                     </Border>
                     <ProgressBar x:Name="Progress" Maximum="1" Margin="0,14,0,0" Visibility="Collapsed" />
@@ -35,7 +35,7 @@
             <!-- Results -->
             <Border Style="{StaticResource Card}" Padding="24" Margin="0,16,0,0">
                 <StackPanel>
-                    <TextBlock Text="Resultados" Style="{StaticResource Text.Overline}" />
+                    <TextBlock Text="Results" Style="{StaticResource Text.Overline}" />
                     <ItemsControl x:Name="Results" Margin="0,8,0,0" Focusable="False">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -48,7 +48,7 @@
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource Text.BodyStrong}" VerticalAlignment="Center" />
                                     <TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" IsReadOnly="True" FontFamily="Cascadia Mono, Consolas" FontSize="12"
                                              Background="{StaticResource Brush.Surface1}" />
-                                    <Button Grid.Column="2" Style="{StaticResource Button.Icon}" ui:Ui.Icon="&#xE8C8;" ToolTip="Copiar" Margin="8,0,0,0"
+                                    <Button Grid.Column="2" Style="{StaticResource Button.Icon}" ui:Ui.Icon="&#xE8C8;" ToolTip="Copy" Margin="8,0,0,0"
                                             Click="OnCopy" Tag="{Binding Value}" />
                                 </Grid>
                             </DataTemplate>

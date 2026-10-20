@@ -128,7 +128,7 @@ namespace SwissTechKnife.Modules
             {
                 if (loaded.Version != module.Version || !string.Equals(loaded.Folder, folder, StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new RestartRequiredException("Reinicie o SwissTechKnife para usar a versão " + module.Version + ".");
+                    throw new RestartRequiredException(Strings.Format("RestartForVersion", module.Version));
                 }
                 return loaded.EntryType;
             }

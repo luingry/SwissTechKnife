@@ -41,7 +41,7 @@ Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timer
 
 ### Settings
 
-If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Configurações** tab next to **Descrição** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See `samples/SystemMonitor`.
+If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Settings** tab next to **Description** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See `samples/SystemMonitor`.
 
 ## 3. module.json
 
@@ -60,7 +60,7 @@ If the module offers customization, implement `IModuleSettings.CreateSettingsVie
 | Field | Values |
 |---|---|
 | `activation` | `onDemand` (default): created when the page is first opened. `startup`: created with the host; `IBackgroundModule.Start` is called. |
-| `settings` | `true` when the entry type implements `IModuleSettings` (shows the Configurações tab without loading the module first). |
+| `settings` | `true` when the entry type implements `IModuleSettings` (shows the Settings tab without loading the module first). |
 | `loadMode` | `memory` (default): assemblies are read into memory, files are never locked, uninstall/update apply at once. `file`: `Assembly.LoadFrom`, for code that needs `Assembly.Location` or native side-by-side DLLs (WebView2). File changes then apply after a restart. |
 
 ## 4. Package and catalog
@@ -78,7 +78,7 @@ Zip the build output (no `SwissTechKnife.Sdk.dll`), `module.json` at the root. P
 }
 ```
 
-`releaseNotes` is a list of `{ "version", "date": "yyyy-MM-dd", "notes": ["…"] }` (pt-BR, one sentence per change): the details dialog shows them in **Notas da versão** (up to the current version, marked **Atual**), and the update confirmation shows the versions being installed. `iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Em breve**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Atualização**.
+`releaseNotes` is a list of `{ "version", "date": "yyyy-MM-dd", "notes": ["…"] }` (English, one sentence per change): the details dialog shows them in **Release notes** (up to the current version, marked **Current**), and the update confirmation shows the versions being installed. `iconImage` (PNG, ideally 256 px, put it in `catalog/icons/`) is the module's own icon and replaces the vector `icon` once loaded; it is cached for offline use. `iconBackground` sets the tile color behind it. An entry without `package`/`sha256` shows as **Coming soon**. The host verifies SHA-256, extracts into a staging folder, validates `module.json` (id, version, entry, SDK) and only then swaps it in. A newer catalog `version` shows **Update available**.
 
 ## 5. Rules
 

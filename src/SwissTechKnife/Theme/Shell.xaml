@@ -192,19 +192,19 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:ModuleStatus.ComingSoon}">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Em breve" />
+                <Setter Property="Content" Value="{infra:Loc ComingSoon}" />
                 <Setter Property="Background" Value="{StaticResource Brush.Info.Soft}" />
                 <Setter Property="Foreground" Value="{StaticResource Brush.Info}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding HasUpdate}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Atualização disponível" />
+                <Setter Property="Content" Value="{infra:Loc UpdateAvailable}" />
                 <Setter Property="Background" Value="{StaticResource Brush.Success.Soft}" />
                 <Setter Property="Foreground" Value="{StaticResource Brush.Success}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding RestartRequired}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Content" Value="Reiniciar" />
+                <Setter Property="Content" Value="{infra:Loc Restart}" />
                 <Setter Property="Background" Value="{StaticResource Brush.Warning.Soft}" />
                 <Setter Property="Foreground" Value="{StaticResource Brush.Warning}" />
             </DataTrigger>
@@ -297,7 +297,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="Glyph" Text="{Binding Icon}" Style="{StaticResource Text.Icon}" FontSize="14" Foreground="{StaticResource Brush.Info}" Margin="0,0,12,0" />
                 <TextBlock Grid.Column="1" Text="{Binding Message}" Style="{StaticResource Text.Body}" TextWrapping="Wrap" TextTrimming="None" VerticalAlignment="Center" />
-                <Button Grid.Column="2" Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE711;" Margin="10,0,0,0" ToolTip="Fechar"
+                <Button Grid.Column="2" Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE711;" Margin="10,0,0,0" ToolTip="{infra:Loc Close}"
                         Command="{Binding DataContext.DismissToastCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
             </Grid>
         </Border>
@@ -332,7 +332,7 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <!-- Release notes, one version: "v1.1.0  19 out 2026  [Atual]" + bullet list (module dialog, host update popup). -->
+    <!-- Release notes, one version: "v1.1.0  Oct 19, 2026  [Current]" + bullet list (module dialog, host update popup). -->
     <DataTemplate x:Key="ReleaseNoteTemplate">
         <StackPanel Margin="0,0,0,18">
             <StackPanel Orientation="Horizontal">
@@ -340,7 +340,7 @@
                 <TextBlock Text="{Binding DateText}" Style="{StaticResource Text.Caption}" Margin="10,1,0,0" VerticalAlignment="Center" />
                 <Border Style="{StaticResource Chip}" Background="{StaticResource Brush.Accent.Soft}" Margin="10,0,0,0"
                         Visibility="{Binding IsCurrent, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Text="Atual" Foreground="{StaticResource Brush.Accent}" VerticalAlignment="Center" />
+                    <TextBlock Text="{infra:Loc Current}" Foreground="{StaticResource Brush.Accent}" VerticalAlignment="Center" />
                 </Border>
             </StackPanel>
             <ItemsControl ItemsSource="{Binding Notes}" Margin="0,8,0,0" Focusable="False">

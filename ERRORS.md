@@ -55,3 +55,9 @@
 - Cause: VisualStateManager *generated* transitions (`GeneratedDuration`) do not interpolate properties of Freezable targets such as `TranslateTransform`/`ScaleTransform`; they only apply the new state at the end. Same for button/card press scale and the radio dot.
 - Solution: explicit `VisualTransition From/To` storyboards animate the transforms (switch knob slide and press stretch, radio dot, button and card press). Animations also run at the display refresh rate (`FrameRate.MatchDisplay`, 74–75 Hz here) instead of WPF's fixed 60 fps.
 - Prevention: any transform in a VSM state needs an explicit transition storyboard; verify motion with `STK_FRAMEDIAG=1` (it logs the knob position per frame and frame gaps).
+
+## 2026-10-20 — Language combo box items read as "[pt-BR, Português (Brasil)]" to UI Automation
+- Symptom: the language options showed correctly (`DisplayMemberPath`), but screen readers and UI Automation saw each item as `[pt-BR, Português (Brasil)]`.
+- Cause: a `ComboBoxItem`'s accessible name comes from the item's `ToString()`, and the items were `KeyValuePair<string, string>`.
+- Solution: bind the combo to small option classes (`LanguageOption`, `FrequencyOption`) whose `ToString()` returns the display text.
+- Prevention: never use `KeyValuePair`/tuples as items of a selectable control; give options a class with a meaningful `ToString()`.

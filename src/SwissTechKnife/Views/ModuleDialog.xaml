@@ -1,6 +1,7 @@
 <UserControl x:Class="SwissTechKnife.Views.ModuleDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:infra="clr-namespace:SwissTechKnife.Infrastructure"
              xmlns:ui="clr-namespace:SwissTechKnife.Sdk;assembly=SwissTechKnife.Sdk"
              Visibility="Collapsed"
              KeyboardNavigation.TabNavigation="Cycle">
@@ -39,26 +40,26 @@
                         <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" Margin="0,3,0,8" />
                         <ContentControl Style="{StaticResource StatusChip}" HorizontalAlignment="Left" />
                     </StackPanel>
-                    <Button x:Name="CloseButton" Grid.Column="2" Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE711;" ToolTip="Fechar (Esc)"
+                    <Button x:Name="CloseButton" Grid.Column="2" Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE711;" ToolTip="{infra:Loc CloseEsc}"
                             VerticalAlignment="Top" Margin="0,-10,-10,0" Click="OnCloseClick" />
                 </Grid>
 
-                <!-- Tabs: "Notas da versão" when notes exist; "Configurações" for enabled modules with settings -->
+                <!-- Tabs: "Release notes" when notes exist; "Settings" for enabled modules with settings -->
                 <StackPanel Grid.Row="1" Margin="0,22,0,0">
                     <Border Style="{StaticResource Segmented.Container}" HorizontalAlignment="Left" Margin="0,0,0,20"
                             Visibility="{Binding ShowTabs, Converter={StaticResource BoolToVisibility}}">
                         <ui:SegmentedPanel>
-                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Descrição"
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="{infra:Loc DescriptionTab}"
                                          IsChecked="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
-                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="Notas da versão"
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" Content="{infra:Loc ReleaseNotesTab}"
                                          Visibility="{Binding HasReleaseNotes, Converter={StaticResource BoolToVisibility}}"
                                          IsChecked="{Binding DataContext.IsNotesTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
-                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" AutomationProperties.Name="Configurações"
+                            <RadioButton Style="{StaticResource Segmented.Item}" GroupName="DialogTab" AutomationProperties.Name="{infra:Loc SettingsTitle}"
                                          Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}"
                                          IsChecked="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE713;" Style="{StaticResource Text.Icon}" FontSize="12" Margin="0,0,7,0" />
-                                    <TextBlock Text="Configurações" />
+                                    <TextBlock Text="{infra:Loc SettingsTitle}" />
                                 </StackPanel>
                             </RadioButton>
                         </ui:SegmentedPanel>
@@ -69,7 +70,7 @@
                             <TranslateTransform x:Name="TabMove" />
                         </Grid.RenderTransform>
 
-                        <!-- Descrição -->
+                        <!-- Description -->
                         <StackPanel Visibility="{Binding DataContext.IsDescriptionTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                             <ScrollViewer MaxHeight="220" VerticalScrollBarVisibility="Auto">
                                 <TextBlock Text="{Binding Description}" Style="{StaticResource Text.Paragraph}" />
@@ -81,25 +82,25 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="Versão" Style="{StaticResource Text.Overline}" />
+                                    <TextBlock Text="{infra:Loc Version}" Style="{StaticResource Text.Overline}" />
                                     <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
                                     <TextBlock Text="{Binding UpdateText}" Style="{StaticResource Text.Caption}" Foreground="{StaticResource Brush.Success}" Margin="0,2,0,0"
                                                Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="Tamanho" Style="{StaticResource Text.Overline}" />
+                                    <TextBlock Text="{infra:Loc Size}" Style="{StaticResource Text.Overline}" />
                                     <TextBlock Text="{Binding SizeText}" Style="{StaticResource Text.BodyStrong}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
 
-                        <!-- Notas da versão -->
+                        <!-- Release notes -->
                         <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto"
                                       Visibility="{Binding DataContext.IsNotesTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                             <ItemsControl ItemsSource="{Binding ReleaseNotes}" ItemTemplate="{StaticResource ReleaseNoteTemplate}" Focusable="False" Margin="0,0,0,-18" />
                         </ScrollViewer>
 
-                        <!-- Configurações -->
+                        <!-- Settings -->
                         <Grid Visibility="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
                             <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
                                 <ContentPresenter Content="{Binding DataContext.SettingsPage, RelativeSource={RelativeSource AncestorType=Window}}" />
@@ -121,7 +122,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="&#xE777;" Style="{StaticResource Text.Icon}" FontSize="14" Foreground="{StaticResource Brush.Warning}" />
                             <TextBlock Grid.Column="1" Text="{Binding RestartReason}" Style="{StaticResource Text.Body}" TextWrapping="Wrap" TextTrimming="None" Margin="12,0" VerticalAlignment="Center" />
-                            <Button Grid.Column="2" Style="{StaticResource Button.Ghost}" Content="Reiniciar agora" MinHeight="28" Padding="10,0"
+                            <Button Grid.Column="2" Style="{StaticResource Button.Ghost}" Content="{infra:Loc RestartNow}" MinHeight="28" Padding="10,0"
                                     Foreground="{StaticResource Brush.Warning}"
                                     Command="{Binding DataContext.RestartCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                         </Grid>
@@ -157,10 +158,10 @@
                             Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibility}}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource Button.Danger}">
-                                <Setter Property="Content" Value="Desinstalar" />
+                                <Setter Property="Content" Value="{infra:Loc Uninstall}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ConfirmingUninstall}" Value="True">
-                                        <Setter Property="Content" Value="Confirmar remoção" />
+                                        <Setter Property="Content" Value="{infra:Loc ConfirmRemoval}" />
                                         <Setter Property="Background" Value="{StaticResource Brush.Danger.Strong}" />
                                         <Setter Property="Foreground" Value="White" />
                                     </DataTrigger>
@@ -170,24 +171,24 @@
                     </Button>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE8A7;" Content="Abrir" Margin="8,0,0,0"
+                        <Button Style="{StaticResource Button.Secondary}" ui:Ui.Icon="&#xE8A7;" Content="{infra:Loc Open}" Margin="8,0,0,0"
                                 Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowOpenSecondary, Converter={StaticResource BoolToVisibility}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE8A7;" Content="Abrir" Margin="8,0,0,0"
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE8A7;" Content="{infra:Loc Open}" Margin="8,0,0,0"
                                 Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowOpenPrimary, Converter={StaticResource BoolToVisibility}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" Margin="8,0,0,0"
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="{infra:Loc Update}" Margin="8,0,0,0"
                                 Command="{Binding DataContext.RequestUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowUpdate, Converter={StaticResource BoolToVisibility}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE896;" Content="Instalar" Margin="8,0,0,0"
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE896;" Content="{infra:Loc Install}" Margin="8,0,0,0"
                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                                 Visibility="{Binding ShowInstall, Converter={StaticResource BoolToVisibility}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE823;" Content="Em breve" Margin="8,0,0,0" IsEnabled="False"
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE823;" Content="{infra:Loc ComingSoon}" Margin="8,0,0,0" IsEnabled="False"
                                 Visibility="{Binding ShowComingSoon, Converter={StaticResource BoolToVisibility}}" />
                         <CheckBox Style="{StaticResource Switch}" Margin="20,0,0,0" VerticalAlignment="Center"
                                   IsChecked="{Binding IsActive, Mode=TwoWay}" Content="{Binding ActiveText}"
                                   Foreground="{StaticResource Brush.Text.Secondary}"
-                                  AutomationProperties.Name="Ativar módulo"
+                                  AutomationProperties.Name="{infra:Loc EnableModule}"
                                   Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibility}}" />
                     </StackPanel>
                 </Grid>
@@ -214,7 +215,7 @@
                         <ContentControl Style="{StaticResource IconTile}" Width="40" Height="40" Padding="9" ui:Ui.CornerRadius="11" />
                         <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource Text.Subtitle}">
-                                <Run Text="Atualizar" /> <Run Text="{Binding Name, Mode=OneWay}" />
+                                <Run Text="{infra:Loc Update}" /> <Run Text="{Binding Name, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock Style="{StaticResource Text.Caption}" Margin="0,2,0,0">
                                 <Run Text="{Binding VersionText, Mode=OneWay}" /> <Run Text="→" /> <Run Text="{Binding LatestVersion, Mode=OneWay, StringFormat=v{0}}" Foreground="{StaticResource Brush.Success}" />
@@ -222,17 +223,17 @@
                         </StackPanel>
                     </Grid>
 
-                    <TextBlock Text="O que muda" Style="{StaticResource Text.Overline}" Margin="0,22,0,10" />
+                    <TextBlock Text="{infra:Loc WhatsNew}" Style="{StaticResource Text.Overline}" Margin="0,22,0,10" />
                     <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding UpdateNotes}" ItemTemplate="{StaticResource ReleaseNoteTemplate}" Focusable="False" Margin="0,0,0,-18" />
                     </ScrollViewer>
-                    <TextBlock Text="Esta versão não tem notas publicadas." Style="{StaticResource Text.Paragraph}"
+                    <TextBlock Text="{infra:Loc NoReleaseNotes}" Style="{StaticResource Text.Paragraph}"
                                Visibility="{Binding HasUpdateNotes, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-                        <Button x:Name="ConfirmCancel" Style="{StaticResource Button.Secondary}" Content="Cancelar"
+                        <Button x:Name="ConfirmCancel" Style="{StaticResource Button.Secondary}" Content="{infra:Loc Cancel}"
                                 Command="{Binding DataContext.CancelUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
-                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="Atualizar" Margin="8,0,0,0"
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE895;" Content="{infra:Loc Update}" Margin="8,0,0,0"
                                 Command="{Binding DataContext.ConfirmUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                     </StackPanel>
                 </StackPanel>
