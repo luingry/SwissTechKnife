@@ -39,6 +39,7 @@ namespace SwissTechKnife.Core
 
             // Store
             ["StoreSubtitle"] = "Install only what you use. Each module runs inside SwissTechKnife, in the same process, and can be disabled or removed at any time.",
+            ["AllTab"] = "All",
             ["AvailableTab"] = "Available",
             ["InstalledTab"] = "Installed",
             ["SearchModules"] = "Search modules",
@@ -53,6 +54,8 @@ namespace SwissTechKnife.Core
             ["EmptyFailedText"] = "Check your connection and try again.",
             ["EmptyAllTitle"] = "All installed",
             ["EmptyAllText"] = "You already have every module in the catalog.",
+            ["EmptyCatalogTitle"] = "No modules yet",
+            ["EmptyCatalogText"] = "The catalog has no modules right now.",
 
             // Module dialog
             ["DescriptionTab"] = "Description",
@@ -190,6 +193,7 @@ namespace SwissTechKnife.Core
             ["NoReleaseNotes"] = "Esta versão não tem notas publicadas.",
 
             ["StoreSubtitle"] = "Instale só o que você usa. Cada módulo roda dentro do SwissTechKnife, no mesmo processo, e pode ser desativado ou removido a qualquer momento.",
+            ["AllTab"] = "Todos",
             ["AvailableTab"] = "Disponíveis",
             ["InstalledTab"] = "Instalados",
             ["SearchModules"] = "Buscar módulos",
@@ -204,6 +208,8 @@ namespace SwissTechKnife.Core
             ["EmptyFailedText"] = "Verifique a conexão e tente de novo.",
             ["EmptyAllTitle"] = "Tudo instalado",
             ["EmptyAllText"] = "Você já tem todos os módulos do catálogo.",
+            ["EmptyCatalogTitle"] = "Nenhum módulo ainda",
+            ["EmptyCatalogText"] = "O catálogo não tem módulos no momento.",
 
             ["DescriptionTab"] = "Descrição",
             ["ReleaseNotesTab"] = "Notas da versão",

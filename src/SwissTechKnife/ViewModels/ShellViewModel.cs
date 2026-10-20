@@ -17,6 +17,7 @@ namespace SwissTechKnife.ViewModels
 {
     public enum StoreTab
     {
+        All,
         Available,
         Installed,
     }
@@ -47,7 +48,7 @@ namespace SwissTechKnife.ViewModels
         private readonly DispatcherTimer _searchDebounce;
         private string _searchText = string.Empty;
         private string _appliedSearch = string.Empty;
-        private StoreTab _tab = StoreTab.Available;
+        private StoreTab _tab = StoreTab.All;
         private bool _isStoreActive = true;
         private ModuleItem _currentModule;
         private FrameworkElement _currentPage;

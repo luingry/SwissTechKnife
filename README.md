@@ -45,8 +45,6 @@ SwissTechKnife is a lightweight app that brings many tools together as **modules
 |---|---|
 | **SmoothMice** | Smooth mouse scrolling across Windows, with per-app tuning and no interference with games. |
 | **Tamarillo** | Hold Ctrl + Alt + Shift while dragging files and pick what to do from a wheel: convert, resize, compress, recognize text and more. |
-| **System Monitor** | Shows processor and memory usage and how long your PC has been on. |
-| **Hash** | Computes MD5, SHA-1, SHA-256 and SHA-512 for text and files. |
 | **Winput LAN** | *Coming soon:* one mouse and keyboard for several PCs on your network. |
 | **AQ Tracker** | *Coming soon.* |
 

@@ -124,56 +124,6 @@
       ]
     },
     {
-      "id": "system-monitor",
-      "name": "System Monitor",
-      "tagline": "CPU, memory and uptime, in real time.",
-      "description": "SwissTechKnife sample module. Shows processor usage over the last 60 seconds, memory in use and how long Windows has been running. Readings only happen while the page is open.",
-      "version": "1.1.0",
-      "icon": "M3,12 L7,12 L10,5 L14,19 L17,12 L21,12",
-      "accent": "#5FB3D0",
-      "package": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/system-monitor-1.1.0.zip",
-      "releaseNotes": [
-        {
-          "version": "1.1.0",
-          "date": "2026-10-19",
-          "notes": [
-            "New Settings tab: refresh interval (1, 2 or 5 seconds) and an option to hide the processor chart.",
-            "Settings apply right away and are kept across updates."
-          ]
-        },
-        {
-          "version": "1.0.0",
-          "date": "2026-10-19",
-          "notes": [
-            "First release: processor usage, memory in use and uptime, read only while the page is open."
-          ]
-        }
-      ],
-      "sha256": "225a78af3fe6bc229fb835bf27a89e1ca86b00bcac22b9bc2b6a3675f39cda49",
-      "size": 17935
-    },
-    {
-      "id": "hash-tool",
-      "name": "Hash",
-      "tagline": "MD5, SHA-1, SHA-256 and SHA-512 for text and files.",
-      "description": "SwissTechKnife sample module. Hashes text as you type, or a file dropped on the page, reading the file only once for every algorithm.",
-      "version": "1.0.0",
-      "icon": "M9,4 L7,20 M17,4 L15,20 M4,9 L20,9 M3,15 L19,15",
-      "accent": "#A98BF0",
-      "package": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.0/hash-tool-1.0.0.zip",
-      "releaseNotes": [
-        {
-          "version": "1.0.0",
-          "date": "2026-10-19",
-          "notes": [
-            "First release: MD5, SHA-1, SHA-256 and SHA-512 for text and files, with one-click copy."
-          ]
-        }
-      ],
-      "sha256": "5b1e722d95f5130d3798bfebef6abfb1aec048cdfbb3097bd2bd349134546799",
-      "size": 15531
-    },
-    {
       "id": "tamarillo",
       "name": "Tamarillo",
       "tagline": "Drag, hold the shortcut and drop: convert and process files from a wheel.",

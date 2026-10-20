@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AssemblyName>SwissTechKnife.Samples.HashTool</AssemblyName>
-    <RootNamespace>SwissTechKnife.Samples.HashTool</RootNamespace>
-    <Version>1.0.0</Version>
-  </PropertyGroup>
-</Project>

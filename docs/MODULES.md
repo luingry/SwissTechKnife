@@ -41,7 +41,7 @@ Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timer
 
 ### Settings
 
-If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Settings** tab next to **Description** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See `samples/SystemMonitor`.
+If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Settings** tab next to **Description** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See the Tamarillo module (github.com/luingry/Tamarillo).
 
 ## 3. module.json
 

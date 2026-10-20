@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AssemblyName>SwissTechKnife.Samples.SystemMonitor</AssemblyName>
-    <RootNamespace>SwissTechKnife.Samples.SystemMonitor</RootNamespace>
-    <Version>1.1.0</Version>
-  </PropertyGroup>
-</Project>
