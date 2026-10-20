@@ -1,11 +1,18 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.4",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.4/SwissTechKnife-0.4.4-setup.exe",
-    "sha256": "ebad712695e0ce65083a3f5cc2141dadfad7ec7685b890f5850d6de6077225a2",
-    "size": 2313662,
+    "version": "0.4.5",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.5/SwissTechKnife-0.4.5-setup.exe",
+    "sha256": "1d92307119a61967419f89eed6181a80a0e1dac369333c0ce512e0ad6b56bcae",
+    "size": 2314538,
     "releaseNotes": [
+      {
+        "version": "0.4.5",
+        "date": "2026-10-19",
+        "notes": [
+          "The All tab now splits modules into Installed and Available sections."
+        ]
+      },
       {
         "version": "0.4.4",
         "date": "2026-10-19",
