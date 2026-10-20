@@ -1,6 +1,6 @@
 ## Conventions
 
-- Code, comments, docs and commit messages in English; UI text in Brazilian Portuguese.
+- Code, comments, docs and commit messages in English; UI text and the user-facing README in Brazilian Portuguese (technical docs live in `docs/`).
 - UI uses only design-system tokens and styles from `src/SwissTechKnife.Sdk/Theme` (see `docs/DESIGN_SYSTEM.md`). No solid borders, no native-looking controls, every state transition animated.
 - Performance first: no work before first paint, nothing on the UI thread that touches disk/network, prefer opacity/transform animations, freeze brushes and geometries.
 - The SDK is a public contract for module repositories: only additive changes within 1.x; bump `SdkInfo.ContractVersion` for breaking changes.
