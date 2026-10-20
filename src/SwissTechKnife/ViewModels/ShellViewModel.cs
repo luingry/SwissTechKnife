@@ -94,6 +94,8 @@ namespace SwissTechKnife.ViewModels
             ShowSettingsCommand = new RelayCommand(_ => ShowSettings());
             ShowTabCommand = new RelayCommand(p => { Tab = (StoreTab)p; ShowStore(); });
             OpenDetailsCommand = new RelayCommand(p => SelectedModule = p as ModuleItem, p => p is ModuleItem);
+            OpenNotesCommand = new RelayCommand(p => { SelectedModule = (ModuleItem)p; IsNotesTab = true; }, p => p is ModuleItem);
+            OpenModuleSettingsCommand = new RelayCommand(p => { SelectedModule = (ModuleItem)p; IsSettingsTab = true; }, p => p is ModuleItem m && m.HasSettings);
             CloseDetailsCommand = new RelayCommand(_ => SelectedModule = null);
             InstallCommand = new AsyncCommand(p => InstallAsync((ModuleItem)p), p => p is ModuleItem m && !m.IsBusy && (m.CanInstall || m.HasUpdate), ex => ReportError(ex));
             UninstallCommand = new RelayCommand(p => Uninstall((ModuleItem)p), p => p is ModuleItem m && m.IsInstalled && !m.IsBusy);
@@ -107,6 +109,8 @@ namespace SwissTechKnife.ViewModels
             RestartCommand = new RelayCommand(_ => _restart());
             DismissToastCommand = new RelayCommand(p => DismissToast(p as Toast));
             RetryPageCommand = new RelayCommand(_ => RetryPage(), _ => _currentModule != null);
+            CheckModuleUpdateCommand = new AsyncCommand(p => CheckModuleUpdateAsync((ModuleItem)p),
+                p => p is ModuleItem m && m.IsInstalled && !m.IsBusy && CatalogState != CatalogState.Loading, ex => ReportError(ex));
             RequestUpdateCommand = new RelayCommand(p => PendingUpdate = (ModuleItem)p, p => p is ModuleItem m && m.HasUpdate && !m.IsBusy);
             CancelUpdateCommand = new RelayCommand(_ => PendingUpdate = null);
             ConfirmUpdateCommand = new AsyncCommand(async _ =>
@@ -134,6 +138,12 @@ namespace SwissTechKnife.ViewModels
         public SettingsViewModel Settings { get; }
         public ICommand ShowTabCommand { get; }
         public ICommand OpenDetailsCommand { get; }
+
+        /// <summary>Version link: the details dialog on its Release notes tab (Description when there are none).</summary>
+        public ICommand OpenNotesCommand { get; }
+
+        /// <summary>Module page gear: the details dialog on its Settings tab.</summary>
+        public ICommand OpenModuleSettingsCommand { get; }
         public ICommand CloseDetailsCommand { get; }
         public ICommand InstallCommand { get; }
         public ICommand UninstallCommand { get; }
@@ -144,6 +154,9 @@ namespace SwissTechKnife.ViewModels
 
         /// <summary>Title-bar "Check for updates": a live catalog check; a newer SwissTechKnife opens its confirmation.</summary>
         public ICommand CheckHostUpdateCommand { get; }
+
+        /// <summary>Per-module "Check for updates": a live catalog check; a newer version opens its confirmation.</summary>
+        public ICommand CheckModuleUpdateCommand { get; }
         public ICommand RestartCommand { get; }
         public ICommand DismissToastCommand { get; }
         public ICommand RetryPageCommand { get; }
@@ -493,6 +506,33 @@ namespace SwissTechKnife.ViewModels
             else if (announce && force)
             {
                 Notify(Strings.Get("UpdateCheckFailed"), NotificationKind.Warning);
+            }
+        }
+
+        private async Task CheckModuleUpdateAsync(ModuleItem item)
+        {
+            item.IsCheckingUpdate = true;
+            try
+            {
+                await ReloadCatalogAsync(force: true);
+            }
+            finally
+            {
+                item.IsCheckingUpdate = false;
+            }
+            if (item.HasUpdate)
+            {
+                // The confirmation lives over the details dialog, so the dialog opens first.
+                SelectedModule = item;
+                PendingUpdate = item;
+            }
+            else if (_manager.LastCatalog.Error != null)
+            {
+                Notify(Strings.Get("UpdateCheckFailed"), NotificationKind.Warning);
+            }
+            else
+            {
+                Notify(Strings.Format("ModuleUpToDate", item.Name), NotificationKind.Info);
             }
         }
 

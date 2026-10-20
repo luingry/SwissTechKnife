@@ -94,6 +94,7 @@ namespace SwissTechKnife.Core
             ["ModuleUpdatesOne"] = "1 module update available.",
             ["ModuleUpdatesMany"] = "{0} module updates available.",
             ["AllUpToDate"] = "Everything is up to date.",
+            ["ModuleUpToDate"] = "{0} is up to date.",
             ["UpdateCheckFailed"] = "Couldn't check for updates right now.",
 
             // Settings
@@ -245,6 +246,7 @@ namespace SwissTechKnife.Core
             ["ModuleUpdatesOne"] = "1 atualização de módulo disponível.",
             ["ModuleUpdatesMany"] = "{0} atualizações de módulos disponíveis.",
             ["AllUpToDate"] = "Tudo atualizado.",
+            ["ModuleUpToDate"] = "{0} está atualizado.",
             ["UpdateCheckFailed"] = "Não foi possível verificar atualizações agora.",
 
             ["SettingsTitle"] = "Configurações",

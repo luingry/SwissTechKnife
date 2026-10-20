@@ -27,6 +27,7 @@ namespace SwissTechKnife.ViewModels
         private CatalogEntry _catalogEntry;
         private InstalledModule _installed;
         private bool _isBusy;
+        private bool _isCheckingUpdate;
         private double _progress;
         private string _busyText;
         private string _error;
@@ -228,8 +229,30 @@ namespace SwissTechKnife.ViewModels
         public bool IsBusy
         {
             get => _isBusy;
-            set => Set(ref _isBusy, value);
+            set
+            {
+                if (Set(ref _isBusy, value))
+                {
+                    OnPropertyChanged(nameof(ShowUpdateRing));
+                }
+            }
         }
+
+        /// <summary>A live catalog check started from this module's update button is running.</summary>
+        public bool IsCheckingUpdate
+        {
+            get => _isCheckingUpdate;
+            set
+            {
+                if (Set(ref _isCheckingUpdate, value))
+                {
+                    OnPropertyChanged(nameof(ShowUpdateRing));
+                }
+            }
+        }
+
+        /// <summary>Progress ring around the update button: spins while checking, fills while updating.</summary>
+        public bool ShowUpdateRing => _isBusy || _isCheckingUpdate;
 
         /// <summary>0..1 while installing/updating.</summary>
         public double Progress

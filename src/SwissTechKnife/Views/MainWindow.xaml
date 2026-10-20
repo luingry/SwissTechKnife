@@ -133,9 +133,12 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <ContentControl Style="{StaticResource IconTile}" Width="26" Height="26" Padding="5" ui:Ui.CornerRadius="7" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <Ellipse Grid.Column="2" Width="6" Height="6" Fill="{StaticResource Brush.Success}" Margin="8,0,0,0" ToolTip="{infra:Loc UpdateAvailable}"
-                                             Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
+                                    <TextBlock Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                                        <Run Text="{Binding Name, Mode=OneWay}" /> <Run Text="{Binding VersionText, Mode=OneWay}" FontSize="{StaticResource FontSize.Caption}" Foreground="{StaticResource Brush.Text.Tertiary}" />
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="2" Text="&#xE72C;" Style="{StaticResource Text.Icon}" FontSize="12" Foreground="{StaticResource Brush.Success}" Margin="8,0,0,0"
+                                               VerticalAlignment="Center" ToolTip="{infra:Loc UpdateAvailable}"
+                                               Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -173,10 +176,16 @@
                             <ContentControl Style="{StaticResource IconTile}" Width="36" Height="36" Padding="8" ui:Ui.CornerRadius="10" />
                             <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name}" Style="{StaticResource Text.Subtitle}" />
-                                <TextBlock Text="{Binding VersionText}" Style="{StaticResource Text.Caption}" Margin="0,1,0,0" />
+                                <ContentControl Content="{Binding}" ContentTemplate="{StaticResource ModuleVersionBar}" Focusable="False" HorizontalAlignment="Left" Margin="0,1,0,0" />
                             </StackPanel>
-                            <Button Grid.Column="2" Style="{StaticResource Button.Ghost}" ui:Ui.Icon="&#xE946;" Content="{infra:Loc Details}"
-                                    Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource Button.Icon}" ui:Ui.Icon="&#xE713;" Margin="0,0,4,0"
+                                        Command="{Binding DataContext.OpenModuleSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
+                                        ToolTip="{infra:Loc SettingsTitle}" AutomationProperties.Name="{infra:Loc SettingsTitle}"
+                                        Visibility="{Binding HasSettings, Converter={StaticResource BoolToVisibility}}" />
+                                <Button Style="{StaticResource Button.Ghost}" ui:Ui.Icon="&#xE946;" Content="{infra:Loc Details}"
+                                        Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                            </StackPanel>
                         </Grid>
 
                         <ContentPresenter Grid.Row="1" Content="{Binding CurrentPage}" />

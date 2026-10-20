@@ -359,4 +359,52 @@
             </ItemsControl>
         </StackPanel>
     </DataTemplate>
+
+    <!-- Per-module "Check for updates": same button and progress ring as the title bar's, for one installed module.
+         DataContext: ModuleItem; the command lives on the window's ShellViewModel. -->
+    <DataTemplate x:Key="ModuleUpdateButton" DataType="{x:Type vm:ModuleItem}">
+        <Grid Width="24" Height="24" Margin="2,0,0,0" Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibility}}">
+            <Button Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE72C;" Width="24" Height="24" FontSize="11"
+                    Command="{Binding DataContext.CheckModuleUpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
+                    ToolTip="{infra:Loc CheckForUpdates}" AutomationProperties.Name="{infra:Loc CheckForUpdates}" />
+            <!-- Spins while the catalog is checked, then fills with the update download. -->
+            <infra:ProgressRing Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsCheckingUpdate, Mode=OneWay}"
+                                Stroke="{StaticResource Brush.Accent}" Track="{StaticResource Brush.Accent.Soft}" Thickness="2" Opacity="0">
+                <infra:ProgressRing.Style>
+                    <Style TargetType="infra:ProgressRing">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowUpdateRing}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{StaticResource Motion.Normal}" EasingFunction="{StaticResource Ease.Out}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </infra:ProgressRing.Style>
+            </infra:ProgressRing>
+        </Grid>
+    </DataTemplate>
+
+    <!-- Module version line: the version opens the release notes (like the title bar's), then the update button.
+         Use with ContentControl Content="{Binding}"; the ghost button's padding is pulled back so the text keeps its column. -->
+    <DataTemplate x:Key="ModuleVersionBar" DataType="{x:Type vm:ModuleItem}">
+        <StackPanel Orientation="Horizontal" Margin="-6,-4,0,-4">
+            <Button Style="{StaticResource Button.Ghost}" Content="{Binding VersionText}"
+                    Command="{Binding DataContext.OpenNotesCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
+                    FontSize="{StaticResource FontSize.Caption}" FontWeight="Normal" Padding="6,0" MinHeight="24" VerticalAlignment="Center"
+                    ui:Ui.CornerRadius="{StaticResource Radius.Sm}" ToolTip="{infra:Loc ReleaseNotesTab}" AutomationProperties.Name="{infra:Loc ReleaseNotesTab}" />
+            <ContentControl Content="{Binding}" ContentTemplate="{StaticResource ModuleUpdateButton}" Focusable="False" VerticalAlignment="Center" />
+        </StackPanel>
+    </DataTemplate>
 </ResourceDictionary>
