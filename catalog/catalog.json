@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.2",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.2/SwissTechKnife-0.4.2-setup.exe",
-    "sha256": "a46e32e6c64ae43afbd62a50dfa8b4b0d0a1a8bc0cf02f549d13e6508e19abc1",
-    "size": 7126963,
+    "version": "0.4.3",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.3/SwissTechKnife-0.4.3-setup.exe",
+    "sha256": "172eac964e68322b52d3147a47ffc1e329ca988e838a4335a82a24a4dfd4433a",
+    "size": 7129135,
     "releaseNotes": [
+      {
+        "version": "0.4.3",
+        "date": "2026-10-19",
+        "notes": [
+          "Updates install reliably: the installer waits for SwissTechKnife to close completely before replacing its files.",
+          "A progress ring around the update button shows the download and installation."
+        ]
+      },
       {
         "version": "0.4.2",
         "date": "2026-10-19",
