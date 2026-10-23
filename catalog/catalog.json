@@ -1,11 +1,18 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.6",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.6/SwissTechKnife-0.4.6-setup.exe",
-    "sha256": "2a851979a71bfbf8e550f7b70fe46936b3abd24d27e56fba260b293643b2a578",
-    "size": 7107444,
+    "version": "0.4.7",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.7/SwissTechKnife-0.4.7-setup.exe",
+    "sha256": "a977e21835b53fdf6229cc7d5bc579bac26b3a01b3c12f659007ac309ecbb0fb",
+    "size": 7209705,
     "releaseNotes": [
+      {
+        "version": "0.4.7",
+        "date": "2026-10-23",
+        "notes": [
+          "Fixed the store's empty-state message sometimes staying on top of the module list after switching tabs."
+        ]
+      },
       {
         "version": "0.4.6",
         "date": "2026-10-23",
