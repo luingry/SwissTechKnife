@@ -1,5 +1,11 @@
 # Resolved errors
 
+## 2026-10-23 — Store: empty state ("No modules yet" / "All installed") drawn over the module list
+
+- Symptom: after switching store tabs, the empty-state panel sometimes stayed visible on top of the All tab's cards.
+- Cause: the `Tab` setter ran `RefreshLists()` (which calls `RefreshEmptyState()`) inside `_storeView.DeferRefresh()`. While deferred, `ListCollectionView.IsEmpty` still reflects the previous filter, so `IsListEmpty` came from the old tab (e.g. an empty Available tab) and was never re-raised after the refresh landed.
+- Solution: call `RefreshEmptyState()` again after the `using (DeferRefresh())` block. Never read `IsEmpty`/`Count` of a view inside its own `DeferRefresh` scope.
+
 ## 2026-10-19 — Host self-update design: avoid the micesmooth OTA failures
 
 - Context: micesmooth's OTA (D:\Dev\micesmooth\ERRORS.md, 2026-10-01) lost the installer exit code (`%%ERRORLEVEL%%` in a .bat) and skipped waits (`timeout.exe` without a console / GNU `timeout` first in PATH), so setup ran while the app still held its files.

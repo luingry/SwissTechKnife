@@ -194,6 +194,9 @@ namespace SwissTechKnife.ViewModels
                         ApplyStoreSections();
                         RefreshLists();
                     }
+                    // IsEmpty is stale until the deferred refresh lands; re-read it now, or the previous
+                    // tab's empty state stays on top of the new list.
+                    RefreshEmptyState();
                 }
             }
         }
