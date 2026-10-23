@@ -218,6 +218,10 @@ namespace SwissTechKnife.Core
         /// <summary>Catalog entry snapshot at install time, so the module still shows offline or after it leaves the catalog.</summary>
         [DataMember(Name = "entry", Order = 6)]
         public CatalogEntry Entry { get; set; }
+
+        /// <summary>The module has its own notification-area icon while enabled.</summary>
+        [DataMember(Name = "trayIcon", Order = 7, EmitDefaultValue = false)]
+        public bool ShowTrayIcon { get; set; }
     }
 
     [DataContract]

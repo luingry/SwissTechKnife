@@ -62,13 +62,19 @@ namespace SwissTechKnife.Infrastructure
             }
             else if (e.Button == Forms.MouseButtons.Right)
             {
-                _menu.Placement = PlacementMode.MousePoint;
-                _menu.IsOpen = true;
-                // Without foreground activation the menu would not close when clicking elsewhere.
-                if (PresentationSource.FromVisual(_menu) is HwndSource source)
-                {
-                    SetForegroundWindow(source.Handle);
-                }
+                ShowMenu(_menu);
+            }
+        }
+
+        /// <summary>Opens a design-system menu at the cursor for a notification-area icon.</summary>
+        internal static void ShowMenu(ContextMenu menu)
+        {
+            menu.Placement = PlacementMode.MousePoint;
+            menu.IsOpen = true;
+            // Without foreground activation the menu would not close when clicking elsewhere.
+            if (PresentationSource.FromVisual(menu) is HwndSource source)
+            {
+                SetForegroundWindow(source.Handle);
             }
         }
 

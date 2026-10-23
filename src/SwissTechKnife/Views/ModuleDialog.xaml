@@ -101,13 +101,26 @@
                         </ScrollViewer>
 
                         <!-- Settings -->
-                        <Grid Visibility="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
-                            <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
-                                <ContentPresenter Content="{Binding DataContext.SettingsPage, RelativeSource={RelativeSource AncestorType=Window}}" />
-                            </ScrollViewer>
-                            <TextBlock Text="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource Text.Paragraph}"
-                                       Visibility="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NullToVisibility}}" />
-                        </Grid>
+                        <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto"
+                                      Visibility="{Binding DataContext.IsSettingsTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel>
+                                <!-- Host options, for every module -->
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowTrayIcon, Mode=TwoWay}" AutomationProperties.Name="{infra:Loc ModuleTrayIcon}">
+                                    <StackPanel Margin="0,0,24,0">
+                                        <TextBlock Text="{infra:Loc ModuleTrayIcon}" Style="{StaticResource Text.BodyStrong}" />
+                                        <TextBlock Text="{infra:Loc ModuleTrayIconHint}"
+                                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                </CheckBox>
+                                <!-- The module's own settings -->
+                                <StackPanel Visibility="{Binding HasModuleSettings, Converter={StaticResource BoolToVisibility}}">
+                                    <Separator Margin="0,18" />
+                                    <ContentPresenter Content="{Binding DataContext.SettingsPage, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                    <TextBlock Text="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource Text.Paragraph}"
+                                               Visibility="{Binding DataContext.SettingsError, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NullToVisibility}}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
                     </Grid>
                 </StackPanel>
                 <!-- Notices -->

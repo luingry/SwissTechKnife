@@ -168,6 +168,9 @@ namespace SwissTechKnife.Core
             ["TrayOpen"] = "Open SwissTechKnife",
             ["TrayExit"] = "Exit",
             ["TrayHint"] = "Still running in the notification area so background modules keep working. To quit, use Exit here.",
+            ["TrayOpenModule"] = "Open {0}",
+            ["ModuleTrayIcon"] = "Show icon in the notification area",
+            ["ModuleTrayIconHint"] = "Adds this module’s own icon with its commands. It stays while the module is enabled; turn the module off to remove it.",
         };
 
         private static readonly Dictionary<string, string> PtBr = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -316,6 +319,9 @@ namespace SwissTechKnife.Core
             ["TrayOpen"] = "Abrir SwissTechKnife",
             ["TrayExit"] = "Sair",
             ["TrayHint"] = "Continua na área de notificação para os módulos em segundo plano funcionarem. Para sair, use Sair aqui.",
+            ["TrayOpenModule"] = "Abrir {0}",
+            ["ModuleTrayIcon"] = "Exibir ícone na barra de notificação",
+            ["ModuleTrayIconHint"] = "Adiciona o ícone próprio deste módulo com os comandos dele. Ele fica enquanto o módulo estiver ativado; desative o módulo para removê-lo.",
         };
 
         private static volatile Dictionary<string, string> _table = En;

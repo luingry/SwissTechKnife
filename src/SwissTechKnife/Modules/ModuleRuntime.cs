@@ -82,6 +82,9 @@ namespace SwissTechKnife.Modules
             return active;
         }
 
+        /// <summary>The active module's instance, or null.</summary>
+        public IModule Instance(string id) => _active.TryGetValue(id, out ActiveModule active) ? active.Instance : null;
+
         public FrameworkElement GetView(string id)
         {
             ActiveModule active = _active[id];

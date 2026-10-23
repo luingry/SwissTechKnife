@@ -37,6 +37,7 @@ namespace SwissTechKnife.ViewModels
         private bool _confirmingUninstall;
         private ImageSource _iconImage;
         private bool? _pendingActive;
+        private bool? _pendingTrayIcon;
 
         public ModuleItem(string id)
         {
@@ -166,8 +167,40 @@ namespace SwissTechKnife.ViewModels
 
         public bool StartsWithHost => _installed?.Manifest?.StartsWithHost == true;
 
-        /// <summary>Enabled module that declares a settings view.</summary>
-        public bool HasSettings => IsEnabled && _installed.Manifest?.HasSettings == true;
+        /// <summary>Every enabled module has a Settings tab: host options (tray icon) plus the module's own view, if any.</summary>
+        public bool HasSettings => IsEnabled;
+
+        /// <summary>Enabled module that declares its own settings view.</summary>
+        public bool HasModuleSettings => IsEnabled && _installed.Manifest?.HasSettings == true;
+
+        /// <summary>Set by the manager: persists the tray icon switch.</summary>
+        public Action<ModuleItem, bool> TrayIconHandler { get; set; }
+
+        /// <summary>Two-way target for "Show icon in the notification area".</summary>
+        public bool ShowTrayIcon
+        {
+            get => _pendingTrayIcon ?? _installed?.ShowTrayIcon == true;
+            set
+            {
+                if (value == ShowTrayIcon)
+                {
+                    return;
+                }
+                // Same as the enable switch: the knob moves now, the icon (WinForms, disk) changes after the animation.
+                _pendingTrayIcon = value;
+                OnPropertyChanged(nameof(ShowTrayIcon));
+                Infrastructure.AfterAnimation.Run(() =>
+                {
+                    bool target = _pendingTrayIcon ?? ShowTrayIcon;
+                    _pendingTrayIcon = null;
+                    if (IsInstalled && target != _installed.ShowTrayIcon)
+                    {
+                        TrayIconHandler?.Invoke(this, target);
+                    }
+                    OnPropertyChanged(nameof(ShowTrayIcon));
+                });
+            }
+        }
 
         /// <summary>Notes for every version up to the current one, newest first; the current is flagged.</summary>
         public IReadOnlyList<ReleaseNoteView> ReleaseNotes

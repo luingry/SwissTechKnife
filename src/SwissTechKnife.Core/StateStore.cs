@@ -76,6 +76,20 @@ namespace SwissTechKnife.Core
             }
         }
 
+        public void SetTrayIcon(string id, bool show)
+        {
+            lock (_gate)
+            {
+                InstalledModule module = _state.Modules.FirstOrDefault(m => m.Id == id);
+                if (module == null || module.ShowTrayIcon == show)
+                {
+                    return;
+                }
+                module.ShowTrayIcon = show;
+                SaveLocked();
+            }
+        }
+
         public InstalledModule Remove(string id)
         {
             lock (_gate)

@@ -142,6 +142,7 @@ namespace SwissTechKnife.Modules
                 if (previous != null)
                 {
                     installed.Enabled = previous.Enabled;
+                    installed.ShowTrayIcon = previous.ShowTrayIcon;
                 }
                 _state.Upsert(installed);
 
@@ -214,6 +215,17 @@ namespace SwissTechKnife.Modules
             RaiseChanged();
         }
 
+        public void SetTrayIcon(ModuleItem item, bool show)
+        {
+            if (!item.IsInstalled)
+            {
+                return;
+            }
+            _state.SetTrayIcon(item.Id, show);
+            item.Installed = _state.Find(item.Id);
+            RaiseChanged();
+        }
+
         /// <summary>Creates the module instance if needed; failures are recorded on the item, never thrown.</summary>
         public bool TryActivate(ModuleItem item)
         {
@@ -247,7 +259,7 @@ namespace SwissTechKnife.Modules
             ModuleItem item = Find(id);
             if (item == null)
             {
-                item = new ModuleItem(id) { ToggleHandler = ToggleHandler };
+                item = new ModuleItem(id) { ToggleHandler = ToggleHandler, TrayIconHandler = SetTrayIcon };
                 Items.Add(item);
             }
             return item;

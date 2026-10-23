@@ -23,6 +23,9 @@ namespace SwissTechKnife
         private ModuleRuntime _runtime;
         private MainWindow _window;
         private TrayIcon _tray;
+        private ModuleTrayIcons _moduleTray;
+        private ModuleManager _manager;
+        private ShellViewModel _shell;
 
         public static Version HostVersion { get; } = typeof(App).Assembly.GetName().Version;
 
@@ -91,6 +94,8 @@ namespace SwissTechKnife
             string exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
             shell = new ShellViewModel(manager, catalogUri, Restart, HostVersionText, _settings, exePath, ApplyTray,
                 new HostUpdater(paths), ExitForUpdate);
+            _manager = manager;
+            _shell = shell;
             bool atLogin = e.Args.Any(a => string.Equals(a, StartupRegistration.StartupArgument, StringComparison.OrdinalIgnoreCase));
 
             // First paint before any disk or network work.
@@ -161,7 +166,8 @@ namespace SwissTechKnife
         /// </summary>
         private bool HideOnClose()
         {
-            bool background = _runtime?.HasBackgroundModules == true;
+            // A module icon in the notification area must keep working too.
+            bool background = _runtime?.HasBackgroundModules == true || _moduleTray?.Any == true;
             if (!_settings.Current.HideToTrayOnClose && !background)
             {
                 return false;
@@ -195,6 +201,11 @@ namespace SwissTechKnife
         private void CreateTray()
         {
             _tray = new TrayIcon(() => _window?.BringToFront(), () => _window?.ExitApplication());
+            _moduleTray = new ModuleTrayIcons(_manager, id =>
+            {
+                _window?.BringToFront();
+                _shell?.ShowModule(id);
+            });
         }
 
         /// <summary>Diagnostics: logs every resource that fails to resolve (merged-dictionary ordering bugs).</summary>
@@ -266,6 +277,7 @@ namespace SwissTechKnife
         {
             try
             {
+                _moduleTray?.Dispose();
                 _tray?.Dispose();
                 _runtime?.DeactivateAll();
                 _settings?.Save();

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SwissTechKnife.Sdk
 {
@@ -47,6 +49,20 @@ namespace SwissTechKnife.Sdk
     {
         /// <summary>Called the first time the tab opens; the host keeps the element until the module is disposed.</summary>
         FrameworkElement CreateSettingsView();
+    }
+
+    /// <summary>
+    /// Optional: commands for the module's own notification-area icon, which the user turns on in the module's
+    /// settings ("Show icon in the notification area"). The host owns the icon: its menu starts with "Open",
+    /// followed by these items. Do not add an Exit/Close item: the module's enable switch controls its lifetime.
+    /// </summary>
+    public interface IModuleTrayMenu
+    {
+        /// <summary>
+        /// Called on the UI thread every time the menu opens, so items can reflect the current state.
+        /// Return new <c>MenuItem</c>/<c>Separator</c> instances each time (an element can have only one parent).
+        /// </summary>
+        IEnumerable<Control> CreateTrayMenuItems();
     }
 
     /// <summary>Optional: notified when the module's page is shown or hidden (pause timers while hidden).</summary>

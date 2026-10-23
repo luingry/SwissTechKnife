@@ -651,7 +651,11 @@ namespace SwissTechKnife.ViewModels
         {
             SettingsError = null;
             FrameworkElement page = null;
-            if (_manager.TryActivate(item))
+            if (!item.HasModuleSettings)
+            {
+                // Host options only: the module is not loaded just to open the tab.
+            }
+            else if (_manager.TryActivate(item))
             {
                 try
                 {

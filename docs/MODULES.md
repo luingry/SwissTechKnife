@@ -43,6 +43,12 @@ Implement `IModuleViewLifecycle` on the view (or its DataContext) to pause timer
 
 If the module offers customization, implement `IModuleSettings.CreateSettingsView()` and set `"settings": true` in `module.json`. The host then shows a **Settings** tab next to **Description** in the module's details dialog (enabled modules only). Changes apply immediately; persist them under `DataDirectory`. See the Tamarillo module (github.com/luingry/Tamarillo).
 
+Every enabled module has the Settings tab, because the host adds its own options at the top (see below); the module's view follows them.
+
+### Notification-area icon
+
+The Settings tab of every enabled module has a **Show icon in the notification area** switch (stored as `trayIcon` in the host state). When on, the host shows the module's icon (its tile, as in the app) in the notification area: left click opens the module page, right click opens a menu with **Open &lt;module&gt;** followed by the module's own commands. Implement `IModuleTrayMenu.CreateTrayMenuItems()` to provide them: it runs on the UI thread every time the menu opens (return new `MenuItem`/`Separator` instances each time; an on-demand module is activated for it). Never add an Exit/Close item: the module's enable switch in the host is what stops it, and disabling the module removes its icon. While any module icon is shown, closing the host window keeps the process running.
+
 ## 3. module.json
 
 ```json
