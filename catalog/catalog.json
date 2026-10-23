@@ -185,6 +185,32 @@
       "size": 167456
     },
     {
+      "id": "kiwindow",
+      "name": "Kiwindow",
+      "tagline": "Save where every window sits and put them all back with one click.",
+      "description": "Arrange your windows across your monitors, capture the layout, and Kiwindow puts every window back in place whenever you want: it reopens what is closed (apps, files, Explorer folders), restores sizes, maximized windows and stacking order.\n\nEdit a layout on a map of your monitors, keep as many profiles as you like and apply them from the notification-area menu. Profiles are shared with the standalone Kiwindow app.",
+      "version": "1.0.0",
+      "icon": "M4,5 L10.5,5 L10.5,19 L4,19 Z M13.5,5 L20,5 L20,10.5 L13.5,10.5 Z M13.5,13.5 L20,13.5 L20,19 L13.5,19 Z",
+      "accent": "#8CC63F",
+      "iconImage": "icons/kiwindow.png",
+      "iconBackground": "#211F1D",
+      "homepage": "https://github.com/luingry/Kiwindow",
+      "package": "https://github.com/luingry/Kiwindow/releases/download/v1.0.0/kiwindow-1.0.0.zip",
+      "sha256": "3360e91a1d6ca1366ef65d1b5b41db50bba62b1e1fea3129b9eb33964b14870d",
+      "size": 83012,
+      "releaseNotes": [
+        {
+          "version": "1.0.0",
+          "date": "2026-10-23",
+          "notes": [
+            "First release: capture where every window sits and put it all back with one click, reopening what is closed.",
+            "Edit a layout on a map of your monitors: drag to move, pull the edges to resize, snap to edges and other windows.",
+            "Apply or capture layouts straight from the notification-area menu."
+          ]
+        }
+      ]
+    },
+    {
       "id": "vd-get",
       "name": "VDGET",
       "tagline": "Download videos and music from YouTube, X, Instagram, SoundCloud and more.",
