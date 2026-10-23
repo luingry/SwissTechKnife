@@ -144,6 +144,11 @@ namespace SwissTechKnife.Modules
                     installed.Enabled = previous.Enabled;
                     installed.ShowTrayIcon = previous.ShowTrayIcon;
                 }
+                else
+                {
+                    // A fresh install shows its notification-area icon; the user can turn it off in the module's settings.
+                    installed.ShowTrayIcon = true;
+                }
                 _state.Upsert(installed);
 
                 bool codeLoaded = _runtime.LoadedVersion(item.Id) != null;
