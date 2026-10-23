@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.5",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.5/SwissTechKnife-0.4.5-setup.exe",
-    "sha256": "1d92307119a61967419f89eed6181a80a0e1dac369333c0ce512e0ad6b56bcae",
-    "size": 2314538,
+    "version": "0.4.6",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.6/SwissTechKnife-0.4.6-setup.exe",
+    "sha256": "2a851979a71bfbf8e550f7b70fe46936b3abd24d27e56fba260b293643b2a578",
+    "size": 7107444,
     "releaseNotes": [
+      {
+        "version": "0.4.6",
+        "date": "2026-10-23",
+        "notes": [
+          "Each module's settings now have a switch to show its own icon in the notification area, with its commands and no Exit item.",
+          "Newly installed modules show their notification-area icon by default."
+        ]
+      },
       {
         "version": "0.4.5",
         "date": "2026-10-19",
