@@ -1,5 +1,12 @@
 # Resolved errors
 
+## 2026-10-23 — Module won't start: `Could not find a part of the path '...\modules\aq-tracker\0.31.0\AqTracker.Module.dll'` although the file is there
+
+- Symptom: after a host self-update, aq-tracker failed on every start with `DirectoryNotFoundException`, yet the DLL was visible in `%LOCALAPPDATA%\SwissTechKnife` from a terminal.
+- Cause: the Claude desktop app is an MSIX package, so every process started from it (agent shells, and any STK launched from them, plus its installer and relaunch) sees `%LOCALAPPDATA%` through package file virtualization: writes land in `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\SwissTechKnife`. aq-tracker was installed by such an STK, so its files existed only in that virtual store. The STK that the 0.4.7 update relaunched ran outside the package, read the real profile, and found no module folder. From inside the package the shell showed the merged view, which hid the gap (the real `host.log` was invisible too).
+- Solution: copied the module folder from the package's `LocalCache` into the real profile with a process started outside the package (`Invoke-CimMethod Win32_Process Create` + robocopy), then restarted STK the same way.
+- Avoid: never launch the installed STK from a Claude session shell (`Start-Process`, `explorer.exe <exe>` both inherit the package); use `Win32_Process.Create` via WMI, or an isolated `STK_HOME` under `D:\`. To read the real profile from an agent shell, run the read through a WMI-created process too.
+
 ## 2026-10-23 — Store: empty state ("No modules yet" / "All installed") drawn over the module list
 
 - Symptom: after switching store tabs, the empty-state panel sometimes stayed visible on top of the All tab's cards.
