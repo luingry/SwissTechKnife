@@ -161,15 +161,22 @@
       "name": "Tamarillo",
       "tagline": "Drag, hold the shortcut and drop: convert and process files from a wheel.",
       "description": "Hold Ctrl + Alt + Shift while dragging files and a wheel appears under the cursor with everything you can do with them: convert images, audio, video, PDFs and documents, resize, compress, rotate, recognize text, zip and more. Drop on an action and the result appears next to the original, with progress in a discreet notification.\n\nEverything runs on this computer using Windows components; FFmpeg and Office add more formats when installed. While Tamarillo is enabled, closing the window keeps SwissTechKnife in the notification area so the shortcut keeps working.",
-      "version": "0.2.0",
+      "version": "0.3.1",
       "icon": "M11,5.5 A7.5,7.5 0 1 0 18.5,13 L11,13 Z M13.5,10.5 L13.5,3 A7.5,7.5 0 0 1 21,10.5 Z",
       "accent": "#E65A70",
       "iconImage": "icons/tamarillo.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/Tamarillo",
-      "package": "https://github.com/luingry/Tamarillo/releases/download/v0.2.0/tamarillo-0.2.0.zip",
+      "package": "https://github.com/luingry/Tamarillo/releases/download/v0.3.1/tamarillo-0.3.1.zip",
       "settings": true,
       "releaseNotes": [
+        {
+          "version": "0.3.1",
+          "date": "2026-10-24",
+          "notes": [
+            "Sub-ring icons show their name below (Qualidade, Eficiência, Esquerda, ZIP…)."
+          ]
+        },
         {
           "version": "0.2.0",
           "date": "2026-10-19",
@@ -188,8 +195,8 @@
           ]
         }
       ],
-      "sha256": "59056de767e587a343a3a8c8c12986c82353d6bfcc84159484443a736724c598",
-      "size": 167456
+      "sha256": "715d20d639569bfdece720224d1e508bcb056935507c03b82aa08fb46ada3326",
+      "size": 170048
     },
     {
       "id": "kiwindow",
