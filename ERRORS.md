@@ -1,5 +1,13 @@
 # Resolved errors
 
+## 2026-10-26 — Scrolling inside the host window jumped or overshot with SmoothMice running
+
+- Symptom: with the SmoothMice module active, the mouse wheel in the SwissTechKnife window scrolled in big jumps / far past the intended distance.
+- Cause: WPF's `ScrollViewer` scrolls a fixed step per `WM_MOUSEWHEEL` message (48 px, or `WheelScrollLines` items in item mode) and ignores `MouseWheelEventArgs.Delta`. SmoothMice, like any high-resolution wheel or precision touchpad, sends many small deltas (e.g. 7 of 120); each one scrolled the full step. Measured: 17 messages of -7 (about one notch) moved 816 px instead of 48 px.
+- Solution: `Infrastructure/WheelScrolling` registers a class handler on `ScrollViewer` (installed in `App.OnStartup`) that scales the scroll with `Delta / 120`: exact pixels in pixel mode (accumulated on the requested offset, since `VerticalOffset` is stale until layout), and a carried remainder in item mode. Whole-notch deltas still use WPF's own path. Verified by raising `MouseWheelEvent` on a `ScrollViewer` with the built assembly: 17 x -7 now moves 47.6 px.
+- Avoid: never assume WPF scroll controls honour the wheel delta; any new custom scroll control must handle fractional deltas itself.
+
+
 ## 2026-10-23 — Module won't start: `Could not find a part of the path '...\modules\aq-tracker\0.31.0\AqTracker.Module.dll'` although the file is there
 
 - Symptom: after a host self-update, aq-tracker failed on every start with `DirectoryNotFoundException`, yet the DLL was visible in `%LOCALAPPDATA%\SwissTechKnife` from a terminal.

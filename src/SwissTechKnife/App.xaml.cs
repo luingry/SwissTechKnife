@@ -61,6 +61,7 @@ namespace SwissTechKnife
             };
 
             base.OnStartup(e);
+            WheelScrolling.Install();
 
             FrameRate.MatchDisplay();
             FrameDiagnostics.StartIfEnabled();
