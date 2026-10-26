@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.7",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.7/SwissTechKnife-0.4.7-setup.exe",
-    "sha256": "a977e21835b53fdf6229cc7d5bc579bac26b3a01b3c12f659007ac309ecbb0fb",
-    "size": 7209705,
+    "version": "0.4.8",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.8/SwissTechKnife-0.4.8-setup.exe",
+    "sha256": "a522892968b1dd33024b6767319b199081a69d4d95d3988462737db3a006a872",
+    "size": 7216085,
     "releaseNotes": [
+      {
+        "version": "0.4.8",
+        "date": "2026-10-26",
+        "notes": [
+          "Modules whose files went missing are now reinstalled automatically instead of failing to open.",
+          "SwissTechKnife no longer removes installed modules when it is started from inside another app's container."
+        ]
+      },
       {
         "version": "0.4.7",
         "date": "2026-10-23",
