@@ -1,11 +1,18 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.4.8",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.8/SwissTechKnife-0.4.8-setup.exe",
-    "sha256": "a522892968b1dd33024b6767319b199081a69d4d95d3988462737db3a006a872",
-    "size": 7216085,
+    "version": "0.4.9",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.4.9/SwissTechKnife-0.4.9-setup.exe",
+    "sha256": "867f203b1f597b1f8e0735d08fd31be10af30e5ae87ddd06fa4c278499f5be49",
+    "size": 7217288,
     "releaseNotes": [
+      {
+        "version": "0.4.9",
+        "date": "2026-10-26",
+        "notes": [
+          "Fixed mouse-wheel scrolling overshooting and jumping in the SwissTechKnife window when a smooth-scrolling tool such as SmoothMice is running."
+        ]
+      },
       {
         "version": "0.4.8",
         "date": "2026-10-26",
