@@ -490,7 +490,15 @@ namespace SwissTechKnife.ViewModels
                 CatalogState = CatalogState.Failed;
             }
             RefreshLists();
-            bool hostOffered = Settings.HostUpdate.SetRelease(result.Catalog.Host, result.Source);
+            foreach (ModuleItem repaired in await _manager.RepairMissingAsync())
+            {
+                Notify(Strings.Format("ModuleRepaired", repaired.Name), NotificationKind.Success);
+                if (ReferenceEquals(repaired, _currentModule) && IsModulePageActive && CurrentPage == null)
+                {
+                    RetryPage();
+                }
+            }
+            bool hostOffered =Settings.HostUpdate.SetRelease(result.Catalog.Host, result.Source);
             if (openHostUpdate && Settings.HostUpdate.IsAvailable)
             {
                 Settings.HostUpdate.ShowUpdate();

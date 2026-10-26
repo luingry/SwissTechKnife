@@ -137,20 +137,16 @@ namespace SwissTechKnife.Core
             {
                 return;
             }
-            var keep = new HashSet<string>(Modules.Select(m => Path.GetFullPath(Path.Combine(_paths.ModuleRoot(m.Id), m.Folder))), StringComparer.OrdinalIgnoreCase);
-            foreach (string moduleRoot in Directory.EnumerateDirectories(_paths.Modules))
+            if (!File.Exists(_paths.StateFile) || FileRedirection.IsRedirected(_paths.StateFile))
             {
-                foreach (string folder in Directory.EnumerateDirectories(moduleRoot))
-                {
-                    if (!keep.Contains(Path.GetFullPath(folder)))
-                    {
-                        TryDelete(folder);
-                    }
-                }
-                if (!Directory.EnumerateFileSystemEntries(moduleRoot).Any())
-                {
-                    TryDelete(moduleRoot);
-                }
+                // Inside another app's container this state can be a stale private copy while the modules folder shows
+                // the real one: the sweep would delete modules installed outside it. Without a state there is nothing
+                // to tell orphans from.
+                Log.Warn(Source, "State file missing or redirected; skipping the orphan folder sweep");
+            }
+            else
+            {
+                SweepOrphanFolders();
             }
             foreach (string file in Directory.EnumerateFiles(_paths.Downloads))
             {
@@ -168,6 +164,25 @@ namespace SwissTechKnife.Core
                 }
                 catch (UnauthorizedAccessException)
                 {
+                }
+            }
+        }
+
+        private void SweepOrphanFolders()
+        {
+            var keep = new HashSet<string>(Modules.Select(m => Path.GetFullPath(Path.Combine(_paths.ModuleRoot(m.Id), m.Folder))), StringComparer.OrdinalIgnoreCase);
+            foreach (string moduleRoot in Directory.EnumerateDirectories(_paths.Modules))
+            {
+                foreach (string folder in Directory.EnumerateDirectories(moduleRoot))
+                {
+                    if (!keep.Contains(Path.GetFullPath(folder)))
+                    {
+                        TryDelete(folder);
+                    }
+                }
+                if (!Directory.EnumerateFileSystemEntries(moduleRoot).Any())
+                {
+                    TryDelete(moduleRoot);
                 }
             }
         }

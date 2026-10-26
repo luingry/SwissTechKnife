@@ -177,6 +177,39 @@ namespace SwissTechKnife.Modules
             }
         }
 
+        /// <summary>
+        /// Reinstalls installed modules whose files are gone (deleted outside SwissTechKnife) from the catalog.
+        /// Returns the modules that were restored.
+        /// </summary>
+        public async Task<System.Collections.Generic.List<ModuleItem>> RepairMissingAsync()
+        {
+            var restored = new System.Collections.Generic.List<ModuleItem>();
+            var candidates = Items
+                .Where(i => i.IsInstalled && !i.IsBusy && i.CatalogEntry != null && i.CatalogEntry.IsAvailable && _runtime.LoadedVersion(i.Id) == null)
+                .Select(i => new { Item = i, Entry = Path.Combine(_runtime.InstallDirectory(i.Installed), i.Installed.Manifest.EntryAssembly) })
+                .ToList();
+            if (candidates.Count == 0 || LastCatalog == null)
+            {
+                return restored;
+            }
+            var missing = await Task.Run(() => candidates.Where(c => !File.Exists(c.Entry)).Select(c => c.Item).ToList());
+            foreach (ModuleItem item in missing)
+            {
+                Log.Warn(Source, "Files missing for " + item.Id + "; reinstalling");
+                try
+                {
+                    await InstallAsync(item);
+                    item.PageError = null;
+                    restored.Add(item);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(Source, "Could not reinstall " + item.Id, ex);
+                }
+            }
+            return restored;
+        }
+
         public void Uninstall(ModuleItem item)
         {
             if (!item.IsInstalled || item.IsBusy)
