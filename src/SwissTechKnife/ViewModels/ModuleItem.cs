@@ -161,9 +161,16 @@ namespace SwissTechKnife.ViewModels
 
         public bool IsComingSoon => Status == ModuleStatus.ComingSoon;
 
-        public bool CanInstall => Status == ModuleStatus.Available;
+        public bool CanInstall => Status == ModuleStatus.Available && !NeedsNewerHost;
 
-        public bool HasUpdate => IsInstalled && _catalogEntry?.IsAvailable == true && Core.VersionText.IsNewer(_catalogEntry.Version, _installed.Version);
+        public bool HasUpdate => IsInstalled && _catalogEntry?.IsAvailable == true && !NeedsNewerHost && Core.VersionText.IsNewer(_catalogEntry.Version, _installed.Version);
+
+        /// <summary>The catalog package (to install, or newer than the installed one) needs a newer SwissTechKnife.</summary>
+        public bool NeedsNewerHost =>
+            _catalogEntry?.IsAvailable == true && _catalogEntry.RequiresNewerHost(App.HostVersionText)
+            && (!IsInstalled || Core.VersionText.IsNewer(_catalogEntry.Version, _installed.Version));
+
+        public string NeedsHostText => NeedsNewerHost ? Strings.Format("RequiresHost", _catalogEntry.MinHostVersion) : null;
 
         public bool StartsWithHost => _installed?.Manifest?.StartsWithHost == true;
 
@@ -250,7 +257,7 @@ namespace SwissTechKnife.ViewModels
         public string UpdateText => HasUpdate ? Strings.Format("VersionAvailable", _catalogEntry.Version) : null;
 
         // Dialog action layout: exactly one primary action per state.
-        public bool ShowInstall => Status == ModuleStatus.Available;
+        public bool ShowInstall => Status == ModuleStatus.Available && !NeedsNewerHost;
 
         public bool ShowComingSoon => Status == ModuleStatus.ComingSoon;
 

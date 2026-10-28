@@ -19,6 +19,7 @@ namespace SwissTechKnife.Tests
         {
             Run("Module ids reject path tricks", ModuleIds);
             Run("Versions compare numerically", Versions);
+            Run("Catalog entries can require a newer host", MinHostVersion);
             Run("Catalog drops invalid and duplicate entries", CatalogSanitize);
             Run("Catalog package URLs resolve relative to the catalog", PackageUris);
             Run("Install extracts a valid package", InstallValid);
@@ -125,6 +126,14 @@ namespace SwissTechKnife.Tests
             Assert(VersionText.IsNewer("2.0", "1.9.9"), "2.0 > 1.9.9");
             Assert(!VersionText.IsNewer("1.2.3-beta", "1.2.3"), "pre-release suffix ignored");
             Assert(VersionText.ParseOrZero("garbage") == new Version(0, 0, 0), "garbage parses to zero");
+        }
+
+        private static void MinHostVersion()
+        {
+            Assert(!new CatalogEntry().RequiresNewerHost("0.5.0"), "no minimum accepts any host");
+            Assert(new CatalogEntry { MinHostVersion = "0.5.1" }.RequiresNewerHost("0.5.0"), "older host is refused");
+            Assert(!new CatalogEntry { MinHostVersion = "0.5.1" }.RequiresNewerHost("0.5.1"), "equal host is accepted");
+            Assert(!new CatalogEntry { MinHostVersion = "0.5.1" }.RequiresNewerHost("0.10.0"), "newer host is accepted");
         }
 
         private static string Sha(string text)

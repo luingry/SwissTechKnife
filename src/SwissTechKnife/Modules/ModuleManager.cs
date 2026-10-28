@@ -125,7 +125,7 @@ namespace SwissTechKnife.Modules
         public async Task InstallAsync(ModuleItem item)
         {
             CatalogEntry entry = item.CatalogEntry;
-            if (entry == null || !entry.IsAvailable || item.IsBusy || LastCatalog == null)
+            if (entry == null || !entry.IsAvailable || item.NeedsNewerHost || item.IsBusy || LastCatalog == null)
             {
                 return;
             }
@@ -185,7 +185,7 @@ namespace SwissTechKnife.Modules
         {
             var restored = new System.Collections.Generic.List<ModuleItem>();
             var candidates = Items
-                .Where(i => i.IsInstalled && !i.IsBusy && i.CatalogEntry != null && i.CatalogEntry.IsAvailable && _runtime.LoadedVersion(i.Id) == null)
+                .Where(i => i.IsInstalled && !i.IsBusy && i.CatalogEntry != null && i.CatalogEntry.IsAvailable && !i.CatalogEntry.RequiresNewerHost(App.HostVersionText) && _runtime.LoadedVersion(i.Id) == null)
                 .Select(i => new { Item = i, Entry = Path.Combine(_runtime.InstallDirectory(i.Installed), i.Installed.Manifest.EntryAssembly) })
                 .ToList();
             if (candidates.Count == 0 || LastCatalog == null)

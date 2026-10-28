@@ -198,6 +198,8 @@
                                 Visibility="{Binding ShowInstall, Converter={StaticResource BoolToVisibility}}" />
                         <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE823;" Content="{infra:Loc ComingSoon}" Margin="8,0,0,0" IsEnabled="False"
                                 Visibility="{Binding ShowComingSoon, Converter={StaticResource BoolToVisibility}}" />
+                        <Button Style="{StaticResource Button.Primary}" ui:Ui.Icon="&#xE946;" Content="{Binding NeedsHostText}" Margin="8,0,0,0" IsEnabled="False"
+                                Visibility="{Binding NeedsNewerHost, Converter={StaticResource BoolToVisibility}}" />
                         <CheckBox Style="{StaticResource Switch}" Margin="20,0,0,0" VerticalAlignment="Center"
                                   IsChecked="{Binding IsActive, Mode=TwoWay}" Content="{Binding ActiveText}"
                                   Foreground="{StaticResource Brush.Text.Secondary}"

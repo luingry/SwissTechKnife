@@ -132,6 +132,9 @@ namespace SwissTechKnife.Core
 
         public bool IsAvailable => !string.IsNullOrWhiteSpace(Package) && !string.IsNullOrWhiteSpace(Sha256);
 
+        /// <summary>True when the package needs a newer host than <paramref name="hostVersion"/> (it may use newer SDK types).</summary>
+        public bool RequiresNewerHost(string hostVersion) => !string.IsNullOrWhiteSpace(MinHostVersion) && VersionText.IsNewer(MinHostVersion, hostVersion);
+
         public CatalogEntry Clone() => (CatalogEntry)MemberwiseClone();
     }
 

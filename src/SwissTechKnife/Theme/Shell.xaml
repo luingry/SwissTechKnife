@@ -196,6 +196,12 @@
                 <Setter Property="Background" Value="{StaticResource Brush.Info.Soft}" />
                 <Setter Property="Foreground" Value="{StaticResource Brush.Info}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding NeedsNewerHost}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Content" Value="{Binding NeedsHostText}" />
+                <Setter Property="Background" Value="{StaticResource Brush.Warning.Soft}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush.Warning}" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding HasUpdate}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Content" Value="{infra:Loc UpdateAvailable}" />
