@@ -570,18 +570,6 @@ namespace SwissTechKnife.ViewModels
             timer.Start();
         }
 
-        /// <summary>Set by the app: a module page is about to be shown here, so a module window holding it gives it up.</summary>
-        public Action<FrameworkElement> PageClaimed { get; set; }
-
-        /// <summary>A module window takes the page this shell shows: the shell moves to the store.</summary>
-        public void ReleasePage(FrameworkElement page)
-        {
-            if (page != null && ReferenceEquals(page, _currentPage))
-            {
-                ShowStore();
-            }
-        }
-
         public void ShowModule(string id)
         {
             ModuleItem item = _manager.Find(id);
@@ -662,10 +650,6 @@ namespace SwissTechKnife.ViewModels
                     Log.Error(Source, "CreateView failed for " + item.Id, ex);
                     item.PageError = Strings.Format("PageFailed", ex.Message);
                 }
-            }
-            if (page != null)
-            {
-                PageClaimed?.Invoke(page);
             }
             CurrentPage = page;
             NotifyPageShown();

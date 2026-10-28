@@ -24,7 +24,6 @@ namespace SwissTechKnife
         private MainWindow _window;
         private TrayIcon _tray;
         private ModuleTrayIcons _moduleTray;
-        private ModuleWindows _moduleWindows;
         private ModuleManager _manager;
         private ShellViewModel _shell;
 
@@ -203,8 +202,7 @@ namespace SwissTechKnife
         private void CreateTray()
         {
             _tray = new TrayIcon(() => _window?.BringToFront(), () => _window?.ExitApplication());
-            _moduleWindows = new ModuleWindows(_manager, _shell);
-            _moduleTray = new ModuleTrayIcons(_manager, _moduleWindows, id =>
+            _moduleTray = new ModuleTrayIcons(_manager, id =>
             {
                 _window?.BringToFront();
                 _shell?.ShowModule(id);
@@ -281,7 +279,6 @@ namespace SwissTechKnife
             try
             {
                 _moduleTray?.Dispose();
-                _moduleWindows?.Dispose();
                 _tray?.Dispose();
                 _runtime?.DeactivateAll();
                 _settings?.Save();
