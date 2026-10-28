@@ -19,19 +19,21 @@ namespace SwissTechKnife.Modules
 {
     /// <summary>
     /// Notification-area icons of enabled modules whose "Show icon in the notification area" switch is on.
-    /// Each icon opens the module on left click (double click opens its <see cref="IModuleWindow"/>, if it declares one); its menu holds "Open &lt;module&gt;" plus the module's own
+    /// Each icon opens the module on left click and in a window of its own on double click; its menu holds "Open &lt;module&gt;" plus the module's own
     /// <see cref="IModuleTrayMenu"/> items, never Exit: the module's enable switch decides whether it runs.
     /// </summary>
     internal sealed class ModuleTrayIcons : IDisposable
     {
         private const string Source = "ModuleTray";
         private readonly ModuleManager _manager;
+        private readonly ModuleWindows _windows;
         private readonly Action<string> _openModule;
         private readonly Dictionary<string, Entry> _icons = new Dictionary<string, Entry>(StringComparer.Ordinal);
 
-        public ModuleTrayIcons(ModuleManager manager, Action<string> openModule)
+        public ModuleTrayIcons(ModuleManager manager, ModuleWindows windows, Action<string> openModule)
         {
             _manager = manager;
+            _windows = windows;
             _openModule = openModule;
             _manager.Changed += OnChanged;
             Sync();
@@ -101,10 +103,13 @@ namespace SwissTechKnife.Modules
             TrayIcon.ShowMenu(menu);
         }
 
-        /// <summary>Opens the module's dedicated window; falls back to its page in the host when it has none.</summary>
+        /// <summary>
+        /// Opens the module in a window of its own: the module's <see cref="IModuleWindow"/> when it declares one,
+        /// otherwise its page in a host window; falls back to the page in the shell.
+        /// </summary>
         private void ShowWindow(ModuleItem item)
         {
-            if (_manager.TryActivate(item) && _manager.Runtime.Instance(item.Id) is IModuleWindow window)
+            if (item.HasWindow && _manager.TryActivate(item) && _manager.Runtime.Instance(item.Id) is IModuleWindow window)
             {
                 try
                 {
@@ -116,7 +121,10 @@ namespace SwissTechKnife.Modules
                     Log.Error(Source, "ShowWindow failed for " + item.Id, ex);
                 }
             }
-            _openModule(item.Id);
+            if (!_windows.Show(item))
+            {
+                _openModule(item.Id);
+            }
         }
 
         /// <summary>One module's icon; follows the module's name and icon image as they change.</summary>
@@ -178,20 +186,13 @@ namespace SwissTechKnife.Modules
             {
                 if (e.Button == Forms.MouseButtons.Left)
                 {
-                    if (_item.HasWindow)
+                    // Wait out the double-click time, so a double click opens only the module's window.
+                    if (_singleClick == null)
                     {
-                        // Wait out the double-click time, so a double click opens only the module's window.
-                        if (_singleClick == null)
-                        {
-                            _singleClick = CreateSingleClickTimer();
-                        }
-                        _singleClick.Stop();
-                        _singleClick.Start();
+                        _singleClick = CreateSingleClickTimer();
                     }
-                    else
-                    {
-                        _owner._openModule(_item.Id);
-                    }
+                    _singleClick.Stop();
+                    _singleClick.Start();
                 }
                 else if (e.Button == Forms.MouseButtons.Right)
                 {
@@ -201,7 +202,7 @@ namespace SwissTechKnife.Modules
 
             private void OnMouseDoubleClick(object sender, Forms.MouseEventArgs e)
             {
-                if (e.Button == Forms.MouseButtons.Left && _item.HasWindow)
+                if (e.Button == Forms.MouseButtons.Left)
                 {
                     _singleClick?.Stop();
                     _owner.ShowWindow(_item);
@@ -214,7 +215,10 @@ namespace SwissTechKnife.Modules
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
-                    _owner._openModule(_item.Id);
+                    if (!_owner._windows.BringToFront(_item.Id))
+                    {
+                        _owner._openModule(_item.Id);
+                    }
                 };
                 return timer;
             }
@@ -223,7 +227,34 @@ namespace SwissTechKnife.Modules
         /// <summary>Draws the module's tile (the same look as in the app) at the shell's small icon size.</summary>
         private static System.Drawing.Icon Render(ModuleItem item)
         {
-            int size = Forms.SystemInformation.SmallIconSize.Width;
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(RenderTile(item, Forms.SystemInformation.SmallIconSize.Width)));
+            using (var stream = new MemoryStream())
+            {
+                encoder.Save(stream);
+                stream.Position = 0;
+                using (var image = new System.Drawing.Bitmap(stream))
+                {
+                    IntPtr handle = image.GetHicon();
+                    try
+                    {
+                        // Clone copies the handle, so the icon owns (and later frees) its own copy.
+                        using (System.Drawing.Icon borrowed = System.Drawing.Icon.FromHandle(handle))
+                        {
+                            return (System.Drawing.Icon)borrowed.Clone();
+                        }
+                    }
+                    finally
+                    {
+                        DestroyIcon(handle);
+                    }
+                }
+            }
+        }
+
+        /// <summary>The module's tile as a frozen bitmap (also the taskbar icon of its window).</summary>
+        internal static BitmapSource RenderTile(ModuleItem item, int size)
+        {
             var visual = new DrawingVisual();
             using (DrawingContext dc = visual.RenderOpen())
             {
@@ -247,30 +278,8 @@ namespace SwissTechKnife.Modules
             }
             var bitmap = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
             bitmap.Render(visual);
-
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            using (var stream = new MemoryStream())
-            {
-                encoder.Save(stream);
-                stream.Position = 0;
-                using (var image = new System.Drawing.Bitmap(stream))
-                {
-                    IntPtr handle = image.GetHicon();
-                    try
-                    {
-                        // Clone copies the handle, so the icon owns (and later frees) its own copy.
-                        using (System.Drawing.Icon borrowed = System.Drawing.Icon.FromHandle(handle))
-                        {
-                            return (System.Drawing.Icon)borrowed.Clone();
-                        }
-                    }
-                    finally
-                    {
-                        DestroyIcon(handle);
-                    }
-                }
-            }
+            bitmap.Freeze();
+            return bitmap;
         }
 
         [DllImport("user32.dll")]

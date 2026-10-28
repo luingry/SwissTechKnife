@@ -160,7 +160,7 @@ namespace SwissTechKnife.Views
             Thickness frame = SystemParameters.WindowResizeBorderThickness;
             RootGrid.Margin = maximized ? new Thickness(frame.Left + 4, frame.Top + 4, frame.Right + 4, frame.Bottom + 4) : new Thickness(0);
             Ui.SetIcon(MaximizeButton, maximized ? "" : "");
-            MaximizeButton.ToolTip = maximized ? "Restaurar" : "Maximizar";
+            MaximizeButton.ToolTip = Strings.Get(maximized ? "Restore" : "Maximize");
         }
 
         private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

@@ -17,6 +17,8 @@ namespace SwissTechKnife.Core
         {
             // Shell
             ["Minimize"] = "Minimize",
+            ["Maximize"] = "Maximize",
+            ["Restore"] = "Restore",
             ["Close"] = "Close",
             ["CloseEsc"] = "Close (Esc)",
             ["Modules"] = "Modules",
@@ -177,6 +179,8 @@ namespace SwissTechKnife.Core
         private static readonly Dictionary<string, string> PtBr = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["Minimize"] = "Minimizar",
+            ["Maximize"] = "Maximizar",
+            ["Restore"] = "Restaurar",
             ["Close"] = "Fechar",
             ["CloseEsc"] = "Fechar (Esc)",
             ["Modules"] = "Módulos",
