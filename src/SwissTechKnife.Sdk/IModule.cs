@@ -65,6 +65,17 @@ namespace SwissTechKnife.Sdk
         IEnumerable<Control> CreateTrayMenuItems();
     }
 
+    /// <summary>
+    /// Optional: the module has a dedicated window of its own, besides its page in the host. Requires
+    /// <c>"window": true</c> in <c>module.json</c> (so the host knows without loading the module). Double-clicking
+    /// the module's notification-area icon then calls <see cref="ShowWindow"/> instead of opening the host.
+    /// </summary>
+    public interface IModuleWindow
+    {
+        /// <summary>Called on the UI thread. Create the window if needed, show it and bring it to the front.</summary>
+        void ShowWindow();
+    }
+
     /// <summary>Optional: notified when the module's page is shown or hidden (pause timers while hidden).</summary>
     public interface IModuleViewLifecycle
     {

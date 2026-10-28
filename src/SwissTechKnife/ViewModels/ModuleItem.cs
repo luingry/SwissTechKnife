@@ -173,6 +173,9 @@ namespace SwissTechKnife.ViewModels
         /// <summary>Enabled module that declares its own settings view.</summary>
         public bool HasModuleSettings => IsEnabled && _installed.Manifest?.HasSettings == true;
 
+        /// <summary>Enabled module that declares a dedicated window of its own.</summary>
+        public bool HasWindow => IsEnabled && _installed?.Manifest?.HasWindow == true;
+
         /// <summary>Set by the manager: persists the tray icon switch.</summary>
         public Action<ModuleItem, bool> TrayIconHandler { get; set; }
 

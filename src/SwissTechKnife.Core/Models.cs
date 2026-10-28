@@ -187,6 +187,10 @@ namespace SwissTechKnife.Core
         [DataMember(Name = "settings", Order = 7, EmitDefaultValue = false)]
         public bool HasSettings { get; set; }
 
+        /// <summary>True when the entry type implements IModuleWindow (double-clicking the tray icon opens it).</summary>
+        [DataMember(Name = "window", Order = 8, EmitDefaultValue = false)]
+        public bool HasWindow { get; set; }
+
         public bool StartsWithHost => string.Equals(Activation, "startup", System.StringComparison.OrdinalIgnoreCase);
 
         public bool LoadsFromFile => string.Equals(LoadMode, "file", System.StringComparison.OrdinalIgnoreCase);

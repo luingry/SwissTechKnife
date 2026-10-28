@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using SwissTechKnife.Core;
 using SwissTechKnife.Infrastructure;
 using SwissTechKnife.Sdk;
@@ -18,7 +19,7 @@ namespace SwissTechKnife.Modules
 {
     /// <summary>
     /// Notification-area icons of enabled modules whose "Show icon in the notification area" switch is on.
-    /// Each icon opens the module on left click; its menu holds "Open &lt;module&gt;" plus the module's own
+    /// Each icon opens the module on left click (double click opens its <see cref="IModuleWindow"/>, if it declares one); its menu holds "Open &lt;module&gt;" plus the module's own
     /// <see cref="IModuleTrayMenu"/> items, never Exit: the module's enable switch decides whether it runs.
     /// </summary>
     internal sealed class ModuleTrayIcons : IDisposable
@@ -100,6 +101,24 @@ namespace SwissTechKnife.Modules
             TrayIcon.ShowMenu(menu);
         }
 
+        /// <summary>Opens the module's dedicated window; falls back to its page in the host when it has none.</summary>
+        private void ShowWindow(ModuleItem item)
+        {
+            if (_manager.TryActivate(item) && _manager.Runtime.Instance(item.Id) is IModuleWindow window)
+            {
+                try
+                {
+                    window.ShowWindow();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(Source, "ShowWindow failed for " + item.Id, ex);
+                }
+            }
+            _openModule(item.Id);
+        }
+
         /// <summary>One module's icon; follows the module's name and icon image as they change.</summary>
         private sealed class Entry : IDisposable
         {
@@ -107,6 +126,7 @@ namespace SwissTechKnife.Modules
             private readonly ModuleTrayIcons _owner;
             private readonly Forms.NotifyIcon _icon;
             private object _renderedFrom;
+            private DispatcherTimer _singleClick;
 
             public Entry(ModuleItem item, ModuleTrayIcons owner)
             {
@@ -116,11 +136,13 @@ namespace SwissTechKnife.Modules
                 Refresh();
                 _icon.Visible = true;
                 _icon.MouseClick += OnMouseClick;
+                _icon.MouseDoubleClick += OnMouseDoubleClick;
                 _item.PropertyChanged += OnItemChanged;
             }
 
             public void Dispose()
             {
+                _singleClick?.Stop();
                 _item.PropertyChanged -= OnItemChanged;
                 _icon.Visible = false;
                 _icon.Icon?.Dispose();
@@ -156,12 +178,45 @@ namespace SwissTechKnife.Modules
             {
                 if (e.Button == Forms.MouseButtons.Left)
                 {
-                    _owner._openModule(_item.Id);
+                    if (_item.HasWindow)
+                    {
+                        // Wait out the double-click time, so a double click opens only the module's window.
+                        if (_singleClick == null)
+                        {
+                            _singleClick = CreateSingleClickTimer();
+                        }
+                        _singleClick.Stop();
+                        _singleClick.Start();
+                    }
+                    else
+                    {
+                        _owner._openModule(_item.Id);
+                    }
                 }
                 else if (e.Button == Forms.MouseButtons.Right)
                 {
                     _owner.ShowMenu(_item);
                 }
+            }
+
+            private void OnMouseDoubleClick(object sender, Forms.MouseEventArgs e)
+            {
+                if (e.Button == Forms.MouseButtons.Left && _item.HasWindow)
+                {
+                    _singleClick?.Stop();
+                    _owner.ShowWindow(_item);
+                }
+            }
+
+            private DispatcherTimer CreateSingleClickTimer()
+            {
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(Forms.SystemInformation.DoubleClickTime) };
+                timer.Tick += (s, e) =>
+                {
+                    timer.Stop();
+                    _owner._openModule(_item.Id);
+                };
+                return timer;
             }
         }
 
