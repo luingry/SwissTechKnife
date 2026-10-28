@@ -111,16 +111,23 @@
       "name": "SmoothMice",
       "tagline": "Smooth mouse scrolling, with per-app profiles.",
       "description": "Smooths mouse wheel scrolling across Windows, with configurable animation and acceleration, per-app profiles and automatic game detection so it never gets in the way.\n\nSmoothMice runs in its own process, started alongside SwissTechKnife, so nothing in SwissTechKnife can delay scrolling. Open the SmoothMice window from the module page.",
-      "version": "3.0.0",
+      "version": "3.1.0",
       "icon": "M12,3 C8.7,3 6,5.7 6,9 L6,15 C6,18.3 8.7,21 12,21 C15.3,21 18,18.3 18,15 L18,9 C18,5.7 15.3,3 12,3 Z M12,7 L12,10",
       "accent": "#F2A65A",
       "iconImage": "icons/smooth-mice.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/SmoothMice",
-      "package": "https://github.com/luingry/smoothmice/releases/download/module-v3.0.0/smooth-mice-3.0.0.zip",
-      "sha256": "680db6cd67a867200c61ce2cb6755247e7c9815e10ca841b8e08fe0bfa2bd0b2",
-      "size": 512175,
+      "package": "https://github.com/luingry/smoothmice/releases/download/module-v3.1.0/smooth-mice-3.1.0.zip",
+      "sha256": "132ddbbafda944c266dec84e000a4be791d240d44185c2e7b1ea66c917755cc8",
+      "size": 521437,
       "releaseNotes": [
+        {
+          "version": "3.1.0",
+          "date": "2026-10-28",
+          "notes": [
+            "Double-clicking the module's notification-area icon opens the SmoothMice window."
+          ]
+        },
         {
           "version": "3.0.0",
           "date": "2026-10-19",
@@ -137,16 +144,23 @@
       "name": "Winput LAN",
       "tagline": "One mouse and keyboard for several PCs on your local network.",
       "description": "Control other Windows PCs on the same network with this PC's mouse and keyboard, switching by shortcut or at the screen edges. Connections stay on your local network, with no account or cloud, and each PC chooses who may control it.\n\nWinput LAN runs in its own process, started with SwissTechKnife. On first run it brings over the settings, known machines and identity of an installed Winput LAN, and the two never run at the same time. Controlling administrator apps asks for Windows confirmation once, on request.",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "icon": "M3,4 L11,4 L11,11 L3,11 Z M13,13 L21,13 L21,20 L13,20 Z M7,11 L7,16.5 L13,16.5 M17,13 L17,7.5 L11,7.5",
       "accent": "#6C9EF8",
       "iconImage": "icons/winput-lan.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/WinputLan",
-      "package": "https://github.com/luingry/WinputLan/releases/download/v0.4.0/winput-lan-0.4.0.zip",
-      "sha256": "8e8aaa73c46cb85d18e6f0436dd5bc3eba4486e5400fbff7eff87f7568800660",
-      "size": 913020,
+      "package": "https://github.com/luingry/WinputLan/releases/download/v0.5.0/winput-lan-0.5.0.zip",
+      "sha256": "6fd40974474ef8fe4c5de0d3febc32bf6c781650c8570b29e784c99df004deeb",
+      "size": 913466,
       "releaseNotes": [
+        {
+          "version": "0.5.0",
+          "date": "2026-10-28",
+          "notes": [
+            "Double-clicking the module's notification-area icon opens the Winput LAN window."
+          ]
+        },
         {
           "version": "0.4.0",
           "date": "2026-10-19",
@@ -165,16 +179,23 @@
       "name": "AQ Tracker",
       "tagline": "Codex and Claude quotas always in sight, in a floating widget.",
       "description": "Tracks the 5-hour and weekly quotas of Codex and Claude, with reset countdowns, an exhaustion forecast and estimated usage cost from local history. The floating widget shows up by itself when agents are working or completions are unread.\n\nAQ Tracker runs in its own process, started and supervised by SwissTechKnife. On first run it brings over the preferences and quota history of an installed Agent Quota Tracker and shares its Claude sign-in; the two never run at the same time.",
-      "version": "0.31.0",
+      "version": "0.32.0",
       "icon": "M12,3 A9,9 0 1 1 11.99,3 Z M12,8 A4,4 0 1 1 11.99,8 Z M12,12 L18.5,5.5",
       "accent": "#63C28F",
       "iconImage": "icons/aq-tracker.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/aq-tracker",
-      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.31.0/aq-tracker-0.31.0.zip",
-      "sha256": "a291587a20a171767d22e88a0c81e01a4d7a65aabb61fc16a0120dae22a869ab",
-      "size": 4568250,
+      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.32.0/aq-tracker-0.32.0.zip",
+      "sha256": "7bfffec87195ef94467374be1d057709642dc786ae231b1d8c8ef81c0b57887a",
+      "size": 4568584,
       "releaseNotes": [
+        {
+          "version": "0.32.0",
+          "date": "2026-10-28",
+          "notes": [
+            "Double-clicking the module's notification-area icon shows the widget."
+          ]
+        },
         {
           "version": "0.31.0",
           "date": "2026-10-19",
