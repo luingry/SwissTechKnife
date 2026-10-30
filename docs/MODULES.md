@@ -70,7 +70,7 @@ If the module has a dedicated window of its own (besides its page in the host), 
 | `activation` | `onDemand` (default): created when the page is first opened. `startup`: created with the host; `IBackgroundModule.Start` is called. |
 | `settings` | `true` when the entry type implements `IModuleSettings` (shows the Settings tab without loading the module first). |
 | `window` | `true` when the entry type implements `IModuleWindow` (double-clicking the tray icon opens the module's own window). |
-| `loadMode` | `memory` (default): assemblies are read into memory, files are never locked, uninstall/update apply at once. `file`: `Assembly.LoadFrom`, for code that needs `Assembly.Location` or native side-by-side DLLs (WebView2). File changes then apply after a restart. |
+| `loadMode` | `memory` (default): assemblies are read into memory, files are never locked, uninstall/update apply at once. An update of a loaded module stops and disposes the old instance, loads the new version side by side (the old code stays mapped, unused, until exit) and recreates the instance and its open page without restarting the host. `file`: `Assembly.LoadFrom`, for code that needs `Assembly.Location` or native side-by-side DLLs (WebView2). File changes then apply after a restart. |
 
 ## 4. Package and catalog
 
@@ -98,7 +98,7 @@ Release notes for the catalog come from an optional `releaseNotes` list in the p
 ## 5. Rules
 
 - Use only design-system keys (`docs/DESIGN_SYSTEM.md`); no native-looking controls, no hard-coded colors.
-- The module shares the host process: never block the UI thread, never call `Environment.Exit`, catch your own background exceptions, release hooks/handles in `Stop`/`Dispose`.
+- The module shares the host process: never block the UI thread, never call `Environment.Exit`, catch your own background exceptions, release hooks/handles in `Stop`/`Dispose`. `Dispose` must leave nothing running (timers, threads, windows, static event handlers, child processes): an update disposes the instance and starts the new version in the same process.
 - Do not bundle another copy of the SDK or of WPF/.NET assemblies.
 - Single-instance, tray icon, auto-start and updates belong to the host: remove them from the app when converting it. While any `IBackgroundModule` is active, closing the host window keeps the process in the notification area (a one-time hint explains why), so hooks and shortcuts keep working.
 - Local testing from a module's own repository: build its package to `<repo>/artifacts/<id>-<version>.zip` next to this repo; `scripts/pack-modules.ps1` adds it to the local feed for a catalog entry with that id and version.

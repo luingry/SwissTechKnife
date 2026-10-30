@@ -40,6 +40,12 @@ namespace SwissTechKnife.Modules
         /// <summary>Raised after any change that can move an item between lists.</summary>
         public event EventHandler Changed;
 
+        /// <summary>Raised before an update replaces a loaded module's code: release its views.</summary>
+        public event EventHandler<ModuleItem> Reloading;
+
+        /// <summary>Raised after an update replaced a loaded module's code (the new version may be active).</summary>
+        public event EventHandler<ModuleItem> Reloaded;
+
         public ModuleRuntime Runtime => _runtime;
 
         /// <summary>Assigned to every item; the shell owns enable/disable (navigation, notices).</summary>
@@ -152,19 +158,36 @@ namespace SwissTechKnife.Modules
                 _state.Upsert(installed);
 
                 bool codeLoaded = _runtime.LoadedVersion(item.Id) != null;
+                bool wasActive = _runtime.IsActive(item.Id);
+                bool reload = codeLoaded && !_runtime.HoldsFileLocks(item.Id);
+                if (reload)
+                {
+                    // Memory-loaded code: swap in the new version now (the old assemblies stay mapped, unused).
+                    Reloading?.Invoke(this, item);
+                    _runtime.Unload(item.Id);
+                }
                 if (previous != null && previous.Folder != installed.Folder)
                 {
                     _state.DeleteOrQueue(Path.Combine(_paths.ModuleRoot(item.Id), previous.Folder));
                 }
                 item.Installed = installed;
-                if (codeLoaded)
+                if (codeLoaded && !reload)
                 {
                     item.RestartRequired = true;
                     item.RestartReason = Strings.Format("VersionAfterRestart", installed.Version);
                 }
-                else if (installed.Enabled && installed.Manifest.StartsWithHost)
+                else
                 {
-                    TryActivate(item);
+                    item.RestartRequired = false;
+                    item.RestartReason = null;
+                    if (installed.Enabled && (wasActive || installed.Manifest.StartsWithHost))
+                    {
+                        TryActivate(item);
+                    }
+                }
+                if (reload)
+                {
+                    Reloaded?.Invoke(this, item);
                 }
                 Log.Info(Source, (previous == null ? "Installed " : "Updated ") + item.Id + " " + installed.Version);
             }

@@ -20,7 +20,8 @@ namespace SwissTechKnife.Modules
     /// <summary>
     /// Loads module assemblies into the host process and owns module instances.
     /// .NET Framework cannot unload assemblies from the default AppDomain, so disabling a module disposes
-    /// its instance (its code stays mapped until exit); a newer version of already-loaded code needs a restart.
+    /// its instance (its code stays mapped until exit). A newer version of memory-loaded code is loaded
+    /// side by side (<see cref="Unload"/>); file-loaded code (Assembly.LoadFrom) needs a restart.
     /// All members are UI-thread only.
     /// </summary>
     public sealed class ModuleRuntime
@@ -30,7 +31,8 @@ namespace SwissTechKnife.Modules
         private readonly Func<InstalledModule, ModuleContext> _contextFactory;
         private readonly Dictionary<string, LoadedCode> _code = new Dictionary<string, LoadedCode>(StringComparer.Ordinal);
         private readonly Dictionary<string, ActiveModule> _active = new Dictionary<string, ActiveModule>(StringComparer.Ordinal);
-        private readonly Dictionary<string, Assembly> _dependencies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+        // Code replaced by Unload: old instances may still run leftover callbacks that resolve their own dependencies.
+        private readonly List<LoadedCode> _retired = new List<LoadedCode>();
 
         public ModuleRuntime(HostPaths paths, Func<InstalledModule, ModuleContext> contextFactory)
         {
@@ -116,6 +118,27 @@ namespace SwissTechKnife.Modules
             }
         }
 
+        /// <summary>
+        /// Disposes the instance and forgets the module's loaded code, so the next <see cref="Activate"/> loads
+        /// the installed version. False (nothing changes) for file-loaded code, which stays until a restart.
+        /// </summary>
+        public bool Unload(string id)
+        {
+            if (!_code.TryGetValue(id, out LoadedCode code))
+            {
+                return true;
+            }
+            if (code.FromFile)
+            {
+                return false;
+            }
+            Deactivate(id);
+            _code.Remove(id);
+            _retired.Add(code);
+            Log.Info(Source, $"Unloaded {id} {code.Version}");
+            return true;
+        }
+
         public void DeactivateAll()
         {
             foreach (string id in _active.Keys.ToList())
@@ -143,7 +166,9 @@ namespace SwissTechKnife.Modules
             {
                 throw new InvalidOperationException(module.Manifest.EntryType + " must be a concrete IModule with a public parameterless constructor.");
             }
-            _code[module.Id] = new LoadedCode(module.Version, folder, type, module.Manifest.LoadsFromFile);
+            var code = new LoadedCode(module.Version, folder, type, module.Manifest.LoadsFromFile);
+            code.Assemblies.Add(assembly);
+            _code[module.Id] = code;
             return type;
         }
 
@@ -155,8 +180,9 @@ namespace SwissTechKnife.Modules
         }
 
         /// <summary>
-        /// Resolves the shared SDK to the host's copy, then module-private dependencies from the folders of
-        /// loaded modules. Each dependency is loaded once per process.
+        /// Resolves the shared SDK to the host's copy, then module-private dependencies: first from the code of
+        /// the requesting module (so a reloaded version gets its own copies), then from other loaded modules and
+        /// the AppDomain, then from the folders of loaded modules. Each dependency loads once per module version.
         /// </summary>
         private Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
         {
@@ -165,34 +191,60 @@ namespace SwissTechKnife.Modules
             {
                 return typeof(IModule).Assembly;
             }
-            if (_dependencies.TryGetValue(name.Name, out Assembly cached))
+            LoadedCode owner = args.RequestingAssembly == null
+                ? null
+                : _code.Values.Concat(_retired).FirstOrDefault(c => c.Assemblies.Contains(args.RequestingAssembly));
+            if (owner != null)
             {
-                return cached;
+                Assembly own = owner.Find(name.Name) ?? Probe(owner, name.Name);
+                if (own != null)
+                {
+                    return own;
+                }
             }
-            Assembly already = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => string.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
+            foreach (LoadedCode code in _code.Values)
+            {
+                Assembly cached = code.Find(name.Name);
+                if (cached != null)
+                {
+                    return cached;
+                }
+            }
+            // Newest first: after a reload, the current copy of a same-named assembly.
+            Assembly already = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(a => string.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
             if (already != null)
             {
                 return already;
             }
             foreach (LoadedCode code in _code.Values)
             {
-                string candidate = Path.Combine(code.Folder, name.Name + ".dll");
-                if (!File.Exists(candidate))
+                Assembly probed = Probe(code, name.Name);
+                if (probed != null)
                 {
-                    continue;
-                }
-                try
-                {
-                    Assembly dependency = code.FromFile ? Assembly.LoadFrom(candidate) : LoadIntoMemory(candidate);
-                    _dependencies[name.Name] = dependency;
-                    return dependency;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(Source, "Failed to load dependency " + candidate, ex);
+                    return probed;
                 }
             }
             return null;
+        }
+
+        private static Assembly Probe(LoadedCode code, string name)
+        {
+            string candidate = Path.Combine(code.Folder, name + ".dll");
+            if (!File.Exists(candidate))
+            {
+                return null;
+            }
+            try
+            {
+                Assembly dependency = code.FromFile ? Assembly.LoadFrom(candidate) : LoadIntoMemory(candidate);
+                code.Assemblies.Add(dependency);
+                return dependency;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(Source, "Failed to load dependency " + candidate, ex);
+                return null;
+            }
         }
 
         private static void SafeDispose(ActiveModule active)
@@ -234,6 +286,11 @@ namespace SwissTechKnife.Modules
             public string Folder { get; }
             public Type EntryType { get; }
             public bool FromFile { get; }
+
+            /// <summary>Entry assembly and the dependencies loaded for this version.</summary>
+            public List<Assembly> Assemblies { get; } = new List<Assembly>();
+
+            public Assembly Find(string name) => Assemblies.FirstOrDefault(a => string.Equals(a.GetName().Name, name, StringComparison.OrdinalIgnoreCase));
         }
     }
 

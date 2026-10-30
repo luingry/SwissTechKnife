@@ -51,6 +51,8 @@ namespace SwissTechKnife.ViewModels
         private StoreTab _tab = StoreTab.All;
         private bool _isStoreActive = true;
         private ModuleItem _currentModule;
+        private bool _reopenAfterReload;
+        private bool _reloadSettingsAfterReload;
         private FrameworkElement _currentPage;
         private ModuleItem _selectedModule;
         private CatalogState _catalogState = CatalogState.Loading;
@@ -90,6 +92,8 @@ namespace SwissTechKnife.ViewModels
             _searchDebounce.Stop();
             manager.Changed += (s, e) => RefreshLists();
             manager.ToggleHandler = SetEnabled;
+            manager.Reloading += OnModuleReloading;
+            manager.Reloaded += OnModuleReloaded;
 
             ShowStoreCommand = new RelayCommand(_ => ShowStore());
             ShowSettingsCommand = new RelayCommand(_ => ShowSettings());
@@ -721,6 +725,44 @@ namespace SwissTechKnife.ViewModels
             {
                 item.Error = ex.Message;
                 Notify(Strings.Format("InstallFailed", item.Name), NotificationKind.Error);
+            }
+        }
+
+        /// <summary>Detaches the views of a module whose code an update is about to replace.</summary>
+        private void OnModuleReloading(object sender, ModuleItem item)
+        {
+            if (ReferenceEquals(_currentModule, item) && IsModulePageActive)
+            {
+                NotifyPageHidden();
+                CurrentPage = null;
+                _reopenAfterReload = true;
+            }
+            if (ReferenceEquals(_selectedModule, item) && SettingsPage != null)
+            {
+                SettingsPage = null;
+                _reloadSettingsAfterReload = true;
+            }
+        }
+
+        /// <summary>Shows the new version's views where the old ones were.</summary>
+        private void OnModuleReloaded(object sender, ModuleItem item)
+        {
+            if (_reopenAfterReload)
+            {
+                _reopenAfterReload = false;
+                if (ReferenceEquals(_currentModule, item) && IsModulePageActive)
+                {
+                    _currentModule = null;
+                    OpenModule(item);
+                }
+            }
+            if (_reloadSettingsAfterReload)
+            {
+                _reloadSettingsAfterReload = false;
+                if (ReferenceEquals(_selectedModule, item) && IsSettingsTab)
+                {
+                    LoadSettingsPage(item);
+                }
             }
         }
 
