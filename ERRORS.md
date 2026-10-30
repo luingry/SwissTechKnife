@@ -1,5 +1,12 @@
 # Resolved errors
 
+## 2026-10-30 — winput-lan won't start: Windows Defender quarantined its app
+
+- Symptom: the module stayed stopped. `host.log`: `Could not start Winput LAN` (`Win32Exception`: the file contains a virus or potentially unwanted software), then `Winput LAN executable not found: ...\modules\winput-lan\0.5.0\app\WinputLan.Hosted.exe` on every start.
+- Cause: Defender flagged `WinputLan.Hosted.exe` as `Trojan:Win32/Bearfoos.A!ml` (cloud ML heuristic, false positive) at process start and quarantined both the package copy and the module's `data\winput-lan\runtime` copy. Not a host bug: `RepairMissingAsync` only checks the entry assembly, which was untouched (and a reinstall would just be quarantined again).
+- Solution: WinputLan module 0.5.1 (WinputLan repo; details in its ERRORS.md) adds a `Blocked` state with restore instructions, falls back to whichever copy survived, and restarts by itself once the file is restored. On an affected machine: restore the file in Windows Security > Protection history (needs admin), or install 0.5.1.
+- Diagnose: read the real `host.log` through a WMI-created process (see the 2026-10-23 entry), then `Get-MpThreatDetection` / `Get-MpThreat` (no admin needed) for the threat name and files.
+
 ## 2026-10-26 — Scrolling inside the host window jumped or overshot with SmoothMice running
 
 - Symptom: with the SmoothMice module active, the mouse wheel in the SwissTechKnife window scrolled in big jumps / far past the intended distance.
