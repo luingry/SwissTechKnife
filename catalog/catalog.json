@@ -151,16 +151,26 @@
       "name": "Winput LAN",
       "tagline": "One mouse and keyboard for several PCs on your local network.",
       "description": "Control other Windows PCs on the same network with this PC's mouse and keyboard, switching by shortcut or at the screen edges. Connections stay on your local network, with no account or cloud, and each PC chooses who may control it.\n\nWinput LAN runs in its own process, started with SwissTechKnife. On first run it brings over the settings, known machines and identity of an installed Winput LAN, and the two never run at the same time. Controlling administrator apps asks for Windows confirmation once, on request.",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "icon": "M3,4 L11,4 L11,11 L3,11 Z M13,13 L21,13 L21,20 L13,20 Z M7,11 L7,16.5 L13,16.5 M17,13 L17,7.5 L11,7.5",
       "accent": "#6C9EF8",
       "iconImage": "icons/winput-lan.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/WinputLan",
-      "package": "https://github.com/luingry/WinputLan/releases/download/v0.5.0/winput-lan-0.5.0.zip",
-      "sha256": "6fd40974474ef8fe4c5de0d3febc32bf6c781650c8570b29e784c99df004deeb",
-      "size": 913466,
+      "package": "https://github.com/luingry/WinputLan/releases/download/v0.5.1/winput-lan-0.5.1.zip",
+      "sha256": "67b7dab6024bda9e417e8295256dbb52cb809aeeec2164975e2d422584a56e56",
+      "size": 916021,
       "releaseNotes": [
+        {
+          "version": "0.5.1",
+          "date": "2026-10-30",
+          "notes": [
+            "When an antivirus blocks or quarantines Winput LAN, the module page says so and explains how to restore it, instead of only stopping.",
+            "Winput LAN starts again on its own once the file is restored from quarantine, with no SwissTechKnife restart.",
+            "If an antivirus removes only one of the two copies of the app, the module starts the remaining one.",
+            "Disabling the module or closing SwissTechKnife while Winput LAN was exiting no longer raises an internal error."
+          ]
+        },
         {
           "version": "0.5.0",
           "date": "2026-10-28",
