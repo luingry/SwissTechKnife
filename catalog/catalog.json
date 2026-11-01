@@ -203,16 +203,24 @@
       "name": "AQ Tracker",
       "tagline": "Codex and Claude quotas always in sight, in a floating widget.",
       "description": "Tracks the 5-hour and weekly quotas of Codex and Claude, with reset countdowns, an exhaustion forecast and estimated usage cost from local history. The floating widget shows up by itself when agents are working or completions are unread.\n\nAQ Tracker runs in its own process, started and supervised by SwissTechKnife. On first run it brings over the preferences and quota history of an installed Agent Quota Tracker and shares its Claude sign-in; the two never run at the same time.",
-      "version": "0.32.0",
+      "version": "0.32.1",
       "icon": "M12,3 A9,9 0 1 1 11.99,3 Z M12,8 A4,4 0 1 1 11.99,8 Z M12,12 L18.5,5.5",
       "accent": "#63C28F",
       "iconImage": "icons/aq-tracker.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/aq-tracker",
-      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.32.0/aq-tracker-0.32.0.zip",
-      "sha256": "7bfffec87195ef94467374be1d057709642dc786ae231b1d8c8ef81c0b57887a",
-      "size": 4568584,
+      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.32.1/aq-tracker-0.32.1.zip",
+      "sha256": "68f1f9f854e7fb2ea2413a6ac82da7dc8374cdaac8db5490e6733360004a2833",
+      "size": 4569398,
       "releaseNotes": [
+        {
+          "version": "0.32.1",
+          "date": "2026-11-01",
+          "notes": [
+            "A rejected Claude sign-in is no longer erased: the tracker keeps it, retries every 15 minutes and recovers on its own when the server accepts it again.",
+            "The log now records why Claude rejected the sign-in (HTTP status and OAuth error code)."
+          ]
+        },
         {
           "version": "0.32.0",
           "date": "2026-10-28",
