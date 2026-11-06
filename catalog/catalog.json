@@ -261,6 +261,32 @@
       "minHostVersion": "0.5.1"
     },
     {
+      "id": "padtide",
+      "name": "PadTide",
+      "tagline": "Your GameSir Nova 2 Lite battery, always in sight, in a floating widget.",
+      "description": "Shows the battery of a GameSir Nova 2 Lite in a small floating widget: the controller's outline fills up to the battery level, turns yellow below 15% and shows a bolt while charging. The widget appears when the controller turns on and hides when it turns off. Works over the 2.4G dongle; the battery is not shown over Bluetooth.\n\nPadTide runs in its own process, started and supervised by SwissTechKnife. On first run it copies the preferences of an installed PadTide; the two never run at the same time. Open its settings with a double click on the widget.",
+      "version": "0.5.0",
+      "icon": "M7,6 C5,6 4,7 3.5,8.5 L2,15 C1.6,17 3,19 5,18.5 C6,18.2 6.6,17.3 7.2,16.2 L8,15 L16,15 L16.8,16.2 C17.4,17.3 18,18.2 19,18.5 C21,19 22.4,17 22,15 L20.5,8.5 C20,7 19,6 17,6 Z",
+      "accent": "#FF9B78",
+      "iconImage": "icons/padtide.png",
+      "iconBackground": "#0E2029",
+      "homepage": "https://github.com/luingry/padtide",
+      "package": "https://github.com/luingry/padtide/releases/download/v0.5.0/padtide-0.5.0.zip",
+      "sha256": "010d192fd1e894312db0c572f5b77839c69d87d746d9f2e55b5d93ee705b5365",
+      "size": 110184,
+      "releaseNotes": [
+        {
+          "version": "0.5.0",
+          "date": "2026-11-06",
+          "notes": [
+            "First release as a SwissTechKnife module: starts with SwissTechKnife and restarts automatically after a failure.",
+            "Preferences are copied once from an installed PadTide; while it is open, the module waits and takes over when it closes."
+          ]
+        }
+      ],
+      "minHostVersion": "0.5.1"
+    },
+    {
       "id": "tamarillo",
       "name": "Tamarillo",
       "tagline": "Drag, hold the shortcut and drop: convert and process files from a wheel.",
