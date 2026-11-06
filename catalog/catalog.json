@@ -158,16 +158,24 @@
       "name": "Winput LAN",
       "tagline": "One mouse and keyboard for several PCs on your local network.",
       "description": "Control other Windows PCs on the same network with this PC's mouse and keyboard, switching by shortcut or at the screen edges. Connections stay on your local network, with no account or cloud, and each PC chooses who may control it.\n\nWinput LAN runs in its own process, started with SwissTechKnife. On first run it brings over the settings, known machines and identity of an installed Winput LAN, and the two never run at the same time. Controlling administrator apps asks for Windows confirmation once, on request.",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "icon": "M3,4 L11,4 L11,11 L3,11 Z M13,13 L21,13 L21,20 L13,20 Z M7,11 L7,16.5 L13,16.5 M17,13 L17,7.5 L11,7.5",
       "accent": "#6C9EF8",
       "iconImage": "icons/winput-lan.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/WinputLan",
-      "package": "https://github.com/luingry/WinputLan/releases/download/v0.5.1/winput-lan-0.5.1.zip",
-      "sha256": "67b7dab6024bda9e417e8295256dbb52cb809aeeec2164975e2d422584a56e56",
-      "size": 916021,
+      "package": "https://github.com/luingry/WinputLan/releases/download/v0.6.0/winput-lan-0.6.0.zip",
+      "sha256": "e7397ff33ccc1ecb34e806c0e5c0c7689c842f92816ced4a86cdad21a49112fe",
+      "size": 916951,
       "releaseNotes": [
+        {
+          "version": "0.6.0",
+          "date": "2026-11-06",
+          "notes": [
+            "New option, off by default, to connect through the screen edge: touching this PC's edge connects to the recognized machine as the shortcut does, and hands over control once the connection is accepted.",
+            "After disconnecting with the button, touching the edge does not reconnect until you connect again by shortcut or in the app. With the machine unavailable, edge attempts happen at most every 5 seconds."
+          ]
+        },
         {
           "version": "0.5.1",
           "date": "2026-10-30",
