@@ -158,16 +158,27 @@
       "name": "Winput LAN",
       "tagline": "One mouse and keyboard for several PCs on your local network.",
       "description": "Control other Windows PCs on the same network with this PC's mouse and keyboard, switching by shortcut or at the screen edges. Connections stay on your local network, with no account or cloud, and each PC chooses who may control it.\n\nWinput LAN runs in its own process, started with SwissTechKnife. On first run it brings over the settings, known machines and identity of an installed Winput LAN, and the two never run at the same time. Controlling administrator apps asks for Windows confirmation once, on request.",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "icon": "M3,4 L11,4 L11,11 L3,11 Z M13,13 L21,13 L21,20 L13,20 Z M7,11 L7,16.5 L13,16.5 M17,13 L17,7.5 L11,7.5",
       "accent": "#6C9EF8",
       "iconImage": "icons/winput-lan.png",
       "iconBackground": "#ECE6DD",
       "homepage": "https://github.com/luingry/WinputLan",
-      "package": "https://github.com/luingry/WinputLan/releases/download/v0.6.0/winput-lan-0.6.0.zip",
-      "sha256": "e7397ff33ccc1ecb34e806c0e5c0c7689c842f92816ced4a86cdad21a49112fe",
-      "size": 916951,
+      "package": "https://github.com/luingry/WinputLan/releases/download/v0.7.0/winput-lan-0.7.0.zip",
+      "sha256": "cb21e800e3e7164b8e1d8f5247b700609268ed3e7f82dc0ee274e94a349860eb",
+      "size": 931208,
       "releaseNotes": [
+        {
+          "version": "0.7.0",
+          "date": "2026-11-06",
+          "notes": [
+            "New edge connection window: it shows the monitors of both PCs, one color per PC, with a notebook icon on built-in screens.",
+            "Drag a PC to arrange it: it always sticks to the other PC and aligns to the start, center or end of the neighboring monitor.",
+            "The touching edges are highlighted in full, and an animated pointer shows where the switch happens.",
+            "Edge switching now works on any monitor, not just the primary. Using another monitor of the controlled PC requires version 0.7.0 on that PC too.",
+            "The edge buttons in the main window were replaced by a summary and a Configure button, and the option to connect through the edge moved to the new window."
+          ]
+        },
         {
           "version": "0.6.0",
           "date": "2026-11-06",
