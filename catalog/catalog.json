@@ -366,14 +366,31 @@
       "name": "VDGET",
       "tagline": "Download videos and music from YouTube, X, Instagram, SoundCloud and more.",
       "description": "Paste one or more links and VDGET downloads them with yt-dlp: best quality, smallest size or audio only, into the folder you choose, with progress, thumbnails and a history of finished downloads. Pages whose player hides the video are rescued automatically with a headless browser.\n\nRequires Python 3; yt-dlp is installed automatically on first use. Everything runs inside SwissTechKnife, with no console or browser windows, and closes itself after a few idle minutes.",
-      "version": "1.1.0",
+      "version": "2.0.0",
       "icon": "M12,4 L12,15 M7,10.5 L12,15.5 L17,10.5 M5,19.5 L19,19.5",
       "accent": "#9B7BE8",
       "homepage": "https://github.com/luingry/vd-get",
-      "package": "https://github.com/luingry/vd-get/releases/download/module-v1.1.0/vd-get-1.1.0.zip",
-      "sha256": "1a7a1ed6b7a8f42e179e16361e0c41fc5b474c9076d35d5732d737644da63cfd",
-      "size": 75856,
+      "package": "https://github.com/luingry/Cachalot/releases/download/module-v2.0.0/vd-get-2.0.0.zip",
+      "sha256": "45424d333e7e2d31c9521e1e13e9664422bd9da37d6fc8add4222b240da315b6",
+      "size": 277005,
       "releaseNotes": [
+        {
+          "version": "2.0.0",
+          "date": "2026-11-14",
+          "notes": [
+            "VDGET is now Cachalot, with a new icon.",
+            "Smarter queue: several downloads at once with per-site limits, automatic retries for temporary failures, and real pause, resume and cancel.",
+            "Downloads interrupted by closing SwissTechKnife come back paused and resume where they stopped.",
+            "Choose video quality (4K to 360p) or audio format (original, M4A, MP3, Opus, FLAC, WAV) on the page.",
+            "Playlists, channels and profiles become one download per item, in their own folder; type a song name to search and download it.",
+            "Own extractors for X, Reddit, Instagram, TikTok, Pinterest, Bluesky, Threads, Twitch clips and Douyin, including photos and carousels.",
+            "Whole galleries and profiles from 250+ image sites, magnet links and .torrent files, and fast multi-connection downloads of direct files.",
+            "New Chrome extension: send the page, a link or a detected video to Cachalot with one click, with the site's login cookies.",
+            "Settings: subtitles, SponsorBlock, metadata and cover embedding, chapters, .nfo files, file names, per-site folders, rules, speed limit, proxy and per-site cookies.",
+            "Follow channels to be told about (or automatically download) new uploads.",
+            "Offers a copied link when you come back to the page, optional Ctrl+Alt+D shortcut, and keeps the PC awake while downloading."
+          ]
+        },
         {
           "version": "1.1.0",
           "date": "2026-10-19",
