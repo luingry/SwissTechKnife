@@ -366,7 +366,7 @@
       "name": "Cachalot",
       "tagline": "Paste a link, get the file: videos, music, photos, galleries and torrents from 1,800+ sites.",
       "description": "Paste links, a magnet or just a song name, and Cachalot picks the right engine for each: yt-dlp for 1,800+ sites, its own extractors for X, Reddit, Instagram, TikTok, Pinterest, Bluesky and Threads (photos and carousels included), gallery-dl for whole galleries and profiles, fast multi-connection downloads for direct files and a built-in torrent client. Playlists and channels become one download per item; video from 4K to 360p or audio as it is, MP3, M4A, Opus, FLAC or WAV. A smart queue limits each site, retries temporary failures, and pauses, resumes and cancels for real.\n\nThe Chrome extension sends the page, a link or a detected video with one click, with the site's login cookies. Follow channels to get new uploads, set rules per site, subtitles, SponsorBlock, metadata and cover embedding. Requires Python 3 (yt-dlp installs and updates itself); FFmpeg recommended. Formerly VDGET.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "icon": "M6,10 C4,10 3,11.3 3,13.2 L3,15.5 C3,17.4 4.4,18.5 6.5,18.5 L12.5,18.5 C15.2,18.5 17,17.3 18.2,15.6 C19.6,15.3 21,13.8 21.5,11 C20.6,11.8 19.8,12.1 19,12.2 C19.3,11.1 19.1,10.1 18.6,9.4 C17.9,10.7 17.4,11.9 17.1,12.9 C16.3,11.1 14.6,10 12.6,10 Z M8.5,2.5 L8.5,7.4 M6.4,5.4 L8.5,7.6 L10.6,5.4",
       "accent": "#F2C14E",
       "iconImage": "icons/cachalot.png",
@@ -374,10 +374,21 @@
       "settings": true,
       "minHostVersion": "0.4.6",
       "homepage": "https://github.com/luingry/Cachalot",
-      "package": "https://github.com/luingry/Cachalot/releases/download/module-v2.0.0/vd-get-2.0.0.zip",
-      "sha256": "45424d333e7e2d31c9521e1e13e9664422bd9da37d6fc8add4222b240da315b6",
-      "size": 277005,
+      "package": "https://github.com/luingry/Cachalot/releases/download/module-v2.1.0/vd-get-2.1.0.zip",
+      "sha256": "6c26e5f7883dc2aa27234f148420cc313339f2b409b4589c3d221374e84453b2",
+      "size": 354169,
       "releaseNotes": [
+        {
+          "version": "2.1.0",
+          "date": "2026-11-14",
+          "notes": [
+            "Installing Cachalot now offers to set up the Chrome extension: it copies the extension, opens Chrome and checks off each step as you go, and the extension pairs itself.",
+            "The Chrome extension now updates itself whenever Cachalot updates.",
+            "New transient mode in the extension: turns a song into its waveform, sliced on the beats and bars it detects, with loop preview, fades, undo and one-click download of every section.",
+            "Choose the format transient sections are saved in (MP3, WAV or FLAC), or be asked each time.",
+            "Fixed the extension's button getting stuck on \"✓ Na fila\" for something no longer in Cachalot."
+          ]
+        },
         {
           "version": "2.0.0",
           "date": "2026-11-14",
