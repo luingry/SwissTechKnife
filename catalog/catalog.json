@@ -366,7 +366,7 @@
       "name": "Cachalot",
       "tagline": "Paste a link, get the file: videos, music, photos, galleries and torrents from 1,800+ sites.",
       "description": "Paste links, a magnet or just a song name, and Cachalot picks the right engine for each: yt-dlp for 1,800+ sites, its own extractors for X, Reddit, Instagram, TikTok, Pinterest, Bluesky and Threads (photos and carousels included), gallery-dl for whole galleries and profiles, fast multi-connection downloads for direct files and a built-in torrent client. Playlists and channels become one download per item; video from 4K to 360p or audio as it is, MP3, M4A, Opus, FLAC or WAV. A smart queue limits each site, retries temporary failures, and pauses, resumes and cancels for real.\n\nThe Chrome extension sends the page, a link or a detected video with one click, with the site's login cookies. Follow channels to get new uploads, set rules per site, subtitles, SponsorBlock, metadata and cover embedding. Requires Python 3 (yt-dlp installs and updates itself); FFmpeg recommended. Formerly VDGET.",
-      "version": "2.6.0",
+      "version": "2.7.0",
       "icon": "M6,10 C4,10 3,11.3 3,13.2 L3,15.5 C3,17.4 4.4,18.5 6.5,18.5 L12.5,18.5 C15.2,18.5 17,17.3 18.2,15.6 C19.6,15.3 21,13.8 21.5,11 C20.6,11.8 19.8,12.1 19,12.2 C19.3,11.1 19.1,10.1 18.6,9.4 C17.9,10.7 17.4,11.9 17.1,12.9 C16.3,11.1 14.6,10 12.6,10 Z M8.5,2.5 L8.5,7.4 M6.4,5.4 L8.5,7.6 L10.6,5.4",
       "accent": "#F2C14E",
       "iconImage": "icons/cachalot.png",
@@ -374,10 +374,19 @@
       "settings": true,
       "minHostVersion": "0.4.6",
       "homepage": "https://github.com/luingry/Cachalot",
-      "package": "https://github.com/luingry/Cachalot/releases/download/module-v2.6.0/vd-get-2.6.0.zip",
-      "sha256": "b310f56fe5b9c3ac9211bb325e8f9cd933cdbb58f97ad0c30abce91a4d534c33",
-      "size": 378338,
+      "package": "https://github.com/luingry/Cachalot/releases/download/module-v2.7.0/vd-get-2.7.0.zip",
+      "sha256": "c296332f1c8579ee9f59d862e48f82dd5ca40e74e3dc88024ebd780cc4e09acf",
+      "size": 390323,
       "releaseNotes": [
+        {
+          "version": "2.7.0",
+          "date": "2026-11-16",
+          "notes": [
+            "Audio downloads from the extension ask the format (MP3, FLAC, WAV or Original, one under the other), in the popup and on the SoundCloud player button. \"Lembrar para este site\" stops asking on that site; Settings › Formato do áudio por site shows, changes or forgets each one.",
+            "The cover is no longer left as a loose .jpg next to the file. It is only embedded, and Settings › Extras has a new switch, off by default, to also save it as a .jpg. WAV never gets an embedded cover (it cannot hold one), so its download no longer fails and retries.",
+            "SoundCloud player button: a green check when the playing track is already downloaded in Cachalot, a progress ring while it downloads (spinning while queued)."
+          ]
+        },
         {
           "version": "2.6.0",
           "date": "2026-11-16",
