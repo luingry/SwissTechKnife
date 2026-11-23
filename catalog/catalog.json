@@ -1,11 +1,18 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.5.3",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.5.3/SwissTechKnife-0.5.3-setup.exe",
-    "sha256": "94d74185366ca0491968c420ae93c66969d5248f65f112906dd6486c0f457881",
-    "size": 7223298,
+    "version": "0.5.4",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.5.4/SwissTechKnife-0.5.4-setup.exe",
+    "sha256": "105f3e1faa9ef04a0484dd616438e0ba20d36b0f6063fb8f62b1781255aa4dbd",
+    "size": 2998708,
     "releaseNotes": [
+      {
+        "version": "0.5.4",
+        "date": "2026-11-23",
+        "notes": [
+          "Clicking the green update icon next to a module in the sidebar now installs its update."
+        ]
+      },
       {
         "version": "0.5.3",
         "date": "2026-10-30",
