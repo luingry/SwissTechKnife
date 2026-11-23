@@ -136,9 +136,11 @@
                                     <TextBlock Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
                                         <Run Text="{Binding Name, Mode=OneWay}" /> <Run Text="{Binding VersionText, Mode=OneWay}" FontSize="{StaticResource FontSize.Caption}" Foreground="{StaticResource Brush.Text.Tertiary}" />
                                     </TextBlock>
-                                    <TextBlock Grid.Column="2" Text="&#xE72C;" Style="{StaticResource Text.Icon}" FontSize="12" Foreground="{StaticResource Brush.Success}" Margin="8,0,0,0"
-                                               VerticalAlignment="Center" ToolTip="{infra:Loc UpdateAvailable}"
-                                               Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
+                                    <Button Grid.Column="2" Style="{StaticResource Button.Icon.Sm}" ui:Ui.Icon="&#xE72C;" FontSize="12" Width="24" Height="24"
+                                            Foreground="{StaticResource Brush.Success}" Margin="6,0,-4,0" VerticalAlignment="Center"
+                                            ToolTip="{Binding UpdateText}" AutomationProperties.Name="{infra:Loc Update}"
+                                            Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
+                                            Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}" />
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
