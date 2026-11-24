@@ -229,16 +229,24 @@
       "name": "AQ Tracker",
       "tagline": "Codex and Claude quotas always in sight, in a floating widget.",
       "description": "Tracks the 5-hour and weekly quotas of Codex and Claude, with reset countdowns, an exhaustion forecast and estimated usage cost from local history. The floating widget shows up by itself when agents are working or completions are unread.\n\nAQ Tracker runs in its own process, started and supervised by SwissTechKnife. On first run it brings over the preferences and quota history of an installed Agent Quota Tracker and shares its Claude sign-in; the two never run at the same time.",
-      "version": "0.32.1",
+      "version": "0.32.2",
       "icon": "M12,3 A9,9 0 1 1 11.99,3 Z M12,8 A4,4 0 1 1 11.99,8 Z M12,12 L18.5,5.5",
       "accent": "#63C28F",
       "iconImage": "icons/aq-tracker.png",
       "iconBackground": "#211F1D",
       "homepage": "https://github.com/luingry/aq-tracker",
-      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.32.1/aq-tracker-0.32.1.zip",
-      "sha256": "68f1f9f854e7fb2ea2413a6ac82da7dc8374cdaac8db5490e6733360004a2833",
-      "size": 4569398,
+      "package": "https://github.com/luingry/aq-tracker/releases/download/v0.32.2/aq-tracker-0.32.2.zip",
+      "sha256": "a56afd70602105849d0d4e90d70b144069a91a93a49237f21aa2fc8f5d8cb8b9",
+      "size": 4569920,
       "releaseNotes": [
+        {
+          "version": "0.32.2",
+          "date": "2026-11-23",
+          "notes": [
+            "Injected clicks (autoclickers, macros, AutoHotkey) are no longer slowed down system-wide while the widget animates working agents: each left-button press used to wait about 11 ms, capping autoclickers near 75 clicks per second.",
+            "The widget and the agent list keep their transparent look through DWM instead of layered windows; their transparent edges now take mouse clicks."
+          ]
+        },
         {
           "version": "0.32.1",
           "date": "2026-11-01",
