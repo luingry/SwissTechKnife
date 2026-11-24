@@ -1,5 +1,11 @@
 # Resolved errors
 
+## 2026-11-24 — Catalog worker: /releases/latest misses module packages
+
+- Symptom: the first seed of `tools/catalog-worker` recorded `luingry/smoothmice` with no package, so a new SmoothMice module release would never have dispatched the catalog sync.
+- Cause: SmoothMice publishes app releases (`vX`) alongside module releases (`module-vX`). `GET /releases/latest` returns the newest app release, which has no `smooth-mice-x.y.z.zip` asset.
+- Solution: poll `/releases?per_page=10` (still with ETags) and take the highest-versioned uploaded `<id>-<x.y.z>.zip` asset, the same rule as `newestRelease()` in `scripts/sync-catalog.mjs`. Never rely on "latest release" to find a module package.
+
 ## 2026-10-30 — winput-lan won't start: Windows Defender quarantined its app
 
 - Symptom: the module stayed stopped. `host.log`: `Could not start Winput LAN` (`Win32Exception`: the file contains a virus or potentially unwanted software), then `Winput LAN executable not found: ...\modules\winput-lan\0.5.0\app\WinputLan.Hosted.exe` on every start.

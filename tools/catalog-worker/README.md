@@ -18,15 +18,16 @@ Every minute (Cron Trigger `* * * * *`):
 1. Reads the published catalog (`raw.githubusercontent.com/luingry/SwissTechKnife/main/catalog/catalog.json`) and
    derives each module's repository exactly like `sourceRepo()` in `scripts/sync-catalog.mjs`: the GitHub
    `homepage`, or this repository when there is none. New modules need no configuration.
-2. For each repository, requests `GET /repos/<repo>/releases/latest` with `If-None-Match`. A `304` costs nothing
-   against the rate limit.
-3. A release counts once it has an uploaded `<id>-<x.y.z>.zip` asset for one of that repository's modules, so a
-   release whose package is still uploading is picked up on a later tick, not missed.
-4. When any repository has a new tag, it dispatches `sync-catalog.yml` on `main` once for that tick.
+2. For each repository, requests `GET /repos/<repo>/releases?per_page=10` with `If-None-Match`. A `304` costs
+   nothing against the rate limit. Not `/releases/latest`: repositories that also publish app releases (SmoothMice)
+   would hide their module package behind a release that has none.
+3. Picks the highest-versioned uploaded `<id>-<x.y.z>.zip` asset among those releases (drafts and prereleases
+   skipped, like `newestRelease()` in the sync script). A package still uploading is picked up on a later tick.
+4. When any repository's newest package changed, it dispatches `sync-catalog.yml` on `main` once for that tick.
 
-State is one KV key, `state`, in the `STATE` namespace: `{ repos: { "<owner>/<repo>": { tag, etag, etagSavedAt } } }`.
+State is one KV key, `state`, in the `STATE` namespace: `{ repos: { "<owner>/<repo>": { pkg, etag, etagSavedAt } } }`.
 A repository seen for the first time (including the first run ever) is seeded without dispatching. KV is written
-only when a tag changes, or when only the ETag changed and it was last saved 10+ minutes ago (asset download counts
+only when a package changes, or when only the ETag changed and it was last saved 10+ minutes ago (asset download counts
 change the ETag), which keeps writes well under the free limit of 1,000 a day.
 
 Budget: about 8 GitHub requests a minute, almost all `304`; at most 10 subrequests per tick.
@@ -47,6 +48,6 @@ The Worker has no HTTP endpoint (`workers_dev = false`).
 
 - Logs: `npx wrangler tail stk-catalog-worker`, or Workers > stk-catalog-worker > Logs in the dashboard
   (observability is enabled).
-- Force a re-dispatch test: edit the `state` key in KV and change one repository's `tag`; the next tick dispatches.
+- Force a re-dispatch test: edit the `state` key in KV and change one repository's `pkg`; the next tick dispatches.
 - Reset: delete the `state` key; the next tick re-seeds without dispatching.
 - Token expired or revoked: ticks log `HTTP 401`; set a new one with `npx wrangler secret put GITHUB_TOKEN`.
