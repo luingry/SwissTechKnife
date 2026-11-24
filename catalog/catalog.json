@@ -1,11 +1,18 @@
 {
   "schema": 1,
   "host": {
-    "version": "0.5.4",
-    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.5.4/SwissTechKnife-0.5.4-setup.exe",
-    "sha256": "105f3e1faa9ef04a0484dd616438e0ba20d36b0f6063fb8f62b1781255aa4dbd",
-    "size": 2998708,
+    "version": "0.6.0",
+    "installer": "https://github.com/luingry/SwissTechKnife/releases/download/v0.6.0/SwissTechKnife-0.6.0-setup.exe",
+    "sha256": "7b687502c21eec175169dced6584e55071ccd9f129601bf4b9e72fd2d1cdbf41",
+    "size": 6675559,
     "releaseNotes": [
+      {
+        "version": "0.6.0",
+        "date": "2026-11-24",
+        "notes": [
+          "A new setting hides every module icon from the notification area; right-click the SwissTechKnife icon to find your modules there instead, grouped into active and inactive, with their icons, to open, enable or disable each one."
+        ]
+      },
       {
         "version": "0.5.4",
         "date": "2026-11-23",
