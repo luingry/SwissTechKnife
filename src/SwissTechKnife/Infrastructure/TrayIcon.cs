@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,21 +13,22 @@ namespace SwissTechKnife.Infrastructure
 {
     /// <summary>
     /// Notification-area icon, shown for the whole life of the process (created after first paint).
-    /// The shell's NotifyIcon is native, but its menu is the design-system WPF ContextMenu.
+    /// The shell's NotifyIcon is native, but its menu is the design-system WPF ContextMenu, built each time it opens
+    /// so it can carry the modules' entries when their own icons are hidden.
     /// </summary>
     internal sealed class TrayIcon : IDisposable
     {
         private readonly Forms.NotifyIcon _icon;
-        private readonly ContextMenu _menu;
+        private readonly ContextMenu _menu = new ContextMenu();
         private readonly Action _open;
+        private readonly Action _exit;
+        private readonly Func<IReadOnlyList<Control>> _moduleItems;
 
-        public TrayIcon(Action open, Action exit)
+        public TrayIcon(Action open, Action exit, Func<IReadOnlyList<Control>> moduleItems)
         {
             _open = open;
-            _menu = new ContextMenu();
-            _menu.Items.Add(CreateItem("TrayOpen", "", open));
-            _menu.Items.Add(new Separator());
-            _menu.Items.Add(CreateItem("TrayExit", "", exit));
+            _exit = exit;
+            _moduleItems = moduleItems;
 
             _icon = new Forms.NotifyIcon
             {
@@ -46,6 +48,15 @@ namespace SwissTechKnife.Infrastructure
             _icon.ShowBalloonTip(4000);
         }
 
+        /// <summary>The module list changed: an open menu is rebuilt in place (e.g. a module moved between active and inactive).</summary>
+        public void RefreshMenu()
+        {
+            if (_menu.IsOpen)
+            {
+                Populate();
+            }
+        }
+
         public void Dispose()
         {
             _menu.IsOpen = false;
@@ -62,8 +73,26 @@ namespace SwissTechKnife.Infrastructure
             }
             else if (e.Button == Forms.MouseButtons.Right)
             {
+                Populate();
                 ShowMenu(_menu);
             }
+        }
+
+        private void Populate()
+        {
+            _menu.Items.Clear();
+            _menu.Items.Add(CreateItem("TrayOpen", "", _open));
+            IReadOnlyList<Control> modules = _moduleItems?.Invoke();
+            if (modules != null && modules.Count > 0)
+            {
+                _menu.Items.Add(new Separator());
+                foreach (Control item in modules)
+                {
+                    _menu.Items.Add(item);
+                }
+            }
+            _menu.Items.Add(new Separator());
+            _menu.Items.Add(CreateItem("TrayExit", "", _exit));
         }
 
         /// <summary>Opens a design-system menu at the cursor for a notification-area icon.</summary>
@@ -79,12 +108,15 @@ namespace SwissTechKnife.Infrastructure
         }
 
         /// <summary>The header is bound, so the open menu follows a language change.</summary>
-        private static MenuItem CreateItem(string key, string glyph, Action action)
+        internal static MenuItem CreateItem(string key, string glyph, Action action)
         {
             var item = new MenuItem();
             item.SetBinding(HeaderedItemsControl.HeaderProperty, new Binding("[" + key + "]") { Source = LocalizedStrings.Instance, Mode = BindingMode.OneWay });
             Ui.SetIcon(item, glyph);
-            item.Click += (s, e) => action();
+            if (action != null)
+            {
+                item.Click += (s, e) => action();
+            }
             return item;
         }
 

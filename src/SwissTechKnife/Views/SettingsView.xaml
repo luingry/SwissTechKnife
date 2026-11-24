@@ -118,6 +118,14 @@
                                        Style="{StaticResource Text.Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="0,3,0,0" />
                         </StackPanel>
                     </CheckBox>
+                    <Separator Margin="0,16" />
+                    <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding HideModuleTrayIcons, Mode=TwoWay}" AutomationProperties.Name="{infra:Loc HideModuleTrayIcons}">
+                        <StackPanel Margin="0,0,24,0">
+                            <TextBlock Text="{infra:Loc HideModuleTrayIcons}" Style="{StaticResource Text.BodyStrong}" />
+                            <TextBlock Text="{infra:Loc HideModuleTrayIconsHint}"
+                                       Style="{StaticResource Text.Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </CheckBox>
                 </StackPanel>
             </Border>
         </StackPanel>

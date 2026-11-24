@@ -21,24 +21,100 @@ namespace SwissTechKnife.Modules
     /// Notification-area icons of enabled modules whose "Show icon in the notification area" switch is on.
     /// Each icon opens the module on left click (double click opens its <see cref="IModuleWindow"/>, if it declares one); its menu holds "Open &lt;module&gt;" plus the module's own
     /// <see cref="IModuleTrayMenu"/> items, never Exit: the module's enable switch decides whether it runs.
+    /// When the host setting hides module icons, none is shown and <see cref="CreateMenuSection"/> lists every installed
+    /// module for the host icon's menu instead.
     /// </summary>
     internal sealed class ModuleTrayIcons : IDisposable
     {
         private const string Source = "ModuleTray";
         private readonly ModuleManager _manager;
         private readonly Action<string> _openModule;
+        private readonly Action<string> _showDetails;
+        private readonly Func<bool> _iconsHidden;
         private readonly Dictionary<string, Entry> _icons = new Dictionary<string, Entry>(StringComparer.Ordinal);
 
-        public ModuleTrayIcons(ModuleManager manager, Action<string> openModule)
+        public ModuleTrayIcons(ModuleManager manager, Action<string> openModule, Action<string> showDetails, Func<bool> iconsHidden)
         {
             _manager = manager;
             _openModule = openModule;
+            _showDetails = showDetails;
+            _iconsHidden = iconsHidden;
             _manager.Changed += OnChanged;
             Sync();
         }
 
-        /// <summary>True while at least one module shows its icon: closing the window must keep the host alive.</summary>
-        public bool Any => _icons.Count > 0;
+        /// <summary>Raised after the module list changed, so an open host menu can rebuild its module section.</summary>
+        public event EventHandler MenuChanged;
+
+        /// <summary>
+        /// True while at least one enabled module asks for its icon: closing the window must keep the host alive.
+        /// With module icons hidden, its entry lives in the host icon's menu, which needs the host just the same.
+        /// </summary>
+        public bool Any => _manager.Items.Any(i => i.IsEnabled && i.ShowTrayIcon);
+
+        /// <summary>The host setting changed: shows or removes the icons accordingly.</summary>
+        public void Refresh()
+        {
+            Sync();
+            MenuChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Entries for the host icon's menu while module icons are hidden: installed modules grouped into active and
+        /// inactive, each with its icon, a click that opens it and a switch that enables or disables it. Empty otherwise.
+        /// </summary>
+        public IReadOnlyList<Control> CreateMenuSection()
+        {
+            var items = new List<Control>();
+            if (!_iconsHidden())
+            {
+                return items;
+            }
+            List<ModuleItem> installed = _manager.Items.Where(i => i.IsInstalled).ToList();
+            AddGroup(items, "TrayActiveModules", installed.Where(i => i.IsEnabled));
+            AddGroup(items, "TrayInactiveModules", installed.Where(i => !i.IsEnabled));
+            return items;
+        }
+
+        private void AddGroup(List<Control> items, string captionKey, IEnumerable<ModuleItem> modules)
+        {
+            bool first = true;
+            foreach (ModuleItem module in modules)
+            {
+                if (first)
+                {
+                    MenuItem caption = TrayIcon.CreateItem(captionKey, null, null);
+                    caption.Style = (Style)Application.Current.FindResource("TrayMenu.Group");
+                    items.Add(caption);
+                    first = false;
+                }
+                items.Add(CreateModuleRow(module));
+            }
+        }
+
+        private MenuItem CreateModuleRow(ModuleItem module)
+        {
+            var row = new MenuItem
+            {
+                Header = module.Name ?? module.Id,
+                DataContext = module,
+                Tag = Strings.Format("TrayToggleModule", module.Name ?? module.Id),
+                Style = (Style)Application.Current.FindResource("TrayMenu.Module"),
+            };
+            System.Windows.Automation.AutomationProperties.SetName(row, module.Name ?? module.Id);
+            row.Click += (s, e) =>
+            {
+                if (module.IsEnabled)
+                {
+                    ShowWindow(module);
+                }
+                else
+                {
+                    _showDetails(module.Id);
+                }
+            };
+            return row;
+        }
 
         public void Dispose()
         {
@@ -50,11 +126,15 @@ namespace SwissTechKnife.Modules
             _icons.Clear();
         }
 
-        private void OnChanged(object sender, EventArgs e) => Sync();
+        private void OnChanged(object sender, EventArgs e) => Refresh();
 
         private void Sync()
         {
-            var wanted = new HashSet<string>(_manager.Items.Where(i => i.IsEnabled && i.ShowTrayIcon).Select(i => i.Id), StringComparer.Ordinal);
+            var wanted = new HashSet<string>(StringComparer.Ordinal);
+            if (!_iconsHidden())
+            {
+                wanted.UnionWith(_manager.Items.Where(i => i.IsEnabled && i.ShowTrayIcon).Select(i => i.Id));
+            }
             foreach (string id in _icons.Keys.Where(id => !wanted.Contains(id)).ToList())
             {
                 _icons[id].Dispose();

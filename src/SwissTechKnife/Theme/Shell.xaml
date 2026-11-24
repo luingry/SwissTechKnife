@@ -171,6 +171,51 @@
         </Setter>
     </Style>
 
+    <!-- ═══ Host tray menu: group caption and module row (module icons hidden from the notification area) ═══ -->
+    <Style x:Key="TrayMenu.Group" TargetType="MenuItem">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource Text.Overline}" Margin="10,8,10,4" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- DataContext = ModuleItem. Clicking the row opens the module; the switch enables or disables it without closing the menu. -->
+    <Style x:Key="TrayMenu.Module" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="8,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Grid Background="Transparent">
+                        <Border x:Name="Hover" Background="{StaticResource Brush.Overlay.Hover}" CornerRadius="{StaticResource Radius.Sm}" Opacity="0" />
+                        <Grid Margin="{TemplateBinding Padding}" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ContentControl Style="{StaticResource IconTile}" Width="22" Height="22" Padding="5" ui:Ui.CornerRadius="6" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" MaxWidth="240" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="10,0,20,0" />
+                            <!-- The switch template keeps a 12 px gap for its (empty) label on the left. -->
+                            <CheckBox Grid.Column="2" Style="{StaticResource Switch}" Focusable="False" VerticalAlignment="Center" Margin="-12,0,0,0"
+                                      IsChecked="{Binding IsActive, Mode=TwoWay}" AutomationProperties.Name="{TemplateBinding Tag}" />
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Hover" Property="Opacity" Value="1" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ═══ Status chip (DataContext = ModuleItem) ═══ -->
     <Style x:Key="StatusChip" TargetType="ContentControl">
         <Setter Property="Focusable" Value="False" />

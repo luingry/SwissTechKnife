@@ -68,6 +68,7 @@ Click the gear at the bottom of the sidebar:
 - **Check for updates:** daily, weekly, monthly or never. You can also check right away.
 - **Start with Windows:** SwissTechKnife opens on its own when you sign in.
 - **Hide to the notification area on close:** closing the window keeps your modules running. To quit for good, right-click the icon near the clock and choose **Exit**.
+- **Hide module icons in the notification area:** removes every module icon from near the clock. Right-click the SwissTechKnife icon instead: installed modules are listed there with their icons, grouped into active and inactive; click one to open it, or flip its switch to enable or disable it.
 
 ## Updates
 

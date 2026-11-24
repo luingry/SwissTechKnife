@@ -184,10 +184,14 @@ namespace SwissTechKnife
 
         private bool _backgroundHintShown;
 
-        /// <summary>The icon stays in the notification area whether or not the window is open; the setting only changes what closing does.</summary>
+        /// <summary>
+        /// The icon stays in the notification area whether or not the window is open; "hide on close" only changes what
+        /// closing does. Module icons follow the "hide module icons" setting.
+        /// </summary>
         private void ApplyTray(bool hideToTrayOnClose)
         {
             EnsureTray();
+            _moduleTray?.Refresh();
         }
 
         private void EnsureTray()
@@ -201,12 +205,20 @@ namespace SwissTechKnife
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void CreateTray()
         {
-            _tray = new TrayIcon(() => _window?.BringToFront(), () => _window?.ExitApplication());
-            _moduleTray = new ModuleTrayIcons(_manager, id =>
-            {
-                _window?.BringToFront();
-                _shell?.ShowModule(id);
-            });
+            _moduleTray = new ModuleTrayIcons(_manager,
+                id =>
+                {
+                    _window?.BringToFront();
+                    _shell?.ShowModule(id);
+                },
+                id =>
+                {
+                    _window?.BringToFront();
+                    _shell?.ShowDetails(id);
+                },
+                () => _settings.Current.HideModuleTrayIcons);
+            _tray = new TrayIcon(() => _window?.BringToFront(), () => _window?.ExitApplication(), _moduleTray.CreateMenuSection);
+            _moduleTray.MenuChanged += (s, e) => _tray?.RefreshMenu();
         }
 
         /// <summary>Diagnostics: logs every resource that fails to resolve (merged-dictionary ordering bugs).</summary>

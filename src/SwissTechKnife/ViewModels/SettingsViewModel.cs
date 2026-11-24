@@ -184,6 +184,25 @@ namespace SwissTechKnife.ViewModels
             }
         }
 
+        /// <summary>Removes every module icon from the notification area; the host icon's menu lists the modules instead.</summary>
+        public bool HideModuleTrayIcons
+        {
+            get => _settings.Current.HideModuleTrayIcons;
+            set
+            {
+                if (value != _settings.Current.HideModuleTrayIcons)
+                {
+                    _settings.Current.HideModuleTrayIcons = value;
+                    OnPropertyChanged();
+                    AfterAnimation.Run(() =>
+                    {
+                        _settings.Save();
+                        _applyTray(_settings.Current.HideToTrayOnClose);
+                    });
+                }
+            }
+        }
+
         public bool IsChecking
         {
             get => _isChecking;

@@ -583,6 +583,16 @@ namespace SwissTechKnife.ViewModels
             }
         }
 
+        /// <summary>Shows a module's details (where it can be enabled), e.g. for a disabled module picked in the tray menu.</summary>
+        public void ShowDetails(string id)
+        {
+            ModuleItem item = _manager.Find(id);
+            if (item != null)
+            {
+                SelectedModule = item;
+            }
+        }
+
         private void DismissToast(Toast toast)
         {
             if (toast == null || toast.IsClosing)

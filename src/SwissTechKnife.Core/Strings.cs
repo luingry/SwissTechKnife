@@ -129,6 +129,8 @@ namespace SwissTechKnife.Core
             ["StartupChangeFailed"] = "Couldn't change the Windows startup setting.",
             ["HideToTray"] = "Hide to the notification area on close",
             ["HideToTrayHint"] = "Closing the window keeps SwissTechKnife and its modules running. Open it from the notification area icon; to quit, use “Exit” in its menu.",
+            ["HideModuleTrayIcons"] = "Hide module icons in the notification area",
+            ["HideModuleTrayIconsHint"] = "Modules show up in the SwissTechKnife icon’s menu instead, grouped into active and inactive, where you can open, enable or disable each one. Each module’s own icon setting is kept for when you show them again.",
 
             // Host self-update
             ["HostUpdateTitle"] = "Update SwissTechKnife",
@@ -173,6 +175,9 @@ namespace SwissTechKnife.Core
             ["TrayExit"] = "Exit",
             ["TrayHint"] = "Still running in the notification area so background modules keep working. To quit, use Exit here.",
             ["TrayOpenModule"] = "Open {0}",
+            ["TrayActiveModules"] = "Active",
+            ["TrayInactiveModules"] = "Inactive",
+            ["TrayToggleModule"] = "Enable {0}",
             ["ModuleTrayIcon"] = "Show icon in the notification area",
             ["ModuleTrayIconHint"] = "Adds this module’s own icon with its commands. It stays while the module is enabled; turn the module off to remove it.",
         };
@@ -287,6 +292,8 @@ namespace SwissTechKnife.Core
             ["StartupChangeFailed"] = "Não foi possível alterar a inicialização com o Windows.",
             ["HideToTray"] = "Esconder na área de notificação ao fechar",
             ["HideToTrayHint"] = "Fechar a janela mantém o SwissTechKnife e os módulos rodando. Abra pelo ícone na área de notificação; para sair, use “Sair” no menu dele.",
+            ["HideModuleTrayIcons"] = "Ocultar ícones dos módulos na área de notificação",
+            ["HideModuleTrayIconsHint"] = "Os módulos passam a aparecer no menu do ícone do SwissTechKnife, agrupados em ativos e inativos, onde dá para abrir, ativar ou desativar cada um. A opção de ícone de cada módulo é mantida para quando você voltar a exibi-los.",
 
             ["HostUpdateTitle"] = "Atualizar o SwissTechKnife",
             ["HostUpdateHint"] = "O SwissTechKnife fecha, instala a nova versão e abre de novo sozinho. O Windows pode pedir permissão para instalar.",
@@ -328,6 +335,9 @@ namespace SwissTechKnife.Core
             ["TrayExit"] = "Sair",
             ["TrayHint"] = "Continua na área de notificação para os módulos em segundo plano funcionarem. Para sair, use Sair aqui.",
             ["TrayOpenModule"] = "Abrir {0}",
+            ["TrayActiveModules"] = "Ativos",
+            ["TrayInactiveModules"] = "Inativos",
+            ["TrayToggleModule"] = "Ativar {0}",
             ["ModuleTrayIcon"] = "Exibir ícone na barra de notificação",
             ["ModuleTrayIconHint"] = "Adiciona o ícone próprio deste módulo com os comandos dele. Ele fica enquanto o módulo estiver ativado; desative o módulo para removê-lo.",
         };

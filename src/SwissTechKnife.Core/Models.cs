@@ -273,6 +273,10 @@ namespace SwissTechKnife.Core
         /// <summary>UI language: "en" (default) or "pt-BR".</summary>
         [DataMember(Name = "language", Order = 6, EmitDefaultValue = false)]
         public string Language { get; set; }
+
+        /// <summary>Module icons stay out of the notification area; the host icon's menu lists the modules instead.</summary>
+        [DataMember(Name = "hideModuleTrayIcons", Order = 7, EmitDefaultValue = false)]
+        public bool HideModuleTrayIcons { get; set; }
     }
 
     [DataContract]
