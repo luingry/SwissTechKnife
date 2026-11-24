@@ -511,18 +511,25 @@
       "name": "Clicket",
       "tagline": "Record keyboard and mouse once, replay it with one key, exactly as you did it.",
       "description": "Record keys, clicks, the wheel and the mouse path itself, sample by sample with the real timing, and replay it on its original clock with a hotkey or a mouse side button: once, a set number of times, while held or as a toggle. Or build macros step by step from keyboard, mouse, text, delay, loop, command, open and PowerShell script steps; a script's param() block becomes a settings form in the editor. A floating macro pad plays macros without taking focus, and one hotkey stops everything.\n\nClicket runs in its own process, started with SwissTechKnife, so nothing in SwissTechKnife can delay a macro and its hotkeys work while this window is closed. Open the Clicket window from the module page.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "M3.5,19 L6.5,11 L8.5,17 M8.5,14 C8.5,12 10.8,10.6 13.6,10.6 C16.2,10.6 18,11.8 18,13.4 C18,15.1 15.8,16.4 13,16.4 C10.6,16.4 8.5,15.6 8.5,14 Z M17.2,10.6 C15.8,7 12.6,5.2 7.5,5.6 M18.4,10.4 C18.2,6.8 16,4.4 11.5,3.6",
       "accent": "#8FD14F",
       "iconImage": "icons/clicket.png",
       "iconBackground": "#8FD14F",
       "window": true,
       "homepage": "https://github.com/luingry/Clicket",
-      "package": "https://github.com/luingry/Clicket/releases/download/v1.0.1/clicket-1.0.1.zip",
-      "sha256": "60426b069281147edc9bc0b97457e83c9e5be6ca5581e717288271575943ac46",
-      "size": 234463,
+      "package": "https://github.com/luingry/Clicket/releases/download/v1.0.2/clicket-1.0.2.zip",
+      "sha256": "ab1cc6083434691440cbaed0c4024473e323ad3fe4126f4fa0c8d96038911236",
+      "size": 235137,
       "minHostVersion": "0.5.1",
       "releaseNotes": [
+        {
+          "version": "1.0.2",
+          "date": "2026-11-23",
+          "notes": [
+            "Loops have a pause between rounds, 1 ms at minimum."
+          ]
+        },
         {
           "version": "1.0.1",
           "date": "2026-11-23",
