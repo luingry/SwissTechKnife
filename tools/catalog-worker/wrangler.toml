@@ -1,0 +1,18 @@
+# Cloudflare Worker that dispatches the Sync catalog workflow when a module repository publishes a release.
+# See README.md. Secret (never in this file): GITHUB_TOKEN, set with `npx wrangler secret put GITHUB_TOKEN`.
+name = "stk-catalog-worker"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+# No HTTP endpoint: the Worker only runs on its cron trigger.
+workers_dev = false
+preview_urls = false
+
+[triggers]
+crons = ["* * * * *"]
+
+[[kv_namespaces]]
+binding = "STATE"
+id = "61341af917454802b87b3aa4d1c84d5e"
+
+[observability]
+enabled = true
