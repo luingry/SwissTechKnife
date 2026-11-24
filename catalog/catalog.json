@@ -505,6 +505,35 @@
           ]
         }
       ]
+    },
+    {
+      "id": "clicket",
+      "name": "Clicket",
+      "tagline": "Record keyboard and mouse once, replay it with one key, exactly as you did it.",
+      "description": "Record keys, clicks, the wheel and the mouse path itself, sample by sample with the real timing, and replay it on its original clock with a hotkey or a mouse side button: once, a set number of times, while held or as a toggle. Or build macros step by step from keyboard, mouse, text, delay, loop, command, open and PowerShell script steps; a script's param() block becomes a settings form in the editor. A floating macro pad plays macros without taking focus, and one hotkey stops everything.\n\nClicket runs in its own process, started with SwissTechKnife, so nothing in SwissTechKnife can delay a macro and its hotkeys work while this window is closed. Open the Clicket window from the module page.",
+      "version": "1.0.0",
+      "icon": "M3.5,19 L6.5,11 L8.5,17 M8.5,14 C8.5,12 10.8,10.6 13.6,10.6 C16.2,10.6 18,11.8 18,13.4 C18,15.1 15.8,16.4 13,16.4 C10.6,16.4 8.5,15.6 8.5,14 Z M17.2,10.6 C15.8,7 12.6,5.2 7.5,5.6 M18.4,10.4 C18.2,6.8 16,4.4 11.5,3.6",
+      "accent": "#8FD14F",
+      "iconImage": "icons/clicket.png",
+      "iconBackground": "#8FD14F",
+      "window": true,
+      "homepage": "https://github.com/luingry/Clicket",
+      "package": "https://github.com/luingry/Clicket/releases/download/v1.0.0/clicket-1.0.0.zip",
+      "sha256": "50bd94a3b1b5544065aff049ebf52feb7dbd2e01a9f214afb928f8fa57c51583",
+      "size": 229496,
+      "minHostVersion": "0.5.1",
+      "releaseNotes": [
+        {
+          "version": "1.0.0",
+          "date": "2026-11-24",
+          "notes": [
+            "First release: record, build and replay keyboard and mouse macros with global hotkeys.",
+            "Mouse movement is recorded sample by sample and replays on its original clock.",
+            "Script steps run your own PowerShell, with its parameters shown as fields in the editor.",
+            "Runs in its own process, started with SwissTechKnife, so nothing in the host can delay a macro."
+          ]
+        }
+      ]
     }
   ]
 }
