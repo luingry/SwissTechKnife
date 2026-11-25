@@ -526,18 +526,25 @@
       "name": "Clicket",
       "tagline": "Record keyboard and mouse once, replay it with one key, exactly as you did it.",
       "description": "Record keys, clicks, the wheel and the mouse path itself, sample by sample with the real timing, and replay it on its original clock with a hotkey or a mouse side button: once, a set number of times, while held or as a toggle. Or build macros step by step from keyboard, mouse, text, delay, loop, command, open and PowerShell script steps; a script's param() block becomes a settings form in the editor. A floating macro pad plays macros without taking focus, and one hotkey stops everything.\n\nClicket runs in its own process, started with SwissTechKnife, so nothing in SwissTechKnife can delay a macro and its hotkeys work while this window is closed. Open the Clicket window from the module page.",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "icon": "M3.5,19 L6.5,11 L8.5,17 M8.5,14 C8.5,12 10.8,10.6 13.6,10.6 C16.2,10.6 18,11.8 18,13.4 C18,15.1 15.8,16.4 13,16.4 C10.6,16.4 8.5,15.6 8.5,14 Z M17.2,10.6 C15.8,7 12.6,5.2 7.5,5.6 M18.4,10.4 C18.2,6.8 16,4.4 11.5,3.6",
       "accent": "#8FD14F",
       "iconImage": "icons/clicket.png",
       "iconBackground": "#8FD14F",
       "window": true,
       "homepage": "https://github.com/luingry/Clicket",
-      "package": "https://github.com/luingry/Clicket/releases/download/v1.1.2/clicket-1.1.2.zip",
-      "sha256": "4d626f629ba4a7004875c598813ded224112d8978b0f687c60fdae2c390e772d",
-      "size": 268688,
+      "package": "https://github.com/luingry/Clicket/releases/download/v1.1.3/clicket-1.1.3.zip",
+      "sha256": "ad1d859a4deea271dcfb727cdc64b8ba0d8326a2c7e2422ea976ac84c6bc11a2",
+      "size": 268995,
       "minHostVersion": "0.5.1",
       "releaseNotes": [
+        {
+          "version": "1.1.3",
+          "date": "2026-11-25",
+          "notes": [
+            "Recording starts right away: the editor minimizes when you press Record, so you no longer have to click outside Clicket first."
+          ]
+        },
         {
           "version": "1.1.2",
           "date": "2026-11-24",
